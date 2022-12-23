@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.cydeo</groupId>
-    <artifactId>number-one</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>number-one</name>
-    <description>number-one</description>
+    <artifactId>sparkle-project</artifactId>
+    <version>0.0.1</version>
+    <name>sparkle-accounting</name>
+    <description>accounting project</description>
     <properties>
         <java.version>11</java.version>
     </properties>
