@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class InvoiceEntity extends BaseEntity{
+public class Invoice extends BaseEntity{
 
 
     private String invoiceNo;
