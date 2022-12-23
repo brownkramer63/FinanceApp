@@ -12,4 +12,5 @@ public enum InvoiceStatus {
     public String getValue() {
         return value;
     }
+
 }
