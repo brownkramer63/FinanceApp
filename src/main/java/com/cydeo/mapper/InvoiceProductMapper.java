@@ -16,11 +16,11 @@ public class InvoiceProductMapper {
     }
 
 
-    public InvoiceProduct convertToEntity(InvoiceProductDTO<I> dto){
+    public InvoiceProduct convertToEntity(InvoiceProductDTO dto){
         return modelMapper.map(dto, InvoiceProduct.class);
     }
 
-    public InvoiceProductDTO<I> convertToDTO(InvoiceProduct entity){
+    public InvoiceProductDTO convertToDTO(InvoiceProduct entity){
         return modelMapper.map(entity, InvoiceProductDTO.class);
     }
 
