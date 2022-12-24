@@ -12,8 +12,9 @@ public class SparkleApplication {
         SpringApplication.run(SparkleApplication.class, args);
     }
 
+
     @Bean
-    public ModelMapper mapper(){
+    public ModelMapper modelMapper(){
         return new ModelMapper();
     }
 }
