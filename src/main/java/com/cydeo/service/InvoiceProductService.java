@@ -10,7 +10,6 @@ public interface InvoiceProductService {
 
     InvoiceProductDTO findById(Long id);
 
-    InvoiceProductDTO<InvoiceProductDTO> listAllTasks();
 
 
 }
