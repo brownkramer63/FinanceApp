@@ -7,11 +7,11 @@ import java.lang.reflect.Type;
 
 
 @Component
-public class Mapper {
+public class InvoiceDTOConverter {
 
     private final ModelMapper modelMapper;
 
-    public Mapper(ModelMapper modelMapper) {
+    public InvoiceDTOConverter(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 
