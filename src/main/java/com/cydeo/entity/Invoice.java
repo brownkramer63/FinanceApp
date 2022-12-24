@@ -3,6 +3,7 @@ package com.cydeo.entity;
 
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
+import com.sun.xml.bind.v2.TODO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,15 +26,15 @@ public class Invoice extends BaseEntity{
     private InvoiceType invoiceType;
     @Column(columnDefinition = "DATE")
     private LocalDate date;
-    /*
-    Waiting for other group mates to complete
+
+  // TODO waiting for others to complete
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ClientVendor clientVendor;
     @ManyToOne(fetch = FetchType.LAZY)
     private Company company;
 
-     */
+
 
 
 
