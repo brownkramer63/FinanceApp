@@ -1,23 +1,27 @@
 package com.cydeo.converter;
 
 import com.cydeo.dto.RoleDTO;
-import com.cydeo.entity.Role;
-import org.modelmapper.ModelMapper;
+import com.cydeo.service.RoleService;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RoleDtoConverter {
+@ConfigurationPropertiesBinding
+public class RoleDtoConverter implements Converter<String, RoleDTO> {
 
-    private final ModelMapper mapper;
-    public RoleDtoConverter(ModelMapper mapper) {
-        this.mapper = mapper;
-    }
-    public Role convertToEntity(RoleDTO dto){
-        return mapper.map(dto, Role.class);
+    private final RoleService roleService;
+
+    public RoleDtoConverter(RoleService roleService) {
+        this.roleService = roleService;
     }
 
-    public RoleDTO convertToDto(Role entity){
-        return mapper.map(entity, RoleDTO.class);
+    @Override
+    public RoleDTO convert(String source) {
+
+        if (source==null || source.equals("")) return null;
+
+        return roleService.findById(Long.parseLong(source));
     }
 
 
