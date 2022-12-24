@@ -14,11 +14,11 @@ public class UserDtoConverter {
         this.mapper = mapper;
     }
 
-    User convertToEntity(UserDTO dto){
-        return mapper.map(dto, User.class);
+    User convertToEntity(UserDTO id){
+        return mapper.map(id, User.class);
     }
 
-    UserDTO convertToDto(User entity){
-        return mapper.map(entity, UserDTO.class);
+    UserDTO convertToDto(User id){
+        return mapper.map(id, UserDTO.class);
     }
 }
