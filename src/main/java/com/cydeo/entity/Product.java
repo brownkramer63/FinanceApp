@@ -13,7 +13,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "products")
 public class Product extends BaseEntity{
