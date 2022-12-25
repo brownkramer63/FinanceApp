@@ -35,13 +35,8 @@ public class InvoiceController {
 
     }
 
-    @GetMapping("/salesInvoices/update/{id}")
-    public String editSalesInvoice(@PathVariable("id") Long id, Model model){
 
-        model.addAttribute();
 
-        return "/invoice/sales-invoice-update";
-    }
 
 
 
