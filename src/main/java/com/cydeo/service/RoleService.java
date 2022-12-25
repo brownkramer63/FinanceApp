@@ -7,5 +7,5 @@ import java.util.List;
 public interface RoleService {
 
     RoleDTO findById(Long id);
-    //List<RoleDTO> listRoles();
+    List<RoleDTO> listRoles();
 }

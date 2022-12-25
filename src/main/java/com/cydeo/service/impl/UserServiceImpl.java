@@ -34,4 +34,32 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findById(id);
         return mapperUtil.convert(user, new UserDTO());
     }
+
+    @Override
+    public void save(UserDTO userDTO) {
+        userDTO.setPassWord(userDTO.getPassWord());
+        userDTO.setConfirmPassword(userDTO.getPassWord());
+        User user = mapperUtil.convert(userDTO, new User());
+        userRepository.save(user);
+    }
+
+    @Override
+    public UserDTO update(UserDTO userDTO) {
+
+        Optional<User> user = userRepository.findById(userDTO.getId());
+        User convertedUser = mapperUtil.convert(userDTO, new User());
+        convertedUser.setId(user.get().getId());
+        convertedUser.setPassWord(user.get().getPassWord());
+        userRepository.save(convertedUser);
+        return findById(userDTO.getId());
+    }
+
+//    @Override
+//    public void delete(Long id) {
+//        Optional<User> user = userRepository.findById(id);
+//        user.setIsDeleted(true);
+//        userRepository.save(user);
+//
+//
+//    }
 }

@@ -17,7 +17,7 @@ public class UserDTO {
     private String lastName;
     private String phone;
     private RoleDTO role;
-    private CompanyDTO company;
+    //private CompanyDTO company;
     private boolean isOnlyAdmin;
 
     public Long getId() {
@@ -83,14 +83,14 @@ public class UserDTO {
     public void setRole(RoleDTO role) {
         this.role = role;
     }
-
-    public CompanyDTO getCompany() {
-        return company;
-    }
-
-    public void setCompany(CompanyDTO company) {
-        this.company = company;
-    }
+//
+//    public CompanyDTO getCompany() {
+//        return company;
+//    }
+//
+//    public void setCompany(CompanyDTO company) {
+//        this.company = company;
+//    }
 
     public boolean isOnlyAdmin() {
         return isOnlyAdmin;
