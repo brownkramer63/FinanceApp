@@ -5,18 +5,17 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Type;
 
-
 @Component
-public class InvoiceDTOConverter {
+public class MapperUtil {
 
     private final ModelMapper modelMapper;
 
-    public InvoiceDTOConverter(ModelMapper modelMapper) {
+    public MapperUtil(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 
-
     public <T> T convert(Object objectToBeConverted, T convertedObject) {
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
         return modelMapper.map(objectToBeConverted, (Type) convertedObject.getClass());
     }
 

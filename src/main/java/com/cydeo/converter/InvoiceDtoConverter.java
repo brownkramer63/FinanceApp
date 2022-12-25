@@ -1,7 +1,6 @@
 package com.cydeo.converter;
 
 import com.cydeo.dto.InvoiceDTO;
-import com.cydeo.entity.Invoice;
 import com.cydeo.service.InvoiceService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
