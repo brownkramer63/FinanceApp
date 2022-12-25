@@ -8,6 +8,7 @@ import com.cydeo.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,5 +27,11 @@ public class UserServiceImpl implements UserService {
         List<User> userList = userRepository.findAll();
         return userList.stream().map(user -> mapperUtil.convert(user, new UserDTO()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserDTO findById(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        return mapperUtil.convert(user, new UserDTO());
     }
 }
