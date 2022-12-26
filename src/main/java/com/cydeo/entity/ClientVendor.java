@@ -1,32 +1,27 @@
 package com.cydeo.entity;
 
-import com.cydeo.enums.CompanyStatus;
-import lombok.AllArgsConstructor;
+import com.cydeo.enums.ClientVendorType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "companies")
 @Getter
 @Setter
-public class Company extends BaseEntity {
+@Table(name = "clients_vendors")
+public class ClientVendor extends BaseEntity{
 
-    @Column(unique = true)
-    private String title;
-
+    private String clientVendorName;
     private String phone;
     private String website;
-
     @Enumerated(EnumType.STRING)
-    private CompanyStatus companyStatus;
-
-    @OneToOne(fetch = FetchType.LAZY)
+    private ClientVendorType clientVendorType;
+    @OneToOne
     private Address address;
+    @ManyToOne
+    private Company company;
 
 }
