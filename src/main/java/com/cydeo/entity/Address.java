@@ -2,6 +2,7 @@ package com.cydeo.entity;
 
 
 
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import javax.persistence.Table;
 @Table(name = "addresses")
 @Getter
 @Setter
+
 public class Address  extends BaseEntity{
 
     private String addressLine1;
