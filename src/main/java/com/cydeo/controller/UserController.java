@@ -1,6 +1,7 @@
 package com.cydeo.controller;
 
 import com.cydeo.dto.UserDTO;
+import com.cydeo.service.CompanyService;
 import com.cydeo.service.RoleService;
 import com.cydeo.service.UserService;
 import org.springframework.stereotype.Controller;
@@ -36,7 +37,7 @@ public class UserController {
         model.addAttribute("roles", roleService.listRoles());
         //model.addAttribute("companies", companyService.listCompanies());
 
-        return "/user/user-list";
+        return "redirect:/user/user-list";
     }
 
     @PostMapping("/update/{id}")
