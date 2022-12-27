@@ -13,7 +13,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "products")
 public class Product extends BaseEntity{
@@ -24,6 +23,6 @@ public class Product extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private ProductUnit productUnit;
     private int qtyInStock;
-   // @ManyToOne
+   // @ManyToOne (fetch = FetchType.LAZY)
    // Category category;
 }
