@@ -2,6 +2,7 @@ package com.cydeo.dto;
 
 import lombok.*;
 
+
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -17,7 +18,7 @@ public class UserDTO {
     private String lastName;
     private String phone;
     private RoleDTO role;
-    //private CompanyDTO company;
+    private CompanyDTO company;
     private boolean isOnlyAdmin;
 
 
