@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class InvoiceProductServiceImpl implements InvoiceProductService {
 
-    private final InvoiceProductService invoiceProductService;
+
     private final MapperUtil mapperUtil;
 
-    public InvoiceProductServiceImpl(InvoiceProductService invoiceProductService, MapperUtil mapperUtil) {
-        this.invoiceProductService = invoiceProductService;
+    public InvoiceProductServiceImpl( MapperUtil mapperUtil) {
+
         this.mapperUtil = mapperUtil;
     }
 
