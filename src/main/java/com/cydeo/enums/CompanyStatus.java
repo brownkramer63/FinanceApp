@@ -2,7 +2,7 @@ package com.cydeo.enums;
 
 public enum CompanyStatus {
 
-    ACTIVE("Actıve"), PASSIVE("Passive");
+    ACTIVE("Active"), PASSIVE("Passive");
 
     private final String value;
 
