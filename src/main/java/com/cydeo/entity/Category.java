@@ -3,8 +3,10 @@ package com.cydeo.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.engine.profile.Fetch;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -16,7 +18,8 @@ import javax.persistence.Table;
 public class Category extends BaseEntity{
 
     private String description;
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     private Company company;
+
 
 }

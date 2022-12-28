@@ -10,5 +10,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressDTO {
-    // todo @Kadifa
+
+
+  private Long id;
+  private String addressLine1;
+  private String addressLine2;
+  private String city;
+  private String state;
+  private String country;
+  private String zipCode;
 }
