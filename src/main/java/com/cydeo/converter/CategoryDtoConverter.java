@@ -6,11 +6,11 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CategoryDTOConverter implements Converter<String, CategoryDTO> {
+public class CategoryDtoConverter implements Converter<String, CategoryDTO> {
 
     private final CategoryService categoryService;
 
-    public CategoryDTOConverter(CategoryService categoryService) {
+    public CategoryDtoConverter(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
