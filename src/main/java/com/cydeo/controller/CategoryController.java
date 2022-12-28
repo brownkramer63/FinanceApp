@@ -12,7 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/category")
+@RequestMapping("/categories")
 public class CategoryController {
 
     public CategoryController(CategoryService categoryService, MapperUtil mapperUtil) {
@@ -40,7 +40,7 @@ public class CategoryController {
     public String insertCategory(@ModelAttribute("newCategory") CategoryDTO categoryDTO){
         categoryService.save(categoryDTO);
 
-        return "redirect:/category-list";
+        return "redirect:/list";
 
     }
 
@@ -53,7 +53,7 @@ public class CategoryController {
 
 
 
-    @GetMapping("/category/update/{id}")
+    @GetMapping("/update/{id}")
     public String updateCategory(@PathVariable("id") Long id, Model model) {
 
         model.addAttribute("category", categoryService.findById(id));
@@ -62,7 +62,7 @@ public class CategoryController {
 
     }
 
-    @PostMapping("/category/list")
+    @PostMapping("/list")
     public String updateCategory(@ModelAttribute("newCategory") CategoryDTO categoryDTO) {
 
         categoryService.update(categoryDTO);
@@ -71,7 +71,7 @@ public class CategoryController {
 
     }
 
-    @GetMapping("/categories/delete/{id}")
+    @GetMapping("/delete/{id}")
     public String deleteCategory(@PathVariable ("id") Long id){
         categoryService.delete(id);
         return "redirect:/category-list";
