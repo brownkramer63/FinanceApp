@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByIdAndIsDeleted(Long id, Boolean deleted);
-    User findUserByUserName(String username);
+    User findUserByUserNameAndIsDeleted(String username, Boolean deleted);
 }
