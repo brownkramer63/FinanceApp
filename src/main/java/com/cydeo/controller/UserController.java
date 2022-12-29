@@ -9,14 +9,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
-    //private final CompanyService companyService;
+
+    private final CompanyService companyService;
     private final RoleService roleService;
     private final UserService userService;
 
-    public UserController(RoleService roleService, UserService userService) {
+    public UserController(CompanyService companyService, RoleService roleService, UserService userService) {
+        this.companyService = companyService;
         this.roleService = roleService;
         this.userService = userService;
     }
@@ -35,7 +37,7 @@ public class UserController {
 
         model.addAttribute("user", new UserDTO());
         model.addAttribute("roles", roleService.listRoles());
-        //model.addAttribute("companies", companyService.listCompanies());
+        model.addAttribute("companies", companyService.listAllCompanies());
 
         return "redirect:/user/user-list";
     }
@@ -44,7 +46,7 @@ public class UserController {
     public String updateUser(@PathVariable("id") Long id, Model model) {
         model.addAttribute("user", userService.findById(id));
         model.addAttribute("roles", roleService.listRoles());
-        //model.addAttribute("companies", userService.getCompanies());
+        model.addAttribute("companies", companyService.listAllCompanies());
 
         return "/user/user-update";
     }
