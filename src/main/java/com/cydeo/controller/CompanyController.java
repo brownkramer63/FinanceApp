@@ -36,17 +36,17 @@ public class CompanyController {
         return "/company/company-update"; //may use redirect after finishing update?
     }
 
-    @PostMapping("/update{id}")
-    public String editCompany(@ModelAttribute("company") CompanyDTO companyDTO) {
+    @PostMapping("/update/{id}")
+    public String editCompany(@PathVariable("id") Long id, @ModelAttribute("company") CompanyDTO companyDTO) {
 
-        //dto on view, update dto obj on the view, set the entity obj fields to updated dto fields in the db.
+
         companyService.update(companyDTO);
 
         return "redirect:/company/company-list";
 
     }
 
-    @GetMapping("/list/{id}")
+    @GetMapping("/list/activate/{id}")
     public String activate(@PathVariable("id") Long id) {
 
         companyService.activateDeactivateCompanyStatus(id);
@@ -54,7 +54,7 @@ public class CompanyController {
         return "redirect:/company/company-list";
     }
 
-    @GetMapping("/list/{id}")
+    @GetMapping("/list/deactivate/{id}")
     public String deactivate(@PathVariable("id") Long id) {
 
         companyService.activateDeactivateCompanyStatus(id);
