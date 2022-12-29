@@ -11,8 +11,11 @@ import java.util.List;
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 
 
+
     //List<Company> findCompaniesOrderByCompanyStatusAndTitle(CompanyStatus companyStatus, String title);
 
     @Query("SELECT c FROM Company c WHERE c.id <> 1 ORDER BY c.companyStatus, c.title ASC ")
     List<Company> findCompaniesOrderByCompanyStatusAndTitle();
+
+    Company findByTitle(String title);
 }
