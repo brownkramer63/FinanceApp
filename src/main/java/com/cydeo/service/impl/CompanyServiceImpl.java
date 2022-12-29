@@ -64,29 +64,18 @@ public class CompanyServiceImpl implements CompanyService {
             companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
         }
 
-
     }
 
     @Override
     public void update(CompanyDTO companyDTO) {
-        //dto on view, update dto obj on the view, set the entity obj fields to updated dto fields in the db.
-        Company company = companyRepository.findById(companyDTO.getId()).get();
+
+        Company company = companyRepository.findByTitle(companyDTO.getTitle());
         company.setTitle(companyDTO.getTitle());
         company.setPhone(companyDTO.getPhone());
         company.setWebsite(companyDTO.getWebsite());
         company.setAddress(mapperUtil.convert(companyDTO.getAddress(), new Address()));
         companyRepository.save(company);
 
-
-//        Company company = companyRepository.findById(companyDTO.getId()).get();
-//        CompanyDTO companyDTO1 = mapperUtil.convert(company, companyDTO);
-//
-//        companyDTO.setTitle(companyDTO1.getTitle());
-//        companyDTO.setPhone(companyDTO1.getPhone());
-//        companyDTO.setWebsite(companyDTO1.getWebsite());
-//        companyDTO.setAddress(companyDTO1.getAddress());
-//
-//        companyRepository.save(mapperUtil.convert(companyDTO, company));
     }
 
 
