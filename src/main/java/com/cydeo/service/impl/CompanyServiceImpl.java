@@ -67,16 +67,23 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void update(CompanyDTO companyDTO) {
+    public void update(CompanyDTO companyDTO, Long id) {
 
-        Company company = companyRepository.findByTitle(companyDTO.getTitle());
-        company.setTitle(companyDTO.getTitle());
-        company.setPhone(companyDTO.getPhone());
-        company.setWebsite(companyDTO.getWebsite());
-        company.setAddress(mapperUtil.convert(companyDTO.getAddress(), new Address()));
-        companyRepository.save(company);
+        Company company = companyRepository.findById(id).get();
+        companyDTO.setId(id);
+        companyDTO.setCompanyStatus(company.getCompanyStatus());
+        companyDTO.getAddress().setId(company.getAddress().getId());
+        companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
+        // TODO: 12/30/22 check return type of this update method
+
+
+//        Company company = companyRepository.findById(companyDTO.getId()).get();
+//        company.setTitle(companyDTO.getTitle());
+//        company.setPhone(companyDTO.getPhone());
+//        company.setWebsite(companyDTO.getWebsite());
+//        company.setAddress(mapperUtil.convert(companyDTO.getAddress(), new Address()));
+//        companyRepository.save(company);
+
 
     }
-
-
 }

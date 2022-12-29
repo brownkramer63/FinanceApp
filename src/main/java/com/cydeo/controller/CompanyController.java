@@ -40,7 +40,7 @@ public class CompanyController {
     public String editCompany(@PathVariable("id") Long id, @ModelAttribute("company") CompanyDTO companyDTO) {
 
 
-        companyService.update(companyDTO);
+        companyService.update(companyDTO, id);
 
         return "redirect:/company/company-list";
 
