@@ -54,12 +54,12 @@ public class UserServiceImpl implements UserService {
         return findById(userDTO.getId());
     }
 
-//    @Override
-//    public void delete(Long id) {
-//        Optional<User> user = userRepository.findById(id);
-//        user.setIsDeleted(true);
-//        userRepository.save(user);
-//
-//
-//    }
+    @Override
+    public void delete(Long id) {
+        Optional<User> user = Optional.of(userRepository.findById(id).get());
+        user.get().setIsDeleted(true);
+        userRepository.save(user.get());
+
+
+    }
 }
