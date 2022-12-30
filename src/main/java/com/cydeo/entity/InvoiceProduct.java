@@ -1,6 +1,7 @@
 package com.cydeo.entity;
 
 
+import com.cydeo.entity.common.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +18,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
-public class InvoiceProduct extends BaseEntity{
+public class InvoiceProduct extends BaseEntity {
 
     private Integer quantity;
     private BigDecimal price;

@@ -50,9 +50,11 @@ public class UserController {
 
         return "/user/user-update";
     }
-
-    //public String deleteUser(){
-
+    @DeleteMapping("/{id}")
+    public String deleteUser(@PathVariable("id")Long id) {
+        userService.delete(id);
+        return "redirect:/user-list";
+    }
 }
 
 

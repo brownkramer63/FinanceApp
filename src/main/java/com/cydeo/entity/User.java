@@ -1,5 +1,6 @@
 package com.cydeo.entity;
 
+import com.cydeo.entity.common.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,14 +15,14 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User extends BaseEntity{
+public class User extends BaseEntity {
 
     @Column(unique = true, nullable = false)
-    private String userName;
+    private String username;
     @Column(nullable = false)
-    private String passWord;
-    private String firstName;
-    private String lastName;
+    private String password;
+    private String firstname;
+    private String lastname;
     private String phone;
     private boolean enabled;
     @ManyToOne

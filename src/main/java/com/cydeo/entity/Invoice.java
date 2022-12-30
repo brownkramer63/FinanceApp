@@ -1,6 +1,7 @@
 package com.cydeo.entity;
 
 
+import com.cydeo.entity.common.BaseEntity;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 import com.sun.xml.bind.v2.TODO;
@@ -16,7 +17,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Invoice extends BaseEntity{
+public class Invoice extends BaseEntity {
 
 
     private String invoiceNo;

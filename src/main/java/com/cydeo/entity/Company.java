@@ -1,5 +1,6 @@
 package com.cydeo.entity;
 
+import com.cydeo.entity.common.BaseEntity;
 import com.cydeo.enums.CompanyStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 
 
 import javax.persistence.*;
+
 
 @Entity
 @NoArgsConstructor
@@ -28,5 +30,8 @@ public class Company extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     private Address address;
+
+
+
 
 }

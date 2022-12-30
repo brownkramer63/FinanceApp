@@ -1,4 +1,4 @@
-package com.cydeo.entity;
+package com.cydeo.entity.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @MappedSuperclass
+@EntityListeners(BaseEntityListener.class)
 public class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,4 +32,6 @@ public class BaseEntity {
     public Long lastUpdateUserId;
 
     private Boolean isDeleted = false;
+
+
 }

@@ -1,10 +1,13 @@
 package com.cydeo.entity;
 
+import com.cydeo.entity.common.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import org.hibernate.annotations.Where;
 import org.hibernate.engine.profile.Fetch;
+
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,8 +19,8 @@ import javax.persistence.Table;
 @Table(name = "categories")
 @Getter
 @Setter
-//@Where(clause= "is_deleted=false")
-public class Category extends BaseEntity{
+public class Category extends BaseEntity {
+
 
     private String description;
     @ManyToOne(fetch=FetchType.LAZY)
