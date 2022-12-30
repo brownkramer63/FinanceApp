@@ -35,7 +35,7 @@ public class ProductController {
     public String insertProduct(@ModelAttribute("newProduct")  ProductDTO productDTO){
         productService.save(productDTO);
 
-        return "redirect:/list";
+        return "redirect:/products/list";
     }
 
     @GetMapping("/list")
