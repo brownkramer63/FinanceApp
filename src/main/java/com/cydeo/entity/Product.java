@@ -25,5 +25,5 @@ public class Product extends BaseEntity {
     private ProductUnit productUnit;
     private int qtyInStock;
     @ManyToOne (fetch = FetchType.LAZY)
-    Category category;
+    private Category category;
 }
