@@ -1,6 +1,7 @@
 package com.cydeo.entity;
 
 
+import com.cydeo.entity.common.BaseEntity;
 import com.cydeo.enums.ClientVendorType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(name = "clients_vendors")
-public class ClientVendor extends BaseEntity{
+public class ClientVendor extends BaseEntity {
 
     private String clientVendorName;
     private String phone;
