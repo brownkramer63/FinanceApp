@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(UserDTO userDTO) {
-        userDTO.setPassWord(userDTO.getPassWord());
-        userDTO.setConfirmPassword(userDTO.getPassWord());
+        userDTO.setPassword(userDTO.getPassword());
+        userDTO.setConfirmPassword(userDTO.getPassword());
         User user = mapperUtil.convert(userDTO, new User());
         userRepository.save(user);
     }
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findById(userDTO.getId());
         User convertedUser = mapperUtil.convert(userDTO, new User());
         convertedUser.setId(user.get().getId());
-        convertedUser.setPassWord(user.get().getPassWord());
+        convertedUser.setPassword(user.get().getPassword());
         userRepository.save(convertedUser);
         return findById(userDTO.getId());
     }
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     public void delete(Long id) {
         Optional<User> user = Optional.ofNullable(userRepository.findByIdAndIsDeleted(id, false));
         user.get().setIsDeleted(true);
-        user.get().setUserName(user.get().getUserName() + "-" + user.get().getId());
+        user.get().setUsername(user.get().getUsername() + "-" + user.get().getId());
         userRepository.save(user.get());
 
     }
