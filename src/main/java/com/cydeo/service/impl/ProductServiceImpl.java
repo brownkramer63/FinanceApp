@@ -39,19 +39,29 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void save(ProductDTO productDTO) {
-        Product product = mapperUtil.convert(productDTO, new Product() );
+        Product product = mapperUtil.convert(productDTO, new Product());
         productRepository.save(product);
-
 
     }
 
     @Override
-    public void update(ProductDTO dto) {
+    public ProductDTO update(ProductDTO productDTO) {
 
+        Product oldProduct = productRepository.findByIdAndIsDeleted(productDTO.getId(), false);
+        Product newProduct = mapperUtil.convert(productDTO, new Product());
+        newProduct.setId(oldProduct.getId());
+        productRepository.save(newProduct);
+        return findById(productDTO.getId());
     }
+
+
 
     @Override
     public void delete(Long id) {
+        Product product = productRepository.findByIdAndIsDeleted(id, false);
+        product.setIsDeleted(true);
+        productRepository.save(product);
+
 
     }
 }
