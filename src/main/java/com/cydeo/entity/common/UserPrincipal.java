@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,30 +22,28 @@ public class UserPrincipal implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        GrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().getDescription());
-        return List.of(authority);
+//        GrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().getDescription());
+//        return List.of(authority);
 
-        /*
           List<GrantedAuthority> authorityList = new ArrayList<>();
         GrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().getDescription());
         authorityList.add(authority);
-         */
+        return authorityList;
 
     }
 
     @Override
     public String getPassword() {
-        return null;
+        return this.user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return this.user.getUsername();
     }
-
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
@@ -54,7 +53,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
 
@@ -72,7 +71,7 @@ public class UserPrincipal implements UserDetails {
      * @return logged-in user UI dropdown menu item as firstname and lastname
      */
     public String getFullNameForProfile() {
-        return this.user.getFirstName() + " " + this.user.getLastName();
+        return this.user.getFirstname() + " " + this.user.getLastname();
     }
 
     /**

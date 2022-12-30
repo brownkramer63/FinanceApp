@@ -7,6 +7,7 @@ import com.cydeo.repository.UserRepository;
 import com.cydeo.service.SecurityService;
 import com.cydeo.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,18 +21,19 @@ public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public UserDTO getLoggedInUser() {
-        //todo @Violetta will create a method for username
-//        var currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-//        return userService.findByUsername(currentUsername);
-        return new UserDTO();
+
+        var currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.findByUsername(currentUsername);
+
 
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User user = userRepository.findByUserName(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-        return new UserPrincipal(user);
+        var userdetails =  new UserPrincipal(user);
+        return userdetails;
     }
 }

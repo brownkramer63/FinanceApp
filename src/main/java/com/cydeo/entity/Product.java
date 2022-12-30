@@ -1,5 +1,6 @@
 package com.cydeo.entity;
 
+import com.cydeo.entity.common.BaseEntity;
 import com.cydeo.enums.ProductUnit;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "products")
-public class Product extends BaseEntity{
+public class Product extends BaseEntity {
 
     private int lowLimitAlert;
     private String name;
