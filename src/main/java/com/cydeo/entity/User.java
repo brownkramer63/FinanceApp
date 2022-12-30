@@ -17,11 +17,11 @@ import javax.persistence.Table;
 public class User extends BaseEntity{
 
     @Column(unique = true, nullable = false)
-    private String userName;
+    private String username;
     @Column(nullable = false)
-    private String passWord;
-    private String firstName;
-    private String lastName;
+    private String password;
+    private String firstname;
+    private String lastname;
     private String phone;
     private boolean enabled;
     @ManyToOne

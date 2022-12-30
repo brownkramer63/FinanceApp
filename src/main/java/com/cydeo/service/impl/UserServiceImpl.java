@@ -54,12 +54,22 @@ public class UserServiceImpl implements UserService {
         return findById(userDTO.getId());
     }
 
-//    @Override
-//    public void delete(Long id) {
-//        Optional<User> user = userRepository.findById(id);
-//        user.setIsDeleted(true);
-//        userRepository.save(user);
-//
-//
-//    }
+    @Override
+    public void delete(Long id) {
+        Optional<User> user = Optional.ofNullable(userRepository.findByIdAndIsDeleted(id, false));
+        user.get().setIsDeleted(true);
+        user.get().setUserName(user.get().getUserName() + "-" + user.get().getId());
+        userRepository.save(user.get());
+
+    }
+
+    @Override
+    public UserDTO findByUsername(String username) {
+        User user = userRepository.findUserByUserNameAndIsDeleted(username, false);
+        return mapperUtil.convert(user, new UserDTO());
+    }
+
+
+
+
 }
