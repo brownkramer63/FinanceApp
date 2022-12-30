@@ -5,9 +5,10 @@ import com.cydeo.entity.ClientVendor;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.ClientVendorRepository;
 import com.cydeo.service.ClientVendorService;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-
+@Service
 public class ClientVendorServiceImpl implements ClientVendorService {
 
     private final ClientVendorRepository clientVendorRepository;
@@ -39,17 +40,19 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     @Override
     public void update(ClientVendorDTO clientVendorDTO) {
     Optional<ClientVendor> clientVendor= clientVendorRepository.findById(clientVendorDTO.getId());
-    //now we have client vendor need to reset all fields to update
-        ClientVendor updatedClientVendor= mapperUtil.convert(clientVendorDTO, new ClientVendor());
+        if (clientVendor.isPresent()) {
+            ClientVendor updatedClientVendor = clientVendor.get();
 
-        updatedClientVendor.setClientVendorName(clientVendor.get().getClientVendorName());
-        updatedClientVendor.setClientVendorType(clientVendor.get().getClientVendorType());
-        updatedClientVendor.setId(clientVendor.get().getId());
-//        updatedClientVendor.setAddress(clientVendor.get().getAddress());
-//        updatedClientVendor.setCompany(clientVendor.get().getCompany());
-//        updatedClientVendor.setPhone(clientVendor.get().getPhone());
-//        updatedClientVendor.setWebsite(clientVendor.get().getWebsite());
-        //not sure if i did this right actually
+            updatedClientVendor.setClientVendorName(clientVendorDTO.getClientVendorName());
+            updatedClientVendor.setClientVendorType(clientVendorDTO.getClientVendorType());
+            updatedClientVendor.setWebsite(clientVendorDTO.getWebsite());
+            updatedClientVendor.setPhone(clientVendorDTO.getPhone());
+            updatedClientVendor.setCompany(clientVendor.get().getCompany()); //check this one
+            updatedClientVendor.setId(clientVendorDTO.getId());
+            updatedClientVendor.setAddress(clientVendor.get().getAddress());//check this one
 
+            clientVendorRepository.save(updatedClientVendor);
+            //review the logic for this one
+        }
     }
 }
