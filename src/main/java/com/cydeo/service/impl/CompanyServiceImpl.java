@@ -1,7 +1,6 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.CompanyDTO;
-import com.cydeo.entity.Address;
 import com.cydeo.entity.Company;
 import com.cydeo.enums.CompanyStatus;
 import com.cydeo.mapper.MapperUtil;
@@ -52,6 +51,7 @@ public class CompanyServiceImpl implements CompanyService {
         companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
     }
 
+
     @Override
     public void activateDeactivateCompanyStatus(Long id) {
 
@@ -64,30 +64,26 @@ public class CompanyServiceImpl implements CompanyService {
             companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
         }
 
-
     }
 
     @Override
-    public void update(CompanyDTO companyDTO) {
-        //dto on view, update dto obj on the view, set the entity obj fields to updated dto fields in the db.
-        Company company = companyRepository.findById(companyDTO.getId()).get();
-        company.setTitle(companyDTO.getTitle());
-        company.setPhone(companyDTO.getPhone());
-        company.setWebsite(companyDTO.getWebsite());
-        company.setAddress(mapperUtil.convert(companyDTO.getAddress(), new Address()));
-        companyRepository.save(company);
+    public void update(CompanyDTO companyDTO, Long id) {
+
+        Company company = companyRepository.findById(id).get();
+        companyDTO.setId(id);
+        companyDTO.setCompanyStatus(company.getCompanyStatus());
+        companyDTO.getAddress().setId(company.getAddress().getId());
+        companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
+        // TODO: 12/30/22 check return type of this update method
 
 
 //        Company company = companyRepository.findById(companyDTO.getId()).get();
-//        CompanyDTO companyDTO1 = mapperUtil.convert(company, companyDTO);
-//
-//        companyDTO.setTitle(companyDTO1.getTitle());
-//        companyDTO.setPhone(companyDTO1.getPhone());
-//        companyDTO.setWebsite(companyDTO1.getWebsite());
-//        companyDTO.setAddress(companyDTO1.getAddress());
-//
-//        companyRepository.save(mapperUtil.convert(companyDTO, company));
+//        company.setTitle(companyDTO.getTitle());
+//        company.setPhone(companyDTO.getPhone());
+//        company.setWebsite(companyDTO.getWebsite());
+//        company.setAddress(mapperUtil.convert(companyDTO.getAddress(), new Address()));
+//        companyRepository.save(company);
+
+
     }
-
-
 }
