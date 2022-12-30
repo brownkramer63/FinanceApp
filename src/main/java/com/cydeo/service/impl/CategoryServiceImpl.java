@@ -2,6 +2,7 @@ package com.cydeo.service.impl;
 
 import com.cydeo.dto.CategoryDTO;
 import com.cydeo.entity.Category;
+import com.cydeo.entity.User;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CategoryRepository;
 import com.cydeo.service.CategoryService;
@@ -51,8 +52,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void delete(Long Id) {
-        Optional<Category> foundCategory=categoryRepository.findById(Id);
+    public void delete(Long id) {
+
+        Optional<Category> foundCategory=categoryRepository.findById(id);
+
         if(foundCategory.isPresent()){
             foundCategory.get().setIsDeleted(true);
         }
@@ -64,9 +67,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDTO> listAllCategory() {
-            List<Category> listCategory= categoryRepository.findAll();
+            List<Category> listCategory= categoryRepository.findAllByIsDeleted(false);
              return listCategory.stream().map(category-> mapperUtil.convert(category, new CategoryDTO()))
                      .collect(Collectors.toList());
 
     }
+
+
 }
