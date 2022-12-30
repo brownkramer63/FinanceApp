@@ -18,5 +18,5 @@ public class ProductDTO {
     private String name;
     private ProductUnit productUnit;
     private int qtyInStock;
-
+    CategoryDTO category;
 }
