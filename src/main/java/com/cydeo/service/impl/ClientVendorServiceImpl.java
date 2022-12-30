@@ -1,13 +1,18 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.ClientVendorDTO;
+import com.cydeo.dto.RoleDTO;
 import com.cydeo.entity.ClientVendor;
+import com.cydeo.entity.Role;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.ClientVendorRepository;
 import com.cydeo.service.ClientVendorService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class ClientVendorServiceImpl implements ClientVendorService {
 
@@ -55,4 +60,11 @@ public class ClientVendorServiceImpl implements ClientVendorService {
             //review the logic for this one
         }
     }
+
+    @Override
+    public List<ClientVendorDTO> listAllClientVendors() {
+        List<ClientVendor> clientVendors= clientVendorRepository.findAll();
+        return clientVendors.stream().map(clientVendor ->mapperUtil.convert(clientVendor,new ClientVendorDTO())).collect(Collectors.toList());
+    }
+
 }
