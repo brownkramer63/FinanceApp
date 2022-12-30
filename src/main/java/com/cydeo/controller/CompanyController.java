@@ -42,7 +42,7 @@ public class CompanyController {
 
         companyService.update(companyDTO, id);
 
-        return "redirect:/company/company-list";
+        return "redirect:/companies/list";
 
     }
 
@@ -51,7 +51,7 @@ public class CompanyController {
 
         companyService.activateDeactivateCompanyStatus(id);
 
-        return "redirect:/company/company-list";
+        return "redirect:/companies/list";
     }
 
     @GetMapping("/deactivate/{id}")
@@ -59,8 +59,9 @@ public class CompanyController {
 
         companyService.activateDeactivateCompanyStatus(id);
 
-        return "redirect:/company/company-list";
+        return "redirect:/companies/list";
     }
+
 
 
 

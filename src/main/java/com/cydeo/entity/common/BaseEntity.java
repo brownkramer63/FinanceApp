@@ -32,4 +32,6 @@ public class BaseEntity {
     public Long lastUpdateUserId;
 
     private Boolean isDeleted = false;
+
+
 }
