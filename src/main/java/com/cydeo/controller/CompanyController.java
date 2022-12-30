@@ -46,7 +46,7 @@ public class CompanyController {
 
     }
 
-    @GetMapping("/list/activate/{id}")
+    @GetMapping("/activate/{id}")
     public String activate(@PathVariable("id") Long id) {
 
         companyService.activateDeactivateCompanyStatus(id);
@@ -54,7 +54,7 @@ public class CompanyController {
         return "redirect:/company/company-list";
     }
 
-    @GetMapping("/list/deactivate/{id}")
+    @GetMapping("/deactivate/{id}")
     public String deactivate(@PathVariable("id") Long id) {
 
         companyService.activateDeactivateCompanyStatus(id);
