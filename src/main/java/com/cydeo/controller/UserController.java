@@ -32,15 +32,21 @@ public class UserController {
         return "/user/user-list";
     }
 
-    @PostMapping("/create")
-    public String createUser(Model model) {
+    @GetMapping("/create")
+    public String createUserForm(Model model) {
 
-        model.addAttribute("user", new UserDTO());
-        model.addAttribute("roles", roleService.listRoles());
+        model.addAttribute("newUser", new UserDTO());
+        model.addAttribute("userRoles", roleService.listRoles());
         model.addAttribute("companies", companyService.listAllCompanies());
 
+        return "/user/user-create";
+    }
+    @PostMapping("/create")
+    public String insertUser(@ModelAttribute("user") UserDTO userDTO){
+        userService.save(userDTO);
         return "redirect:/user/user-list";
     }
+
 
     @PostMapping("/update/{id}")
     public String updateUser(@PathVariable("id") Long id, Model model) {
@@ -53,7 +59,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable("id")Long id) {
         userService.delete(id);
-        return "redirect:/user-list";
+        return "redirect:/user/user-list";
     }
 }
 

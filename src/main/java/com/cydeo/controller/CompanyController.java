@@ -62,6 +62,15 @@ public class CompanyController {
         return "redirect:/companies/list";
     }
 
+    @GetMapping("/create")
+    public String insertCompanies(Model model) {
+
+
+        model.addAttribute("newCompany", new CompanyDTO());
+
+        return "/company/company-create";
+    }
+
 
 
 
