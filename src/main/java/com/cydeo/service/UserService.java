@@ -12,4 +12,5 @@ public interface UserService {
     UserDTO update (UserDTO userDTO);
     void delete(Long id);
     UserDTO findByUsername(String username);
+    UserDTO findAllByLoggedInUser();
 }
