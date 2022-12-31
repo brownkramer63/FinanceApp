@@ -1,6 +1,7 @@
 package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDTO;
+import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.InvoiceService;
 import com.cydeo.service.ProductService;
@@ -28,25 +29,16 @@ public class SalesInvoiceController {
 
     @GetMapping("/list")
     public String listAllInvoice(Model model){
-        model.addAttribute("invoices", invoiceService.listAllInvoice());
+        model.addAttribute("invoices", invoiceService.listAllInvoicesByType(InvoiceType.SALES));
         return "/invoice/sales-invoice-list";
     }
 
 
-    @GetMapping("/create")
-    public String createInvoice(Model model){
-        model.addAttribute("newSalesInvoice", new InvoiceDTO());
-        model.addAttribute("clients", clientVendorService.findAll());
-        return "/invoice/sales-invoice-create";
-    }
 
 
 
-    @GetMapping("/delete/{id}")
-    public String deleteInvoice(@PathVariable("id") Long id){
-        invoiceService.delete(id);
-        return "redirect:/invoice/sales-invoice-list";
-    }
+
+
 
 
 
