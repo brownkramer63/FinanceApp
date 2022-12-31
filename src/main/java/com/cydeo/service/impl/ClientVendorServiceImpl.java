@@ -1,18 +1,13 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.ClientVendorDTO;
-import com.cydeo.dto.RoleDTO;
 import com.cydeo.entity.ClientVendor;
-import com.cydeo.entity.Role;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.ClientVendorRepository;
 import com.cydeo.service.ClientVendorService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 @Service
 public class ClientVendorServiceImpl implements ClientVendorService {
 
@@ -44,27 +39,11 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public void update(ClientVendorDTO clientVendorDTO) {
-    Optional<ClientVendor> clientVendor= clientVendorRepository.findById(clientVendorDTO.getId());
+        Optional<ClientVendor> clientVendor = clientVendorRepository.findById(clientVendorDTO.getId());
+        ClientVendor updatedClientVendor = mapperUtil.convert(clientVendorDTO, new ClientVendor());
         if (clientVendor.isPresent()) {
-            ClientVendor updatedClientVendor = clientVendor.get();
-
-            updatedClientVendor.setClientVendorName(clientVendorDTO.getClientVendorName());
-            updatedClientVendor.setClientVendorType(clientVendorDTO.getClientVendorType());
-            updatedClientVendor.setWebsite(clientVendorDTO.getWebsite());
-            updatedClientVendor.setPhone(clientVendorDTO.getPhone());
-            updatedClientVendor.setCompany(clientVendor.get().getCompany()); //check this one
-            updatedClientVendor.setId(clientVendorDTO.getId());
-            updatedClientVendor.setAddress(clientVendor.get().getAddress());//check this one
-
+            updatedClientVendor.setId(clientVendor.get().getId());
             clientVendorRepository.save(updatedClientVendor);
-            //review the logic for this one
         }
     }
-
-    @Override
-    public List<ClientVendorDTO> listAllClientVendors() {
-        List<ClientVendor> clientVendors= clientVendorRepository.findAll();
-        return clientVendors.stream().map(clientVendor ->mapperUtil.convert(clientVendor,new ClientVendorDTO())).collect(Collectors.toList());
-    }
-
 }
