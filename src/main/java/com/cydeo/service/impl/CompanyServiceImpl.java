@@ -48,7 +48,9 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public void save(CompanyDTO companyDTO) {
 
-        companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
+        Company company = mapperUtil.convert(companyDTO, new Company());
+        company.setCompanyStatus(CompanyStatus.PASSIVE);
+        companyRepository.save(company);
     }
 
 
