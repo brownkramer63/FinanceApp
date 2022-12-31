@@ -52,4 +52,11 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     public List<ClientVendorDTO> listAllClientVendors() {
         return null;
     }
+
+    @Override
+    public List<ClientVendor> findAllByClientVendorName(String name) {
+        return null;
+    }
+
+
 }
