@@ -63,12 +63,22 @@ public class CompanyController {
     }
 
     @GetMapping("/create")
-    public String insertCompanies(Model model) {
+    public String createCompany(Model model) {
 
 
         model.addAttribute("newCompany", new CompanyDTO());
 
         return "/company/company-create";
+    }
+
+    @PostMapping("/create")
+    public String insertCompany( @ModelAttribute("company") CompanyDTO companyDTO) {
+
+
+        companyService.save(companyDTO);
+
+        return "redirect:/companies/list";
+
     }
 
 
