@@ -1,5 +1,6 @@
 package com.cydeo.entity.common;
 
+import com.cydeo.security.SparkleUserMapperToSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ public class BaseEntityListener {
         baseEntity.lastUpdateDateTime = LocalDateTime.now();
 
         if (authentication != null && !authentication.getName().equals("anonymousUser")) {
-            UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+            SparkleUserMapperToSecurity principal = (SparkleUserMapperToSecurity) authentication.getPrincipal();
             baseEntity.insertUserId = principal.getId();
             baseEntity.lastUpdateUserId = principal.getId();
         }
@@ -33,7 +34,7 @@ public class BaseEntityListener {
         baseEntity.lastUpdateDateTime = LocalDateTime.now();
 
         if (authentication != null && !authentication.getName().equals("anonymousUser")) {
-            UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+            SparkleUserMapperToSecurity principal = (SparkleUserMapperToSecurity) authentication.getPrincipal();
             baseEntity.lastUpdateUserId = principal.getId();
         }
     }
