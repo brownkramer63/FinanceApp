@@ -1,6 +1,7 @@
-package com.cydeo.config;
+package com.cydeo.security;
 
-import com.cydeo.service.SecurityService;
+import com.cydeo.security.AuthSuccessHandler;
+import com.cydeo.security.SecurityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
