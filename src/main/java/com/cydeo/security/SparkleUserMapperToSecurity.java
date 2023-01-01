@@ -1,40 +1,40 @@
-package com.cydeo.entity.common;
+package com.cydeo.security;
 
 import com.cydeo.entity.User;
 import com.cydeo.enums.CompanyStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class UserPrincipal implements UserDetails {
+@Slf4j
+public class SparkleUserMapperToSecurity implements UserDetails {
 
     private final User user;
 
-    public UserPrincipal(@Lazy User user) {
+    public SparkleUserMapperToSecurity(@Lazy User user) {
         this.user = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-//        GrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().getDescription());
-//        return List.of(authority);
-
-        List<GrantedAuthority> authorityList = new ArrayList<>();
         GrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().getDescription());
-        authorityList.add(authority);
-        return authorityList;
+        log.info("logged in user role is " + authority.getAuthority());
+        return List.of(authority);
+
 
     }
 
     @Override
     public String getPassword() {
-        return this.user.getPassword();
+        var pass = user.getPassword();
+        log.info("password of user : " + pass);
+        return pass;
     }
 
     @Override
