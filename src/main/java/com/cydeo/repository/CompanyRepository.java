@@ -19,6 +19,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     @Query("SELECT c FROM Company c WHERE c.id <> 1 ORDER BY c.companyStatus, c.title ASC ")
     List<Company> findCompaniesOrderByCompanyStatusAndTitle();
 
-    Company findByTitle(String title);
+    @Query("SELECT c FROM Company c WHERE c.id <> 1 ORDER BY c.title ASC ")
+    List<Company> findCompaniesOrderByCompanyTitle();
 
 }
