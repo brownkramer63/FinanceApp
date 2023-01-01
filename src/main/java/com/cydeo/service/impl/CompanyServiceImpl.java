@@ -6,12 +6,14 @@ import com.cydeo.enums.CompanyStatus;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CompanyRepository;
 import com.cydeo.service.CompanyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CompanyServiceImpl implements CompanyService {
 
@@ -59,9 +61,11 @@ public class CompanyServiceImpl implements CompanyService {
         if (companyDTO.getCompanyStatus().getValue().equals("Passive")) {
             companyDTO.setCompanyStatus(CompanyStatus.ACTIVE);
             companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
+            log.info(" Company activated : " + companyDTO.getTitle());
         } else {
             companyDTO.setCompanyStatus(CompanyStatus.PASSIVE);
             companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
+            log.info(" Company Deactivated : " + companyDTO.getTitle());
         }
 
     }
