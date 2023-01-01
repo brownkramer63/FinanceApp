@@ -8,6 +8,7 @@ import com.cydeo.enums.CompanyStatus;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CompanyRepository;
 import com.cydeo.repository.UserRepository;
+import com.cydeo.security.SecurityService;
 import com.cydeo.service.CompanyService;
 import com.cydeo.service.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,12 +30,14 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final UserService userService;
 
+    private final SecurityService securityService;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, UserRepository userRepository, UserService userService) {
+    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, UserRepository userRepository, UserService userService, SecurityService securityService) {
         this.companyRepository = companyRepository;
         this.mapperUtil = mapperUtil;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.securityService = securityService;
     }
 
 
@@ -96,21 +100,18 @@ public class CompanyServiceImpl implements CompanyService {
     public List<CompanyDTO> getCompaniesByLoggedInUser() {
         //if currentUser = "Root User", all companies except Cydeo
         //else only his/her company
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserDTO currentUserDTO = userService.findByUsername(username);
-        User user= mapperUtil.convert(currentUserDTO, new User());
+
+        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
 
         if (user.getRole().getDescription().equals("Root User")){
             List<Company> companyList = companyRepository.findCompaniesOrderByCompanyTitle();
-            List<CompanyDTO> companyDTOList = companyList.stream().map(company -> mapperUtil.convert(company, new CompanyDTO())).collect(Collectors.toList());
-            return companyDTOList;
+
+            return companyList.stream().map(company -> mapperUtil.convert(company, new CompanyDTO())).collect(Collectors.toList());
 
         }else{
-            List<CompanyDTO> list = new ArrayList<>();
             Company company = user.getCompany();
             CompanyDTO companyDTO = mapperUtil.convert(company, new CompanyDTO());
-            list.add(companyDTO);
-            return list;
+            return Arrays.asList(companyDTO);
         }
     }
 
