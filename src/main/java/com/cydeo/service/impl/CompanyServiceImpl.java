@@ -1,28 +1,39 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.CompanyDTO;
+import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.Company;
+import com.cydeo.entity.User;
 import com.cydeo.enums.CompanyStatus;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CompanyRepository;
+import com.cydeo.repository.UserRepository;
 import com.cydeo.service.CompanyService;
-import lombok.extern.slf4j.Slf4j;
+import com.cydeo.service.UserService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final MapperUtil mapperUtil;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil) {
+    private final UserRepository userRepository;
+
+    private final UserService userService;
+
+
+    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, UserRepository userRepository, UserService userService) {
         this.companyRepository = companyRepository;
         this.mapperUtil = mapperUtil;
+        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
 
@@ -63,13 +74,10 @@ public class CompanyServiceImpl implements CompanyService {
         if (companyDTO.getCompanyStatus().getValue().equals("Passive")) {
             companyDTO.setCompanyStatus(CompanyStatus.ACTIVE);
             companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
-            log.info(" Company activated : " + companyDTO.getTitle());
         } else {
             companyDTO.setCompanyStatus(CompanyStatus.PASSIVE);
             companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
-            log.info(" Company Deactivated : " + companyDTO.getTitle());
         }
-
     }
 
     @Override
@@ -82,14 +90,30 @@ public class CompanyServiceImpl implements CompanyService {
         companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
         // TODO: 12/30/22 check return type of this update method
 
-
-//        Company company = companyRepository.findById(companyDTO.getId()).get();
-//        company.setTitle(companyDTO.getTitle());
-//        company.setPhone(companyDTO.getPhone());
-//        company.setWebsite(companyDTO.getWebsite());
-//        company.setAddress(mapperUtil.convert(companyDTO.getAddress(), new Address()));
-//        companyRepository.save(company);
-
-
     }
+
+    @Override
+    public List<CompanyDTO> getCompaniesByLoggedInUser() {
+        //if currentUser = "Root User", all companies except Cydeo
+        //else only his/her company
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserDTO currentUserDTO = userService.findByUsername(username);
+        User user= mapperUtil.convert(currentUserDTO, new User());
+
+        if (user.getRole().getDescription().equals("Root User")){
+            List<Company> companyList = companyRepository.findCompaniesOrderByCompanyTitle();
+            List<CompanyDTO> companyDTOList = companyList.stream().map(company -> mapperUtil.convert(company, new CompanyDTO())).collect(Collectors.toList());
+            return companyDTOList;
+
+        }else{
+            List<CompanyDTO> list = new ArrayList<>();
+            Company company = user.getCompany();
+            CompanyDTO companyDTO = mapperUtil.convert(company, new CompanyDTO());
+            list.add(companyDTO);
+            return list;
+        }
+    }
+
+
+
 }
