@@ -63,11 +63,13 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     @Override
-    public void save(CompanyDTO companyDTO) {
+    public CompanyDTO save(CompanyDTO companyDTO) {
 
         Company company = mapperUtil.convert(companyDTO, new Company());
         company.setCompanyStatus(CompanyStatus.PASSIVE);
         companyRepository.save(company);
+
+        return companyDTO;
     }
 
 
@@ -85,7 +87,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void update(CompanyDTO companyDTO, Long id) {
+    public CompanyDTO update(CompanyDTO companyDTO, Long id) {
 
         Company company = companyRepository.findById(id).get();
         companyDTO.setId(id);
@@ -93,6 +95,8 @@ public class CompanyServiceImpl implements CompanyService {
         companyDTO.getAddress().setId(company.getAddress().getId());
         companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
         // TODO: 12/30/22 check return type of this update method
+
+        return companyDTO;
 
     }
 
