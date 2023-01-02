@@ -2,7 +2,8 @@ package com.cydeo.controller;
 
 
 import com.cydeo.dto.ProductDTO;
-import com.cydeo.mapper.MapperUtil;
+import com.cydeo.enums.ProductUnit;
+import com.cydeo.service.CategoryService;
 import com.cydeo.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,21 +15,26 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
 
     private final ProductService productService;
-    private final MapperUtil mapperUtil;
+    private final CategoryService categoryService;
 
-    public ProductController(ProductService productService, MapperUtil mapperUtil) {
+
+    public ProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
-        this.mapperUtil = mapperUtil;
+
+        this.categoryService = categoryService;
     }
 
     @GetMapping("/create")
     public String createProduct(Model model){
     model.addAttribute("newProduct", new ProductDTO());
+    model.addAttribute("categories", categoryService.listAllCategory());
+    model.addAttribute("productUnits", productService.listAllEnums());
+
   return "/product/product-create";
 }
 
 
-    @PostMapping("/insert")
+    @PostMapping("/create")
     public String insertProduct(@ModelAttribute("newProduct")  ProductDTO productDTO){
         productService.save(productDTO);
 
@@ -51,16 +57,18 @@ public class ProductController {
     public String updateProduct(@PathVariable("id") Long id, Model model) {
 
         model.addAttribute("product", productService.findById(id));
+        model.addAttribute("categories", categoryService.listAllCategory());
+        model.addAttribute("productUnits", productService.listAllEnums());
 
-        return "/product/product-create";
+        return "/product/product-update";
     }
 
-    @PostMapping("/list")
-    public String updateCategory(@ModelAttribute("newProduct") ProductDTO categoryDTO) {
+    @PostMapping("/update/{id}")
+    public String updateProduct(@ModelAttribute("newProduct") ProductDTO productDTO) {
 
-        productService.update(categoryDTO);
+        productService.update(productDTO);
 
-        return "redirect/products/list";
+        return "redirect:/products/list";
 
     }
 

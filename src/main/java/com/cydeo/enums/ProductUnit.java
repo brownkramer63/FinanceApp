@@ -1,5 +1,8 @@
 package com.cydeo.enums;
 
+import lombok.Getter;
+
+
 public enum ProductUnit {
     LBS("Libre"),GALLON("Gallon"),PCS("Pieces"),KG("Kilogram"),METER("Meter"),INCH("Inch"),FEET("Feet");
 
@@ -12,6 +15,8 @@ public enum ProductUnit {
     ProductUnit (String value) {
         this.value = value;
     }
+
+
 
 
 }
