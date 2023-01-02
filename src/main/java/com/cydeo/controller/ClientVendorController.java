@@ -30,24 +30,24 @@ public class ClientVendorController {
     public String clientVendorList(Model model){
         List<ClientVendorDTO> clientVendors= clientVendorService.listAllClientVendors();
         model.addAttribute("clientvendors",clientVendors);
-        return "/clientVendor/list";
+        return "redirect:/clientVendors/list";
   //check logic here
     }
-    @PostMapping("/-create")
+    @PostMapping("/create")
     public String createClientVendor(Model model){
 
         model.addAttribute("clientVendor", new ClientVendorDTO());
 //        need to figure out the logic to add here
 
 
-        return "/clientVendor/-create";
+        return "redirect:/clientVendors/create";
     }
-    @PostMapping("/-create")
+    @PostMapping("/create")
     public String insertClientVendor(@ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, Model model){
 
         //check logic here
         clientVendorService.save(clientVendorDTO);
-        return "redirect:/clientVendor/-create";
+        return "redirect:/clientVendors/create";
     }
 
 
