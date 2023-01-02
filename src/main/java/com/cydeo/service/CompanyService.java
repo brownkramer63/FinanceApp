@@ -19,5 +19,9 @@ public interface CompanyService {
 
     void update(CompanyDTO companyDTO, Long id);
 
+    List<CompanyDTO> getCompaniesByLoggedInUser();
+
+
+
 
 }
