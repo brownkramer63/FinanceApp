@@ -29,14 +29,16 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceProductService invoiceProductService;
 
     private final CompanyService companyService;
+    private final Invoice invoice;
 
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, InvoiceProductService invoiceProductService, CompanyService companyService) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, InvoiceProductService invoiceProductService, CompanyService companyService, Invoice invoice) {
         this.invoiceRepository = invoiceRepository;
 
         this.mapperUtil = mapperUtil;
         this.invoiceProductService = invoiceProductService;
         this.companyService = companyService;
+        this.invoice = invoice;
     }
 
     @Override
@@ -81,11 +83,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceDTO> listAllInvoicesByType(InvoiceType invoiceType) {
+        //TODO @nihano add method to the companyService
+       // CompanyDTO companyDTO = companyService.findCompanyByUser();
+        CompanyDTO companyDTO = companyService.findById(1l);
 
-        CompanyDTO companyDTO = companyService.findCompanyByUser();
 
-
-      List<Invoice> invoiceListByType = invoiceRepository.findAllByCompanyAndInvoiceTypeOrderByDate(mapperUtil.convert(companyDTO, new Company()),invoiceType)
+      List<Invoice> invoiceListByType = invoiceRepository.findAllByCompanyAndInvoiceTypeOrderByDateDesc(mapperUtil.convert(companyDTO, new Company()),invoiceType)
               .stream().sorted(Comparator.comparing(Invoice::getInvoiceNo)).collect(Collectors.toList());
 
       return invoiceDtoList(invoiceListByType);
@@ -97,16 +100,28 @@ public class InvoiceServiceImpl implements InvoiceService {
        InvoiceDTO invoiceDTO = new InvoiceDTO();
        invoiceDTO.setDate(LocalDate.now());
        invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
-       invoiceDTO.setInvoiceNumber(getInvoiceNumber(InvoiceType.PURCHASE));
+       invoiceDTO.setInvoiceNumber(generateInvoiceNumber(InvoiceType.PURCHASE));
 
        return invoiceDTO;
 
     }
 
-    // todo come back to complete
-    private String getInvoiceNumber(InvoiceType invoiceType){
-        invoiceRepository.findAllByCompanyAndInvoiceTypeOrderByDate();
-                return null;
+
+    private String generateInvoiceNumber(InvoiceType invoiceType){
+        //TODO @nihano add method to the companyService
+
+       // CompanyDTO companyDTO = companyService.findCompanyByUser();
+        CompanyDTO companyDTO = companyService.findById(1l);
+        Company company = mapperUtil.convert(companyDTO, new Company());
+
+        Invoice invoice = invoiceRepository.findAllByCompanyAndInvoiceTypeOrderByDateDesc(company, invoiceType).stream()
+                .max(Comparator.comparing(Invoice::getInvoiceNo)).orElseThrow();
+
+        String invoiceNum = invoice.getInvoiceNo();
+        int res = Integer.parseInt(invoiceNum.substring(2)) + 1;
+        String numberPart = String.format("%03d", res);
+        String generatedNumber = invoiceNum.substring(0, 2) + numberPart;
+        return generatedNumber;
     }
 
 
@@ -156,15 +171,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceDTO;
 
     }
-
-
-
-
-
-
-
-
-
 
 
 

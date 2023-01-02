@@ -46,7 +46,7 @@ public class PurchaseInvoiceController {
     @GetMapping("/approve/{id}")
     public String approvePurchaseInvoice(@PathVariable("id") Long id){
         invoiceService.approve(id);
-        return "redirect:/purchaseInvoicesList";
+        return "redirect:/purchaseInvoices/list";
 
     }
 
@@ -57,7 +57,9 @@ public class PurchaseInvoiceController {
     public String createPurchaseInvoice(Model model){
 
         model.addAttribute("newPurchaseInvoice", invoiceService.getNewPurchaseInvoice());
-        model.addAttribute("vendors", clientVendorService.findAllByClientVendorName());
+        //TODO @kramerbrown add method findAll
+       // model.addAttribute("vendors", clientVendorService.findAllByClientVendor());
+        model.addAttribute("vendors", clientVendorService.findById(1l));
 
 
         return "/invoice/purchase-invoice-create";
@@ -67,21 +69,27 @@ public class PurchaseInvoiceController {
     public String savePurchaseInvoice(@ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, Model model){
 
         model.addAttribute("newPurchaseInvoice", invoiceService.create(newPurchaseInvoice, InvoiceType.PURCHASE));
-        model.addAttribute("vendors", clientVendorService.findAllByClientVendorName());
+        // TODO @kramerbrown add method findAll
+       // model.addAttribute("vendors", clientVendorService.findAllByClientVendorName());
+        model.addAttribute("vendors", clientVendorService.findById(1l));
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("products", productService.listAllProducts());
         model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(newPurchaseInvoice.getId()));
 
         return "/invoice/purchase-invoice-update";
 
+
     }
+
 
 
 
     @GetMapping("/update/{id}")
     public String editPurchaseInvoice(@PathVariable("id") Long id, Model model){
         model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("vendors", clientVendorService.findAll());
+        // TODO @kramerbrown add method findAll
+        // model.addAttribute("vendors", clientVendorService.findAll());
+        model.addAttribute("vendors", clientVendorService.findById(1l));
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(id));
         model.addAttribute("products", productService.listAllProducts());
@@ -95,7 +103,7 @@ public class PurchaseInvoiceController {
     public String updatePurchaseInvoice(@ModelAttribute("invoice") InvoiceDTO invoiceDTO, @PathVariable("id") Long id){
 
         invoiceProductService.update(invoiceDTO, id);
-        return "redirect: purchaseInvoices/list";
+        return "redirect: /purchaseInvoices/list";
 
     }
 
@@ -107,8 +115,19 @@ public class PurchaseInvoiceController {
 
     @PostMapping("/addInvoiceProduct/{id}")
     public String addInvoiceProduct(@PathVariable("id") Long id, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO){
-        invoiceProductService.addInvoiceProduct(invoiceProductDTO);
+        invoiceProductService.save(id, invoiceProductDTO);
         return "redirect:/purchaseInvoices/update";
+    }
+
+
+    @GetMapping("/print/{id}")
+    public String printPurchaseInvoice(@PathVariable("id") Long id, Model model){
+
+        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(id));
+
+        return "/invoice/invoice_print";
+
     }
 
 }
