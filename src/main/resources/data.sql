@@ -98,7 +98,7 @@ values
 ('2022-09-15 00:00:00', 3, false, '2022-09-15 00:00:00', 3, 'Monitor', 3);
 
 insert into products(insert_date_time, insert_user_id, is_deleted, last_update_date_time, last_update_user_id,
-                     name, qty_in_stock, low_limit_alert, product_unit, category_id)
+                     name, quantity_in_stock, low_limit_alert, product_unit, category_id)
  VALUES
 -- COMPANY-2 / Green Tech
     ('2022-09-15 00:00', 2, 'false', '2022-09-15 00:00', 2, 'HP Elite 800G1 Desktop Computer Package', 8, 5,'PCS', 1),
