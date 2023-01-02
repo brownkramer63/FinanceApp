@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/clientVendor")
+@RequestMapping("/clientVendors")
 public class ClientVendorController {
 
     private final ClientVendorService clientVendorService;
@@ -26,11 +26,11 @@ public class ClientVendorController {
         this.mapperUtil = mapperUtil;
     }
 
-    @GetMapping("/-list")
+    @GetMapping("/list")
     public String clientVendorList(Model model){
         List<ClientVendorDTO> clientVendors= clientVendorService.listAllClientVendors();
         model.addAttribute("clientvendors",clientVendors);
-        return "/clientVendor/-list";
+        return "/clientVendor/list";
   //check logic here
     }
     @PostMapping("/-create")
