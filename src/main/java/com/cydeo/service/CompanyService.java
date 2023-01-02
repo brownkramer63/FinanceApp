@@ -24,7 +24,7 @@ public interface CompanyService {
 
 
 
-    List<CompanyDTO> getCompaniesByLoggedInUser();
+
 
 
 
