@@ -1,10 +1,8 @@
-package com.cydeo.service.impl;
+package com.cydeo.security;
 
 import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.User;
-import com.cydeo.entity.common.UserPrincipal;
 import com.cydeo.repository.UserRepository;
-import com.cydeo.service.SecurityService;
 import com.cydeo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,7 +31,7 @@ public class SecurityServiceImpl implements SecurityService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-        var userdetails =  new UserPrincipal(user);
+        var userdetails =  new SparkleUserMapperToSecurity(user);
         return userdetails;
     }
 }
