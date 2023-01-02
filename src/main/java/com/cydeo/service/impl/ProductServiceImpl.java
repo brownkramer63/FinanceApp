@@ -2,13 +2,17 @@ package com.cydeo.service.impl;
 
 
 import com.cydeo.dto.CategoryDTO;
+import com.cydeo.dto.CompanyDTO;
 import com.cydeo.dto.ProductDTO;
+import com.cydeo.entity.Company;
 import com.cydeo.entity.Product;
+import com.cydeo.enums.ProductUnit;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.ProductRepository;
 import com.cydeo.service.ProductService;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +29,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO findById(Long id) {
-        return null;
+
+        Product  product = productRepository.findById(id).get();
+        return mapperUtil.convert(product, new ProductDTO());
+
+
     }
 
     @Override
@@ -64,4 +72,13 @@ public class ProductServiceImpl implements ProductService {
 
 
     }
+    @Override
+    public List<ProductUnit> listAllEnums(){
+       // List<ProductUnit> productUnits= Arrays.asList(ProductUnit.class.getEnumConstants());
+        List<ProductUnit> productUnits= Arrays.asList(ProductUnit.values());
+        return productUnits;
+    }
+
+
+
 }

@@ -2,6 +2,9 @@ package com.cydeo.service;
 
 
 import com.cydeo.dto.ClientVendorDTO;
+import com.cydeo.entity.ClientVendor;
+
+import java.util.List;
 
 public interface ClientVendorService {
 
@@ -12,5 +15,9 @@ public interface ClientVendorService {
     void delete(Long id);
 
     void update(ClientVendorDTO clientVendorDTO);
+
+    List<ClientVendorDTO> listAllClientVendors();
+
+    public List<ClientVendor> findAllByClientVendorName(String name);
 
 }

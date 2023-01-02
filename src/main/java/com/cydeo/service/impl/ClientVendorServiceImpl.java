@@ -7,6 +7,7 @@ import com.cydeo.repository.ClientVendorRepository;
 import com.cydeo.service.ClientVendorService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 @Service
 public class ClientVendorServiceImpl implements ClientVendorService {
@@ -46,4 +47,16 @@ public class ClientVendorServiceImpl implements ClientVendorService {
             clientVendorRepository.save(updatedClientVendor);
         }
     }
+
+    @Override
+    public List<ClientVendorDTO> listAllClientVendors() {
+        return null;
+    }
+
+    @Override
+    public List<ClientVendor> findAllByClientVendorName(String name) {
+        return null;
+    }
+
+
 }

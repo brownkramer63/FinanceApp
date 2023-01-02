@@ -80,10 +80,13 @@ public class CompanyServiceImpl implements CompanyService {
         if (companyDTO.getCompanyStatus().getValue().equals("Passive")) {
             companyDTO.setCompanyStatus(CompanyStatus.ACTIVE);
             companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
+            log.info(" Company activated : " + companyDTO.getTitle());
         } else {
             companyDTO.setCompanyStatus(CompanyStatus.PASSIVE);
             companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
+            log.info(" Company Deactivated : " + companyDTO.getTitle());
         }
+
     }
 
     @Override
