@@ -1,7 +1,6 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.CompanyDTO;
-import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.Company;
 import com.cydeo.entity.User;
 import com.cydeo.enums.CompanyStatus;
@@ -11,15 +10,15 @@ import com.cydeo.repository.UserRepository;
 import com.cydeo.security.SecurityService;
 import com.cydeo.service.CompanyService;
 import com.cydeo.service.UserService;
-import org.springframework.security.core.context.SecurityContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CompanyServiceImpl implements CompanyService {
 
@@ -110,18 +109,16 @@ public class CompanyServiceImpl implements CompanyService {
 
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
 
-        if (user.getRole().getDescription().equals("Root User")){
+        if (user.getRole().getDescription().equals("Root User")) {
             List<Company> companyList = companyRepository.findCompaniesOrderByCompanyTitle();
 
             return companyList.stream().map(company -> mapperUtil.convert(company, new CompanyDTO())).collect(Collectors.toList());
 
-        }else{
+        } else {
             Company company = user.getCompany();
             CompanyDTO companyDTO = mapperUtil.convert(company, new CompanyDTO());
             return Arrays.asList(companyDTO);
         }
     }
-
-
 
 }
