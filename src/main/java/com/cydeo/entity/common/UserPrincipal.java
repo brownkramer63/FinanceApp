@@ -25,7 +25,7 @@ public class UserPrincipal implements UserDetails {
 //        GrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().getDescription());
 //        return List.of(authority);
 
-          List<GrantedAuthority> authorityList = new ArrayList<>();
+        List<GrantedAuthority> authorityList = new ArrayList<>();
         GrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().getDescription());
         authorityList.add(authority);
         return authorityList;
@@ -41,6 +41,7 @@ public class UserPrincipal implements UserDetails {
     public String getUsername() {
         return this.user.getUsername();
     }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

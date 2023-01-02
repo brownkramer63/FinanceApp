@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,5 +30,8 @@ public class Company extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     private Address address;
+
+
+
 
 }
