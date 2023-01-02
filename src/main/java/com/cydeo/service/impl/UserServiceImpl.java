@@ -19,13 +19,15 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final MapperUtil mapperUtil;
     private final RoleService roleService;
+    private final SecurityService securityService;
 
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, RoleService roleService) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, RoleService roleService, SecurityService securityService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.roleService = roleService;
 
+        this.securityService = securityService;
     }
 
     @Override
@@ -75,7 +77,10 @@ public class UserServiceImpl implements UserService {
         return mapperUtil.convert(user, new UserDTO());
     }
 
-
+    @Override
+    public UserDTO findAllByLoggedInUser() {
+        return null;
+    }
 
 
 }
