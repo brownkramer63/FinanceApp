@@ -2,15 +2,13 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.ClientVendorDTO;
 import com.cydeo.entity.ClientVendor;
+import com.cydeo.enums.ClientVendorType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.service.ClientVendorService;
 import org.apache.catalina.LifecycleState;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,13 +29,14 @@ public class ClientVendorController {
         List<ClientVendorDTO> clientVendors= clientVendorService.listAllClientVendors();
         model.addAttribute("clientvendors",clientVendors);
         return "redirect:/clientVendors/list";
-  //check logic here
+  //should be good
     }
     @PostMapping("/create")
     public String createClientVendor(Model model){
 
         model.addAttribute("clientVendor", new ClientVendorDTO());
-//        need to figure out the logic to add here
+        model.addAttribute("country list", List.of("USA","Canada","Germany") );
+        model.addAttribute("clientVendorTypes", ClientVendorType.values());
 
 
         return "redirect:/clientVendors/create";
@@ -45,9 +44,25 @@ public class ClientVendorController {
     @PostMapping("/create")
     public String insertClientVendor(@ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, Model model){
 
-        //check logic here
         clientVendorService.save(clientVendorDTO);
         return "redirect:/clientVendors/create";
+    }
+
+    @GetMapping("/update/{id}")
+    public String editClientVendor(@PathVariable("clientVendorId") Long clientVendorId, Model model){
+
+        model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
+        model.addAttribute("country list", List.of("USA","Canada","Germany") );
+        model.addAttribute("clientVendorTypes", ClientVendorType.values());
+    return "clientVendor/clientVendor-update";
+    }
+
+    @PostMapping("/update/{id}")
+    public String editClientVendor(@ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, @PathVariable("clientVendorId") Long clientVendorId,Model model){
+
+        clientVendorService.save(clientVendorDTO);
+        return "redirect:/clientVendors/list";
+
     }
 
 
