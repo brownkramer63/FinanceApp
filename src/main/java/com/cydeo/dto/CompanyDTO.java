@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 
 @Getter
 @Setter
@@ -15,9 +20,19 @@ public class CompanyDTO {
 
 
     private Long id;
+
+    @NotBlank
+    @Size(max = 200, min=2)
     private String title;
+
+    @NotBlank
+    @Pattern(regexp = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$")
     private String phone;
+
+    @NotBlank
+    @Size(max=100, min=2)
     private String website;
+
     private AddressDTO address;
     private CompanyStatus companyStatus;
 

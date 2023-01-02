@@ -17,6 +17,6 @@ public class ProductDTO {
     private int lowLimitAlert;
     private String name;
     private ProductUnit productUnit;
-    private int qtyInStock;
+    private int quantityInStock;
     private CategoryDTO category;
 }

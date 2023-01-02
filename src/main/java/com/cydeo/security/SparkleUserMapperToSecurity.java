@@ -49,7 +49,7 @@ public class SparkleUserMapperToSecurity implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !user.getCompany().getCompanyStatus().equals(CompanyStatus.PASSIVE);
+        return user.getCompany().getCompanyStatus().equals(CompanyStatus.ACTIVE);
     }
 
     @Override
