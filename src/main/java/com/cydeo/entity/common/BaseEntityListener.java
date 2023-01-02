@@ -1,5 +1,7 @@
 package com.cydeo.entity.common;
 
+import com.cydeo.security.SparkleUserMapperToSecurity;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -7,8 +9,9 @@ import org.springframework.stereotype.Component;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
+
 @Component
-public class BaseEntityListener {
+public class BaseEntityListener extends AuditingEntityListener {
 
     @PrePersist
     public void onPrePersist(BaseEntity baseEntity) {
@@ -19,7 +22,7 @@ public class BaseEntityListener {
         baseEntity.lastUpdateDateTime = LocalDateTime.now();
 
         if (authentication != null && !authentication.getName().equals("anonymousUser")) {
-            UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+            SparkleUserMapperToSecurity principal = (SparkleUserMapperToSecurity) authentication.getPrincipal();
             baseEntity.insertUserId = principal.getId();
             baseEntity.lastUpdateUserId = principal.getId();
         }
@@ -33,7 +36,7 @@ public class BaseEntityListener {
         baseEntity.lastUpdateDateTime = LocalDateTime.now();
 
         if (authentication != null && !authentication.getName().equals("anonymousUser")) {
-            UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+            SparkleUserMapperToSecurity principal = (SparkleUserMapperToSecurity) authentication.getPrincipal();
             baseEntity.lastUpdateUserId = principal.getId();
         }
     }

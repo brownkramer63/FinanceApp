@@ -4,6 +4,8 @@ import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.User;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.UserRepository;
+import com.cydeo.service.RoleService;
+import com.cydeo.service.SecurityService;
 import com.cydeo.service.UserService;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +18,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final MapperUtil mapperUtil;
+    private final RoleService roleService;
+    private final SecurityService securityService;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil) {
+
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, RoleService roleService, SecurityService securityService) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
+        this.roleService = roleService;
+
+        this.securityService = securityService;
     }
 
     @Override
@@ -69,7 +77,10 @@ public class UserServiceImpl implements UserService {
         return mapperUtil.convert(user, new UserDTO());
     }
 
-
+    @Override
+    public UserDTO findAllByLoggedInUser() {
+        return null;
+    }
 
 
 }
