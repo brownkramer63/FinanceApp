@@ -38,7 +38,6 @@ public class ClientVendorController {
     public String createClientVendor(Model model){
 
         model.addAttribute("newClientVendor", new ClientVendorDTO());
-//        model.addAttribute("country", List.of("USA","Canada","Germany") );
         List<ClientVendorType> clientVendorTypes = Arrays.asList(ClientVendorType.values());
         log.info("size of clientVendorTypes" +clientVendorTypes.size());
         model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
