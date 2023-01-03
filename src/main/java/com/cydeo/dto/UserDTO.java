@@ -17,10 +17,10 @@ public class UserDTO {
     @NotNull
     private String confirmPassword;
     @NotBlank
-    @Size(max = 15, min = 2)
+    @Size(max = 50, min = 2)
     private String firstname;
     @NotBlank
-    @Size(max = 15, min = 2)
+    @Size(max = 50, min = 2)
     private String lastname;
     @NotBlank
     @Pattern(regexp = "^\\d{10}$")
