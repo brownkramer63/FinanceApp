@@ -2,9 +2,10 @@ package com.cydeo.service.impl;
 
 import com.cydeo.dto.CategoryDTO;
 import com.cydeo.entity.Category;
-import com.cydeo.entity.User;
+import com.cydeo.entity.Product;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CategoryRepository;
+import com.cydeo.repository.ProductRepository;
 import com.cydeo.service.CategoryService;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +17,13 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
     private final MapperUtil mapperUtil;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, MapperUtil mapperUtil) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ProductRepository productRepository, MapperUtil mapperUtil) {
         this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
         this.mapperUtil = mapperUtil;
     }
 
@@ -55,12 +58,14 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(Long id) {
 
         Optional<Category> foundCategory=categoryRepository.findById(id);
-
-        if(foundCategory.isPresent()){
+        boolean result = checkIfCategoryCanBeDeleted(foundCategory.get());
+        if(result ) {
             foundCategory.get().setIsDeleted(true);
+            categoryRepository.save(foundCategory.get());
+        }else{
+            CategoryDTO categoryDTO=mapperUtil.convert(foundCategory.get(), new CategoryDTO());
+            categoryDTO.setHasProduct(true);
         }
-        categoryRepository.save(foundCategory.get());
-
 
 
     }
@@ -73,5 +78,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     }
 
+    private boolean checkIfCategoryCanBeDeleted(Category category) {
+        List<Product> productList = productRepository.findProductByCategory(category);
+        if (productList.size() == 0) {
+            return true;
+        } else {
+            return false;
 
+
+        }
+
+
+    }
 }

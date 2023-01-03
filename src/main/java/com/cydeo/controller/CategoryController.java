@@ -30,7 +30,7 @@ public class CategoryController {
 
         model.addAttribute("newCategory", new CategoryDTO());
 
-        return "/category/category-create";
+        return "category/category-create";
     }
 
 
@@ -46,7 +46,7 @@ public class CategoryController {
     public String listCategory(Model model){
         model.addAttribute("categories",categoryService.listAllCategory());
 
-        return "/category/category-list";
+        return "category/category-list";
     }
 
 
@@ -55,7 +55,7 @@ public class CategoryController {
 
         model.addAttribute("category", categoryService.findById(id));
 
-        return "/category/category-update";
+        return "category/category-update";
 
     }
 
