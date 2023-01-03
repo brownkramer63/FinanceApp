@@ -1,5 +1,6 @@
 package com.cydeo.repository;
 
+import com.cydeo.entity.Category;
 import com.cydeo.entity.Product;
 import com.cydeo.enums.ProductUnit;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +12,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     List<Product> findAllByIsDeletedOrderByCategoryAsc(boolean deleted);
 
 
-
+    List<Product> findProductByCategory(Category category);
 
     Product findByIdAndIsDeleted(Long id, Boolean deleted);
 
