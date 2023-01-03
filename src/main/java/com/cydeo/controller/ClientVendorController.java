@@ -56,12 +56,11 @@ public class ClientVendorController {
     public String editClientVendor(@PathVariable("clientVendorId") Long clientVendorId, Model model){
 
         model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
-        model.addAttribute("country", List.of("USA","Canada","Germany") );
-        model.addAttribute("clientVendorType", ClientVendorType.values());
+        model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
     return "clientVendor/clientVendor-update";
     }
 
-    @PostMapping("/update/{id}")
+    @PostMapping("/update/{clientVendorId}")
     public String editClientVendor(@ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, @PathVariable("clientVendorId") Long clientVendorId,Model model){
 
         clientVendorService.save(clientVendorDTO);

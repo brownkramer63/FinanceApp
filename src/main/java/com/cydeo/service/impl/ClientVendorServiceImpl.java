@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     @Override
     public ClientVendorDTO findById(Long id) {
 
-        ClientVendor obj = clientVendorRepository.findById(id).get();
+      ClientVendor obj = clientVendorRepository.findById(id).orElseThrow(() ->new NoSuchElementException("clientVendor does not exist"));
         return mapperUtil.convert(obj, new ClientVendorDTO());
     }
 
