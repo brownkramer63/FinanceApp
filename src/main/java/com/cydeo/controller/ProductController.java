@@ -30,7 +30,7 @@ public class ProductController {
     model.addAttribute("categories", categoryService.listAllCategory());
     model.addAttribute("productUnits", productService.listAllEnums());
 
-  return "/product/product-create";
+  return "product/product-create";
 }
 
 
@@ -45,7 +45,7 @@ public class ProductController {
     public String listProduct(Model model){
         model.addAttribute("products", productService.listAllProducts());
 
-        return "/product/product-list";
+        return "product/product-list";
     }
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable("id") Long id) {
@@ -60,7 +60,7 @@ public class ProductController {
         model.addAttribute("categories", categoryService.listAllCategory());
         model.addAttribute("productUnits", productService.listAllEnums());
 
-        return "/product/product-update";
+        return "product/product-update";
     }
 
     @PostMapping("/update/{id}")

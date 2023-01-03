@@ -1,6 +1,7 @@
 package com.cydeo.service;
 
 import com.cydeo.dto.CompanyDTO;
+import com.cydeo.entity.Company;
 
 
 import java.util.List;
@@ -13,13 +14,17 @@ public interface CompanyService {
 
     List<CompanyDTO> listAllCompaniesOrderByStatusAndTitle();
 
-    void save(CompanyDTO companyDTO);
+    CompanyDTO save(CompanyDTO companyDTO);
 
     void activateDeactivateCompanyStatus(Long id);
 
-    void update(CompanyDTO companyDTO, Long id);
+    CompanyDTO update(CompanyDTO companyDTO, Long id);
 
     List<CompanyDTO> getCompaniesByLoggedInUser();
+
+
+
+
 
 
 
