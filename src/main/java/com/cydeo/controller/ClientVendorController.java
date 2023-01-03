@@ -78,7 +78,7 @@ public class ClientVendorController {
             return "clientVendor/clientVendor-update";
 
         }
-        clientVendorService.save(clientVendorDTO);
+        clientVendorService.update(clientVendorDTO);
         return "redirect:/clientVendors/list";
 
     }
