@@ -48,7 +48,7 @@ public class ClientVendorController {
         return "redirect:/clientVendors/list";
     }
 
-    @GetMapping("/update/{id}")
+    @GetMapping("/update/{clientVendorId}")
     public String editClientVendor(@PathVariable("clientVendorId") Long clientVendorId, Model model){
 
         model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
