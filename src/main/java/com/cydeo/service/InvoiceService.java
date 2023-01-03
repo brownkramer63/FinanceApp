@@ -10,15 +10,16 @@ import java.util.List;
 public interface InvoiceService {
 
     InvoiceDTO findById(Long id);
-
+    List<InvoiceDTO> listAllInvoicesByType(InvoiceType invoiceType);
     void delete(Long id);
+
      List<InvoiceDTO> listAllInvoice();
 
      void approve(Long id);
 
      InvoiceDTO create(InvoiceDTO invoiceDTO, InvoiceType invoiceType);
 
-     List<InvoiceDTO> listAllInvoicesByType(InvoiceType invoiceType);
+
 
 
     InvoiceDTO getNewPurchaseInvoice();
