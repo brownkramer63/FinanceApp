@@ -124,11 +124,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public CompanyDTO getCompanyByLoggedInUser() {
 
-        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
-
-        Company company = user.getCompany();
-        CompanyDTO companyDTO = mapperUtil.convert(company, new CompanyDTO());
-        return companyDTO;
+        return securityService.getLoggedInUser().getCompany();
 
     }
 
