@@ -9,6 +9,7 @@ import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,15 +23,14 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
 
     private final MapperUtil mapperUtil;
-    private final InvoiceProductService invoiceProductService;
+
     private final InvoiceService invoiceService;
     private final InvoiceRepository invoiceRepository;
     private final InvoiceProductRepository invoiceProductRepository;
 
-    public InvoiceProductServiceImpl(MapperUtil mapperUtil, InvoiceProductService invoiceProductService, InvoiceService invoiceService, InvoiceRepository invoiceRepository, InvoiceProductRepository invoiceProductRepository) {
+    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceRepository invoiceRepository, InvoiceProductRepository invoiceProductRepository) {
 
         this.mapperUtil = mapperUtil;
-        this.invoiceProductService = invoiceProductService;
         this.invoiceService = invoiceService;
         this.invoiceRepository = invoiceRepository;
         this.invoiceProductRepository = invoiceProductRepository;
@@ -39,16 +39,16 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public InvoiceProductDTO findById(Long id) {
-        return mapperUtil.convert(invoiceProductService.findById(id), new InvoiceProductDTO());
+        return mapperUtil.convert(invoiceProductRepository.findById(id), new InvoiceProductDTO());
     }
 
     @Override
     public List<InvoiceProductDTO> findByInvoiceProductId(Long id) {
-        return invoiceProductService.findByInvoiceProductId(id).stream()
-                .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDTO()))
-                .collect(Collectors.toList());
+//        return invoiceProductRepository.fin(id).stream()
+//                .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDTO()))
+//                .collect(Collectors.toList());
 
-
+        return null;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         Optional<Invoice> invoice = invoiceRepository.findById(invoiceDTO.getId());
         Invoice convertedInvoice = mapperUtil.convert(invoiceDTO, new Invoice());
 
-        if(invoice.isPresent()){
+        if (invoice.isPresent()) {
             convertedInvoice.setInvoiceNo(convertedInvoice.getInvoiceNo());
             convertedInvoice.setClientVendor(convertedInvoice.getClientVendor());
             convertedInvoice.setDate(convertedInvoice.getDate());
