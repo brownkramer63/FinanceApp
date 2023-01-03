@@ -5,14 +5,17 @@ import com.cydeo.entity.ClientVendor;
 import com.cydeo.enums.ClientVendorType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.service.ClientVendorService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.LifecycleState;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
+@Slf4j
 @RequestMapping("/clientVendors")
 public class ClientVendorController {
 
@@ -34,30 +37,30 @@ public class ClientVendorController {
     @GetMapping("/create")
     public String createClientVendor(Model model){
 
-        model.addAttribute("clientVendor", new ClientVendorDTO());
-        model.addAttribute("country", List.of("USA","Canada","Germany") );
-        model.addAttribute("clientVendorType", ClientVendorType.values());
+        model.addAttribute("newClientVendor", new ClientVendorDTO());
+        List<ClientVendorType> clientVendorTypes = Arrays.asList(ClientVendorType.values());
+        log.info("size of clientVendorTypes" +clientVendorTypes.size());
+        model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
 
 
         return "clientVendor/clientVendor-create";
     }
     @PostMapping("/create")
-    public String insertClientVendor(@ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, Model model){
+    public String insertClientVendor(@ModelAttribute("newClientVendor") ClientVendorDTO clientVendorDTO, Model model){
 
         clientVendorService.save(clientVendorDTO);
         return "redirect:/clientVendors/list";
     }
 
-    @GetMapping("/update/{id}")
+    @GetMapping("/update/{clientVendorId}")
     public String editClientVendor(@PathVariable("clientVendorId") Long clientVendorId, Model model){
 
         model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
-        model.addAttribute("country", List.of("USA","Canada","Germany") );
-        model.addAttribute("clientVendorType", ClientVendorType.values());
+        model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
     return "clientVendor/clientVendor-update";
     }
 
-    @PostMapping("/update/{id}")
+    @PostMapping("/update/{clientVendorId}")
     public String editClientVendor(@ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, @PathVariable("clientVendorId") Long clientVendorId,Model model){
 
         clientVendorService.save(clientVendorDTO);
