@@ -83,9 +83,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceDTO> listAllInvoicesByType(InvoiceType invoiceType) {
-        //TODO @nihano add method to the companyService
-       // CompanyDTO companyDTO = companyService.findCompanyByUser();
-        CompanyDTO companyDTO = companyService.findById(1l);
+
+
+        CompanyDTO companyDTO = (CompanyDTO) companyService.getCompaniesByLoggedInUser();
 
 
       List<Invoice> invoiceListByType = invoiceRepository.findAllByCompanyAndInvoiceTypeOrderByDateDesc(mapperUtil.convert(companyDTO, new Company()),invoiceType)
@@ -108,10 +108,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
     private String generateInvoiceNumber(InvoiceType invoiceType){
-        //TODO @nihano add method to the companyService
 
-       // CompanyDTO companyDTO = companyService.findCompanyByUser();
-        CompanyDTO companyDTO = companyService.findById(1l);
+
+
+        CompanyDTO companyDTO = (CompanyDTO) companyService.getCompaniesByLoggedInUser();
         Company company = mapperUtil.convert(companyDTO, new Company());
 
         Invoice invoice = invoiceRepository.findAllByCompanyAndInvoiceTypeOrderByDateDesc(company, invoiceType).stream()
@@ -172,6 +172,26 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     }
 
+    @Override
+    public InvoiceDTO getNewSalesInvoice() {
+
+        InvoiceDTO invoiceDTO = new InvoiceDTO();
+        invoiceDTO.setDate(LocalDate.now());
+        invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
+        invoiceDTO.setInvoiceNumber(generateInvoiceNumber(InvoiceType.SALES));
+
+        return invoiceDTO;
+
+    }
+
+    @Override
+    public InvoiceDTO save(InvoiceDTO invoiceDTO, InvoiceType invoiceType) {
+        invoiceDTO.setCompanyDTO((CompanyDTO) companyService.getCompaniesByLoggedInUser());
+        invoiceDTO.setInvoiceType(invoiceType);
+        invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
+        Invoice invoice = invoiceRepository.save(mapperUtil.convert(invoiceDTO, new Invoice()));
+        return mapperUtil.convert(invoice, new InvoiceDTO());
+    }
 
 
 }

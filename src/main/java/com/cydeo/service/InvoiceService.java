@@ -22,4 +22,7 @@ public interface InvoiceService {
 
 
     InvoiceDTO getNewPurchaseInvoice();
+    InvoiceDTO getNewSalesInvoice();
+
+    InvoiceDTO save(InvoiceDTO invoiceDTO, InvoiceType invoiceType);
 }
