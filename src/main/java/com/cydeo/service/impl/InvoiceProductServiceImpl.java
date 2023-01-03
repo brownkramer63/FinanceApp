@@ -9,9 +9,10 @@ import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final InvoiceRepository invoiceRepository;
     private final InvoiceProductRepository invoiceProductRepository;
 
-    public InvoiceProductServiceImpl(MapperUtil mapperUtil, InvoiceProductService invoiceProductService, InvoiceService invoiceService, InvoiceRepository invoiceRepository, InvoiceProductRepository invoiceProductRepository) {
+    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceProductService invoiceProductService,@Lazy InvoiceService invoiceService, InvoiceRepository invoiceRepository, InvoiceProductRepository invoiceProductRepository) {
 
         this.mapperUtil = mapperUtil;
         this.invoiceProductService = invoiceProductService;

@@ -12,7 +12,7 @@ public class InvoiceDtoConverter implements Converter<String, InvoiceDTO> {
 
     InvoiceService invoiceService;
 
-    public InvoiceDtoConverter(InvoiceService invoiceService) {
+    public InvoiceDtoConverter( InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
     }
 
