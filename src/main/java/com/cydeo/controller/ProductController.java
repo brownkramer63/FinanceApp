@@ -7,7 +7,10 @@ import com.cydeo.service.CategoryService;
 import com.cydeo.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/products")
@@ -35,7 +38,16 @@ public class ProductController {
 
 
     @PostMapping("/create")
-    public String insertProduct(@ModelAttribute("newProduct")  ProductDTO productDTO){
+    public String insertProduct(@Valid @ModelAttribute("newProduct")  ProductDTO productDTO
+            , BindingResult bindingResult,Model model){
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", categoryService.listAllCategory());
+            model.addAttribute("productUnits", productService.listAllEnums());
+            return "product/product-create";
+
+        }
+
+
         productService.save(productDTO);
 
         return "redirect:/products/list";
@@ -64,9 +76,16 @@ public class ProductController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateProduct(@ModelAttribute("newProduct") ProductDTO productDTO) {
+    public String updateProduct(@Valid @ModelAttribute("newProduct") ProductDTO productDTO
+    ,BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
 
-        productService.update(productDTO);
+            model.addAttribute("categories", categoryService.listAllCategory());
+            model.addAttribute("productUnits", productService.listAllEnums());
+            return "product/product-create";
+
+        }
+            productService.update(productDTO);
 
         return "redirect:/products/list";
 
