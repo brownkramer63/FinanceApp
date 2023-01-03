@@ -5,8 +5,9 @@ import com.cydeo.entity.ClientVendor;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.ClientVendorRepository;
 import com.cydeo.repository.UserRepository;
-import com.cydeo.security.SecurityServiceImpl;
+import com.cydeo.security.SecurityService;
 import com.cydeo.service.ClientVendorService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +19,11 @@ import java.util.stream.Collectors;
 public class ClientVendorServiceImpl implements ClientVendorService {
 
     private final ClientVendorRepository clientVendorRepository;
-    private final UserRepository userRepository;
-    private final SecurityServiceImpl securityService;
+    private final SecurityService securityService;
     private final MapperUtil mapperUtil;
 
-    public ClientVendorServiceImpl(ClientVendorRepository clientVendorRepository, UserRepository userRepository, SecurityServiceImpl securityService, MapperUtil mapperUtil) {
+    public ClientVendorServiceImpl(ClientVendorRepository clientVendorRepository, SecurityService securityService, MapperUtil mapperUtil) {
         this.clientVendorRepository = clientVendorRepository;
-        this.userRepository = userRepository;
         this.securityService = securityService;
         this.mapperUtil = mapperUtil;
     }

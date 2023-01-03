@@ -28,10 +28,10 @@ public class ClientVendorController {
     public String clientVendorList(Model model){
         List<ClientVendorDTO> clientVendors= clientVendorService.listAllClientVendors();
         model.addAttribute("clientvendors",clientVendors);
-        return "redirect:/clientVendors/list";
+        return "clientVendor/clientVendor-list";
   //should be good
     }
-    @PostMapping("/create")
+    @GetMapping("/create")
     public String createClientVendor(Model model){
 
         model.addAttribute("clientVendor", new ClientVendorDTO());
@@ -39,13 +39,13 @@ public class ClientVendorController {
         model.addAttribute("clientVendorTypes", ClientVendorType.values());
 
 
-        return "redirect:/clientVendors/create";
+        return "clientVendor/clientVendor-create";
     }
     @PostMapping("/create")
     public String insertClientVendor(@ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, Model model){
 
         clientVendorService.save(clientVendorDTO);
-        return "redirect:/clientVendors/create";
+        return "redirect:/clientVendors/list";
     }
 
     @GetMapping("/update/{id}")
