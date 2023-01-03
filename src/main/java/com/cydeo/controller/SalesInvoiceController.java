@@ -74,8 +74,19 @@ public class SalesInvoiceController {
     }
 
     @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProduct(@PathVariable("id") Long id, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO){
-        invoiceProductService.save(id, invoiceProductDTO);
+    public String addInvoiceProduct(@PathVariable("id") Long id, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model){
+        if(bindingResult.hasErrors()){
+            model.addAttribute("invoice", invoiceService.findById(id));
+            model.addAttribute("clients", clientVendorService.listAllClientVendors());
+            model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
+            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceProductDTO.getId()));
+            model.addAttribute("products", productService.listAllProducts());
+
+
+
+            return "invoice/sales-invoice-update";
+        }
+        invoiceProductService.addInvoiceProduct(id, invoiceProductDTO);
         return "redirect:/salesInvoices/update";
     }
 
@@ -83,7 +94,7 @@ public class SalesInvoiceController {
     public String createSalesInvoice(Model model){
 
         model.addAttribute("newSalesInvoice", invoiceService.getNewSalesInvoice());
-        model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+        model.addAttribute("clients", clientVendorService.listAllClientVendors());
         return "/invoice/sales-invoice-create";
     }
 
@@ -92,14 +103,20 @@ public class SalesInvoiceController {
     public String saveSalesInvoice( @ModelAttribute("newSalesInvoice") InvoiceDTO newSalesInvoice, BindingResult bindingResult, Model model){
 
             if(bindingResult.hasErrors()){
-                model.addAttribute("newSalesInvoice", invoiceService.getNewSalesInvoice());
-                model.addAttribute("vendors", clientVendorService.listAllClientVendors());
-                return "/invoice/sales-invoice-update";
+                model.addAttribute("clients", clientVendorService.listAllClientVendors());
+                return "invoice/sales-invoice-create";
             }
-            invoiceService.save(newSalesInvoice, InvoiceType.PURCHASE);
+        InvoiceDTO invoiceDTO = invoiceService.save(newSalesInvoice, InvoiceType.SALES);
 
-            return "redirect:/salesInvoices/create";
+        model.addAttribute("invoice", invoiceDTO);
+        model.addAttribute("clients", clientVendorService.listAllClientVendors());
+        model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
+        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceDTO.getId()));
+        model.addAttribute("products", productService.listAllProducts());
 
+
+
+        return "invoice/sales-invoice-update";
 
     }
 

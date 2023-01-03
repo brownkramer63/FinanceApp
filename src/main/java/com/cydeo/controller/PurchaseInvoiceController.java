@@ -3,6 +3,7 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
+import com.cydeo.entity.Invoice;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.InvoiceProductService;
@@ -71,13 +72,20 @@ public class PurchaseInvoiceController {
     public String savePurchaseInvoice( @ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("newPurchaseInvoice", invoiceService.getNewPurchaseInvoice());
             model.addAttribute("vendors", clientVendorService.listAllClientVendors());
-            return "/invoice/purchase-invoice-update";
+            return "/invoice/purchase-invoice-create";
         }
-        invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
+        InvoiceDTO invoiceDTO = invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
 
-        return "redirect:/purchaseInvoices/create";
+        model.addAttribute("invoice", invoiceDTO);
+        model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+        model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
+        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceDTO.getId()));
+        model.addAttribute("products", productService.listAllProducts());
+
+
+
+        return "invoice/purchase-invoice-update";
 
 
 
@@ -115,7 +123,7 @@ public class PurchaseInvoiceController {
 
     @PostMapping("/addInvoiceProduct/{id}")
     public String addInvoiceProduct(@PathVariable("id") Long id, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO){
-        invoiceProductService.save(id, invoiceProductDTO);
+        invoiceProductService.addInvoiceProduct(id, invoiceProductDTO);
         return "redirect:/purchaseInvoices/update";
     }
 

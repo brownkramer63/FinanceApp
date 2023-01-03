@@ -23,15 +23,15 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
 
     private final MapperUtil mapperUtil;
-    private final InvoiceProductService invoiceProductService;
+
     private final InvoiceService invoiceService;
     private final InvoiceRepository invoiceRepository;
     private final InvoiceProductRepository invoiceProductRepository;
 
-    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceProductService invoiceProductService,@Lazy InvoiceService invoiceService, InvoiceRepository invoiceRepository, InvoiceProductRepository invoiceProductRepository) {
+    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceRepository invoiceRepository, InvoiceProductRepository invoiceProductRepository) {
 
         this.mapperUtil = mapperUtil;
-        this.invoiceProductService = invoiceProductService;
+
         this.invoiceService = invoiceService;
         this.invoiceRepository = invoiceRepository;
         this.invoiceProductRepository = invoiceProductRepository;
@@ -40,12 +40,12 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public InvoiceProductDTO findById(Long id) {
-        return mapperUtil.convert(invoiceProductService.findById(id), new InvoiceProductDTO());
+        return mapperUtil.convert(invoiceProductRepository.findById(id), new InvoiceProductDTO());
     }
 
     @Override
     public List<InvoiceProductDTO> findByInvoiceProductId(Long id) {
-        return invoiceProductService.findByInvoiceProductId(id).stream()
+        return invoiceProductRepository.findByInvoiceId(id).stream()
                 .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDTO()))
                 .collect(Collectors.toList());
 
@@ -58,7 +58,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         Optional<Invoice> invoice = invoiceRepository.findById(invoiceDTO.getId());
         Invoice convertedInvoice = mapperUtil.convert(invoiceDTO, new Invoice());
 
-        if(invoice.isPresent()){
+        if (invoice.isPresent()) {
             convertedInvoice.setInvoiceNo(convertedInvoice.getInvoiceNo());
             convertedInvoice.setClientVendor(convertedInvoice.getClientVendor());
             convertedInvoice.setDate(convertedInvoice.getDate());
@@ -76,7 +76,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public void save(Long id, InvoiceProductDTO invoiceProductDTO) {
+    public void addInvoiceProduct(Long id, InvoiceProductDTO invoiceProductDTO) {
         InvoiceDTO invoiceDTO = invoiceService.findById(id);
         InvoiceProductDTO invoiceProductDTO1 = new InvoiceProductDTO();
         invoiceProductDTO1.setInvoice(invoiceDTO);
@@ -88,4 +88,16 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
 
     }
+
+    @Override
+    public void delete(Long id) {
+        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
+
+        invoiceProduct.setIsDeleted(true);
+        invoiceProductRepository.save(invoiceProduct);
+        invoiceProductRepository.delete(invoiceProduct);
+
+    }
+
+
 }
