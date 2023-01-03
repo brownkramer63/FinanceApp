@@ -67,6 +67,12 @@ public class ClientVendorController {
         return "redirect:/clientVendors/list";
 
     }
+    @GetMapping("/delete/{clientVendorId}")
+    public String deleteClientVendorById(@PathVariable("clientVendorId") Long clientVendorId, Model model){
+        model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
+        clientVendorService.delete(clientVendorId);
+        return "redirect:/clientVendors/list";
+    }
 
 
 
