@@ -1,7 +1,6 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.CompanyDTO;
-import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.Company;
 import com.cydeo.entity.User;
 import com.cydeo.enums.CompanyStatus;
@@ -11,15 +10,15 @@ import com.cydeo.repository.UserRepository;
 import com.cydeo.security.SecurityService;
 import com.cydeo.service.CompanyService;
 import com.cydeo.service.UserService;
-import org.springframework.security.core.context.SecurityContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CompanyServiceImpl implements CompanyService {
 
@@ -63,11 +62,13 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     @Override
-    public void save(CompanyDTO companyDTO) {
+    public CompanyDTO save(CompanyDTO companyDTO) {
 
         Company company = mapperUtil.convert(companyDTO, new Company());
         company.setCompanyStatus(CompanyStatus.PASSIVE);
         companyRepository.save(company);
+
+        return companyDTO;
     }
 
 
@@ -78,14 +79,17 @@ public class CompanyServiceImpl implements CompanyService {
         if (companyDTO.getCompanyStatus().getValue().equals("Passive")) {
             companyDTO.setCompanyStatus(CompanyStatus.ACTIVE);
             companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
+            log.info(" Company activated : " + companyDTO.getTitle());
         } else {
             companyDTO.setCompanyStatus(CompanyStatus.PASSIVE);
             companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
+            log.info(" Company Deactivated : " + companyDTO.getTitle());
         }
+
     }
 
     @Override
-    public void update(CompanyDTO companyDTO, Long id) {
+    public CompanyDTO update(CompanyDTO companyDTO, Long id) {
 
         Company company = companyRepository.findById(id).get();
         companyDTO.setId(id);
@@ -93,6 +97,8 @@ public class CompanyServiceImpl implements CompanyService {
         companyDTO.getAddress().setId(company.getAddress().getId());
         companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
         // TODO: 12/30/22 check return type of this update method
+
+        return companyDTO;
 
     }
 
@@ -103,18 +109,16 @@ public class CompanyServiceImpl implements CompanyService {
 
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
 
-        if (user.getRole().getDescription().equals("Root User")){
+        if (user.getRole().getDescription().equals("Root User")) {
             List<Company> companyList = companyRepository.findCompaniesOrderByCompanyTitle();
 
             return companyList.stream().map(company -> mapperUtil.convert(company, new CompanyDTO())).collect(Collectors.toList());
 
-        }else{
+        } else {
             Company company = user.getCompany();
             CompanyDTO companyDTO = mapperUtil.convert(company, new CompanyDTO());
             return Arrays.asList(companyDTO);
         }
     }
-
-
 
 }
