@@ -27,7 +27,7 @@ public class ClientVendorController {
     @GetMapping("/list")
     public String clientVendorList(Model model){
         List<ClientVendorDTO> clientVendors= clientVendorService.listAllClientVendors();
-        model.addAttribute("clientvendors",clientVendors);
+        model.addAttribute("clientVendors",clientVendors);
         return "clientVendor/clientVendor-list";
   //should be good
     }
@@ -35,8 +35,8 @@ public class ClientVendorController {
     public String createClientVendor(Model model){
 
         model.addAttribute("clientVendor", new ClientVendorDTO());
-        model.addAttribute("country list", List.of("USA","Canada","Germany") );
-        model.addAttribute("clientVendorTypes", ClientVendorType.values());
+        model.addAttribute("country", List.of("USA","Canada","Germany") );
+        model.addAttribute("clientVendorType", ClientVendorType.values());
 
 
         return "clientVendor/clientVendor-create";
@@ -52,8 +52,8 @@ public class ClientVendorController {
     public String editClientVendor(@PathVariable("clientVendorId") Long clientVendorId, Model model){
 
         model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
-        model.addAttribute("country list", List.of("USA","Canada","Germany") );
-        model.addAttribute("clientVendorTypes", ClientVendorType.values());
+        model.addAttribute("country", List.of("USA","Canada","Germany") );
+        model.addAttribute("clientVendorType", ClientVendorType.values());
     return "clientVendor/clientVendor-update";
     }
 
