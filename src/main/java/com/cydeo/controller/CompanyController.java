@@ -25,7 +25,7 @@ public class CompanyController {
         //should listAllCompanies  (sort by status and title (repository), id=1 will not be listed)
         model.addAttribute("companies", companyService.listAllCompaniesOrderByStatusAndTitle());
 
-        return "/company/company-list";
+        return "company/company-list";
     }
 
 
@@ -33,7 +33,7 @@ public class CompanyController {
     public String editCompany(@PathVariable("id") Long id, Model model) {
 
         model.addAttribute("company", companyService.findById(id));
-        return "/company/company-update"; //may use redirect after finishing update?
+        return "company/company-update"; //may use redirect after finishing update?
     }
 
     @PostMapping("/update/{id}")
@@ -68,7 +68,7 @@ public class CompanyController {
 
         model.addAttribute("newCompany", new CompanyDTO());
 
-        return "/company/company-create";
+        return "company/company-create";
     }
 
     @PostMapping("/create")

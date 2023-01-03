@@ -33,7 +33,6 @@ public class SparkleUserMapperToSecurity implements UserDetails {
     @Override
     public String getPassword() {
         var pass = user.getPassword();
-        log.info("password of user : " + pass);
         return pass;
     }
 
