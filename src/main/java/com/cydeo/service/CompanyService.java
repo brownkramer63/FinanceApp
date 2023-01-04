@@ -20,13 +20,9 @@ public interface CompanyService {
 
     CompanyDTO update(CompanyDTO companyDTO, Long id);
 
-    List<CompanyDTO> getCompaniesByLoggedInUser();
+    List<CompanyDTO> getCompaniesByLoggedInUserForRoot();
 
-
-
-
-
-
+    CompanyDTO getCompanyByLoggedInUser();
 
 
 }

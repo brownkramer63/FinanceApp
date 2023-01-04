@@ -103,7 +103,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public List<CompanyDTO> getCompaniesByLoggedInUser() {
+    public List<CompanyDTO> getCompaniesByLoggedInUserForRoot() {
         //if currentUser = "Root User", all companies except Cydeo
         //else only his/her company
 
@@ -119,6 +119,13 @@ public class CompanyServiceImpl implements CompanyService {
             CompanyDTO companyDTO = mapperUtil.convert(company, new CompanyDTO());
             return Arrays.asList(companyDTO);
         }
+    }
+
+    @Override
+    public CompanyDTO getCompanyByLoggedInUser() {
+
+        return securityService.getLoggedInUser().getCompany();
+
     }
 
 }
