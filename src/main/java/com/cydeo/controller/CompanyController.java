@@ -6,7 +6,10 @@ import com.cydeo.enums.CompanyStatus;
 import com.cydeo.service.CompanyService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("companies")
@@ -37,8 +40,11 @@ public class CompanyController {
     }
 
     @PostMapping("/update/{id}")
-    public String editCompany(@PathVariable("id") Long id, @ModelAttribute("company") CompanyDTO companyDTO) {
+    public String editCompany(@PathVariable("id") Long id, @ModelAttribute("company") @Valid CompanyDTO companyDTO, BindingResult bindingResult) {
 
+        if (bindingResult.hasErrors()){
+            return "company/company-update";
+        }
 
         companyService.update(companyDTO, id);
 
@@ -72,8 +78,11 @@ public class CompanyController {
     }
 
     @PostMapping("/create")
-    public String insertCompany( @ModelAttribute("company") CompanyDTO companyDTO) {
+    public String insertCompany(@ModelAttribute("company") @Valid CompanyDTO companyDTO, BindingResult bindingResult) {
 
+        if (bindingResult.hasErrors()){
+            return "company/company-create";
+        }
 
         companyService.save(companyDTO);
 
