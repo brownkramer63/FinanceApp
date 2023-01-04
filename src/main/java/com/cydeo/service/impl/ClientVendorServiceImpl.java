@@ -40,7 +40,7 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public void save(ClientVendorDTO clientVendorDTO) {
-        clientVendorDTO.setCompany(companyService.getCompaniesByLoggedInUser().get(0));
+        clientVendorDTO.setCompany(companyService.getCompanyByLoggedInUser());
         ClientVendor clientVendor = mapperUtil.convert(clientVendorDTO, new ClientVendor());
         clientVendorRepository.save(clientVendor);
     }
