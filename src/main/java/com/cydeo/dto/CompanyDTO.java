@@ -31,9 +31,11 @@ public class CompanyDTO {
 
     @NotBlank
     @Size(max=100, min=2)
+    @Pattern(regexp = "^http(s {0,1})://[a-zA-Z0-9/\\-\\.]+.([A-Za-z/] {2,5})[a-zA-Z0-9/\\&\\?\\=\\-\\.\\~\\%]*")
     private String website;
 
     private AddressDTO address;
+
     private CompanyStatus companyStatus;
 
 }

@@ -57,11 +57,13 @@ public class ProductServiceImpl implements ProductService {
 
         Product oldProduct = productRepository.findByIdAndIsDeleted(productDTO.getId(), false);
         Product newProduct = mapperUtil.convert(productDTO, new Product());
+
         newProduct.setId(oldProduct.getId());
+        newProduct.setQuantityInStock(oldProduct.getQuantityInStock());
+
         productRepository.save(newProduct);
         return findById(productDTO.getId());
     }
-
 
 
     @Override
