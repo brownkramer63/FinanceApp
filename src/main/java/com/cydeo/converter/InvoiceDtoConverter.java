@@ -2,6 +2,7 @@ package com.cydeo.converter;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.service.InvoiceService;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ public class InvoiceDtoConverter implements Converter<String, InvoiceDTO> {
 
     InvoiceService invoiceService;
 
-    public InvoiceDtoConverter(InvoiceService invoiceService) {
+    public InvoiceDtoConverter( InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
     }
 

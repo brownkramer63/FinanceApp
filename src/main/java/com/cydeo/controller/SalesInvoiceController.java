@@ -2,6 +2,7 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
+import com.cydeo.entity.Invoice;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.InvoiceProductService;
@@ -9,6 +10,7 @@ import com.cydeo.service.InvoiceService;
 import com.cydeo.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -50,9 +52,7 @@ public class SalesInvoiceController {
     @GetMapping("/update/{id}")
     public String editSalesInvoice(@PathVariable("id") Long id, Model model){
         model.addAttribute("invoice", invoiceService.findById(id));
-        // todo @kramerbrown add method findAll
-       // model.addAttribute("clients", clientVendorService.findAll());
-        model.addAttribute("clients", clientVendorService.findById(1l));
+        model.addAttribute("clients", clientVendorService.listAllClientVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("products", productService.listAllProducts());
         model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(id));
@@ -62,8 +62,10 @@ public class SalesInvoiceController {
 
     @PostMapping("/update/{id}")
     public String updateSalesInvoice(@PathVariable("id") Long id, @ModelAttribute("invoice")InvoiceDTO invoiceDTO){
+
+
         invoiceProductService.update(invoiceDTO, id);
-        return "redirect:/salesInvoices/update";
+        return "redirect:/salesInvoices/list";
 
 
     }
@@ -75,44 +77,60 @@ public class SalesInvoiceController {
     }
 
     @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProduct(@PathVariable("id") Long id, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO){
-        invoiceProductService.save(id, invoiceProductDTO);
-        return "redirect:/salesInvoices/update";
+    public String addInvoiceProduct(@PathVariable("id") Long id, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model){
+        if(bindingResult.hasErrors()){
+            model.addAttribute("invoice", invoiceService.findById(id));
+            model.addAttribute("clients", clientVendorService.listAllClientVendors());
+            model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
+            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceProductDTO.getId()));
+            model.addAttribute("products", productService.listAllProducts());
+
+
+
+            return "invoice/sales-invoice-update";
+        }
+        invoiceProductService.addInvoiceProduct(id, invoiceProductDTO);
+        return "redirect:/salesInvoices/update" ;
     }
 
     @GetMapping("/create")
     public String createSalesInvoice(Model model){
 
-        model.addAttribute("newPurchaseInvoice", invoiceService.getNewPurchaseInvoice());
-        // todo add method findAll()
-        //model.addAttribute("vendors", clientVendorService.findAllClientVendor());
-        model.addAttribute("vendors", clientVendorService.findById(1l));
-
-
+        model.addAttribute("newSalesInvoice", invoiceService.getNewSalesInvoice());
+        model.addAttribute("clients", clientVendorService.listAllClientVendors());
         return "/invoice/sales-invoice-create";
     }
 
+
     @PostMapping("/create")
-    public String saveSalesInvoice(@ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, Model model){
+    public String saveSalesInvoice( @ModelAttribute("newSalesInvoice") InvoiceDTO newSalesInvoice, BindingResult bindingResult, Model model){
 
-        model.addAttribute("newPurchaseInvoice", invoiceService.create(newPurchaseInvoice, InvoiceType.SALES));
-        // todo @kramer add method findAll()
-       // model.addAttribute("vendors", clientVendorService.findAllByClientVendorName());
-        model.addAttribute("vendors", clientVendorService.findById(1l));
+            if(bindingResult.hasErrors()){
+                model.addAttribute("clients", clientVendorService.listAllClientVendors());
+                return "invoice/sales-invoice-create";
+            }
+        InvoiceDTO invoiceDTO = invoiceService.save(newSalesInvoice, InvoiceType.SALES);
+
+        model.addAttribute("invoice", invoiceDTO);
+        model.addAttribute("clients", clientVendorService.listAllClientVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
+        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceDTO.getId()));
         model.addAttribute("products", productService.listAllProducts());
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(newPurchaseInvoice.getId()));
 
-        return "/invoice/sales-invoice-update";
+
+
+        return "invoice/sales-invoice-update";
 
     }
 
     @GetMapping("/print/{id}")
     public String printSalesInvoice(@PathVariable("id") Long id, Model model){
 
-        model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(id));
+        InvoiceDTO invoiceDTO = invoiceService.findById(id);
 
+        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("company", invoiceDTO.getCompanyDTO());
         return "/invoice/invoice_print";
 
     }
