@@ -1,10 +1,14 @@
 package com.cydeo.dto;
 
 import lombok.*;
+
 import javax.validation.constraints.*;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Getter
+@Setter
 public class UserDTO {
 
     private Long id;
@@ -61,11 +65,12 @@ public class UserDTO {
         this.confirmPassword = confirmPassword;
         checkConfirmPassword();
     }
-    public void checkConfirmPassword(){
-        if (this.password == null || this.confirmPassword == null){
+
+    public void checkConfirmPassword() {
+        if (this.password == null || this.confirmPassword == null) {
             return;
         } else if (!this.password.equals(this.confirmPassword)) {
-            this.confirmPassword=null;
+            this.confirmPassword = null;
         }
     }
 
@@ -114,6 +119,7 @@ public class UserDTO {
     }
 
     public void setOnlyAdmin(boolean onlyAdmin) {
-        isOnlyAdmin = onlyAdmin;
+        this.isOnlyAdmin = false;
+
     }
 }
