@@ -58,7 +58,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public List<InvoiceDTO> listAllInvoicesByType(InvoiceType invoiceType) {
 
-        CompanyDTO companyDTO = companyService.getCompaniesByLoggedInUser().get(0);
+        CompanyDTO companyDTO = companyService.getCompanyByLoggedInUser();
 
         log.info("company name for invoices" + companyDTO.getTitle());
         Company company = mapperUtil.convert(companyDTO, new Company());
@@ -194,7 +194,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDTO save(InvoiceDTO invoiceDTO, InvoiceType invoiceType) {
 
-        CompanyDTO company = companyService.getCompaniesByLoggedInUser().get(0);
+        CompanyDTO company = companyService.getCompanyByLoggedInUser();
         invoiceDTO.setCompanyDTO(mapperUtil.convert(company, new CompanyDTO()));
         invoiceDTO.setInvoiceType(invoiceType);
         invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
@@ -211,7 +211,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
 
-        CompanyDTO companyDTO =  companyService.getCompaniesByLoggedInUser().get(0);
+        CompanyDTO companyDTO =  companyService.getCompanyByLoggedInUser();
         Company company = mapperUtil.convert(companyDTO, new Company());
 
         Invoice invoice = invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).stream()
