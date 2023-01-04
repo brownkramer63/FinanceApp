@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -76,7 +77,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public void addInvoiceProduct(Long id, InvoiceProductDTO invoiceProductDTO) {
+    public InvoiceProductDTO addInvoiceProduct(Long id, InvoiceProductDTO invoiceProductDTO) {
         InvoiceDTO invoiceDTO = invoiceService.findById(id);
         InvoiceProductDTO invoiceProductDTO1 = new InvoiceProductDTO();
         invoiceProductDTO1.setInvoice(invoiceDTO);
@@ -84,8 +85,10 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         invoiceProductDTO1.setQuantity(invoiceProductDTO.getQuantity());
         invoiceProductDTO1.setPrice(invoiceDTO.getPrice());
         invoiceProductDTO1.setTax(invoiceDTO.getTax());
-        invoiceProductRepository.save(mapperUtil.convert(invoiceProductDTO1, new InvoiceProduct()));
+        invoiceProductDTO1.setProfitLoss(BigDecimal.valueOf(10));
+         InvoiceProduct invoiceProduct = invoiceProductRepository.save(mapperUtil.convert(invoiceProductDTO1, new InvoiceProduct()));
 
+         return mapperUtil.convert(invoiceProduct, new InvoiceProductDTO());
 
     }
 
@@ -95,7 +98,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
         invoiceProduct.setIsDeleted(true);
         invoiceProductRepository.save(invoiceProduct);
-        invoiceProductRepository.delete(invoiceProduct);
+
 
     }
 

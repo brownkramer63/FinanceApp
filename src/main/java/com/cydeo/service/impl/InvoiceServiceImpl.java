@@ -2,6 +2,7 @@ package com.cydeo.service.impl;
 
 import com.cydeo.dto.CompanyDTO;
 import com.cydeo.dto.InvoiceDTO;
+import com.cydeo.dto.InvoiceProductDTO;
 import com.cydeo.entity.Company;
 import com.cydeo.entity.Invoice;
 import com.cydeo.entity.InvoiceProduct;
@@ -68,9 +69,9 @@ public class InvoiceServiceImpl implements InvoiceService {
                         .stream()
                         .map(invoice -> {
                             InvoiceDTO invoiceDTO = mapperUtil.convert(invoice, new InvoiceDTO());
-                            invoiceDTO.setTax(10);
-                            invoiceDTO.setPrice(BigDecimal.valueOf(20));
-                            invoiceDTO.setTotal(BigDecimal.valueOf(200));
+                            invoiceDTO.setTax(totalTaxOfInvoice(invoiceDTO.getId()).intValueExact());
+                            invoiceDTO.setPrice(totalPriceOfInvoice(invoice.getId()));
+                            invoiceDTO.setTotal(totalPriceOfInvoice(invoice.getId()).subtract(totalTaxOfInvoice(invoice.getId())));
 
 
                             return invoiceDTO;
@@ -85,41 +86,65 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceListByType;
     }
 
-/*
-    private  Integer totalTaxOfInvoice(Long id){
+
+    private  BigDecimal totalTaxOfInvoice(Long id){
 
         List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findByInvoiceProductId(id);
 
         if(invoiceProductDTOList != null){
 
-            invoiceProductDTOList.stream().map(invoiceProductDTO ->
-                            invoiceProductDTO.getPrice().multiply(BigDecimal.valueOf(invoiceProductDTO.getQuantity())))
+           invoiceProductDTOList.stream().map(invoiceProductDTO -> {
 
-
+               BigDecimal price = invoiceProductDTO.getPrice().multiply(BigDecimal.valueOf(invoiceProductDTO.getQuantity()));
+               BigDecimal tax = BigDecimal.valueOf(invoiceProductDTO.getTax()).divide(BigDecimal.valueOf(100));
+               return price.multiply(tax);
+                   }).reduce(BigDecimal.ZERO, BigDecimal::add);
         }
+        return BigDecimal.ZERO;
 
     }
 
- */
 
-    private final BigDecimal totalPriceOfInvoice(){
 
+    private  BigDecimal totalPriceOfInvoice(Long id){
+
+        List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findByInvoiceProductId(id);
+
+        if(invoiceProductDTOList != null){
+
+            BigDecimal price =  invoiceProductDTOList.stream().map(invoiceProductDTO -> {
+
+                BigDecimal priceWithoutTax = invoiceProductDTO.getPrice().multiply(BigDecimal.valueOf(invoiceProductDTO.getQuantity()));
+
+                return priceWithoutTax;
+            }).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal tax = totalTaxOfInvoice(id);
+            BigDecimal totalPrice = tax.add(price);
+            return totalPrice;
+        }
+        return BigDecimal.ZERO;
+    }
+
+
+    @Override
+    public BigDecimal calculateProfitLoss(Long id) {
         return null;
     }
 
+
+
     @Override
     public void delete(Long id) {
-        Optional<Invoice> getInvoice = invoiceRepository.findById(id);
+       Invoice invoice = invoiceRepository.findById(id).orElseThrow();
 
-        if(getInvoice.isPresent()){
-            getInvoice.get().setIsDeleted(true);
-            invoiceRepository.save(getInvoice.get());
-            invoiceProductRepository.findByInvoiceId(id)
-                    .forEach(invoice -> invoiceProductService.delete(invoice.getId()));
 
+            invoice.setIsDeleted(true);
+            invoiceRepository.save(invoice);
+            invoiceProductService.delete(id);
 
         }
-    }
+
 
     @Override
     public List<InvoiceDTO> listAllInvoice() {
@@ -178,6 +203,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceDTO;
 
     }
+
+
 
 
     private String generateInvoiceNumber(InvoiceType invoiceType){

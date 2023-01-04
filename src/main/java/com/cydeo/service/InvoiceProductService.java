@@ -15,7 +15,7 @@ public interface InvoiceProductService {
     void update(InvoiceDTO invoiceDTO, Long id);
 
     void removeInvoiceProduct(Long id);
-    void addInvoiceProduct(Long id, InvoiceProductDTO invoiceProductDTO);
+    InvoiceProductDTO addInvoiceProduct(Long id, InvoiceProductDTO invoiceProductDTO);
 
     void delete(Long id);
 

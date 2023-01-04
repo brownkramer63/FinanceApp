@@ -2,6 +2,7 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
+import com.cydeo.entity.Invoice;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.InvoiceProductService;
@@ -61,8 +62,10 @@ public class SalesInvoiceController {
 
     @PostMapping("/update/{id}")
     public String updateSalesInvoice(@PathVariable("id") Long id, @ModelAttribute("invoice")InvoiceDTO invoiceDTO){
+
+
         invoiceProductService.update(invoiceDTO, id);
-        return "redirect:/salesInvoices/update";
+        return "redirect:/salesInvoices/list";
 
 
     }
@@ -87,7 +90,7 @@ public class SalesInvoiceController {
             return "invoice/sales-invoice-update";
         }
         invoiceProductService.addInvoiceProduct(id, invoiceProductDTO);
-        return "redirect:/salesInvoices/update";
+        return "redirect:/salesInvoices/update" ;
     }
 
     @GetMapping("/create")
@@ -123,9 +126,11 @@ public class SalesInvoiceController {
     @GetMapping("/print/{id}")
     public String printSalesInvoice(@PathVariable("id") Long id, Model model){
 
-        model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(id));
+        InvoiceDTO invoiceDTO = invoiceService.findById(id);
 
+        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("company", invoiceDTO.getCompanyDTO());
         return "/invoice/invoice_print";
 
     }
