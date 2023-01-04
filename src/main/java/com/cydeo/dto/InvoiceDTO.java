@@ -18,12 +18,12 @@ import java.util.List;
 public class InvoiceDTO {
 
     private Long id;
-    private String invoiceNumber;
+    private String invoiceNo;
     private InvoiceStatus invoiceStatus;
     private InvoiceType invoiceType;
     private LocalDate date;
     private CompanyDTO companyDTO;
-    private ClientVendorDTO clientVendorDTO;
+    private ClientVendorDTO clientVendor;
     private BigDecimal price;
     private Integer tax;
     private BigDecimal total;

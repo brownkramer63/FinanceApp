@@ -27,9 +27,6 @@ public class Invoice extends BaseEntity {
     private InvoiceType invoiceType;
     @Column(columnDefinition = "DATE")
     private LocalDate date;
-
-  // TODO waiting for others to complete
-
     @ManyToOne(fetch = FetchType.LAZY)
     private ClientVendor clientVendor;
     @ManyToOne(fetch = FetchType.LAZY)
