@@ -78,7 +78,7 @@ public class CompanyController {
     }
 
     @PostMapping("/create")
-    public String insertCompany(@ModelAttribute("company") @Valid CompanyDTO companyDTO, BindingResult bindingResult) {
+    public String insertCompany(@ModelAttribute("newCompany") @Valid CompanyDTO companyDTO, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()){
             return "company/company-create";
