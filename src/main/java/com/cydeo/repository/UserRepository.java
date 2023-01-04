@@ -11,14 +11,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findById(Long id);
     User findUserByUsernameAndIsDeleted(String username, Boolean deleted);
-    Optional<User> findByUsername(String username);
+    Optional<User> findByUsername(String username);public
     List <User> findAllByCompanyId(Long id);
-    List<User> findAllByRole_DescriptionOrderByCompany(String description);
-    List<User> findUsersByRole_Description(String description);
-    @Query(value = "select * from users" +
-            "join companies c on c.id = users.company_id" +
-            "join roles r on r.id = users.role_id" +
-            "where description = ?! and company_id=?!", nativeQuery = true)
-    List<User> findAllByCompanyIdAndRoleContains(Long id, String description);
+    @Query("select u from User u join Role r on u.role.id = r.id where u.role.description = ?1 order by u.company.title, u.role.description")
+    List<User> getAllByOrderByCompanyAndRole(String description);
 
 }

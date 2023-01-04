@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
         UserDTO loggedInUser = securityService.getLoggedInUser();
 
-        List<User> userList = userRepository.findAllByRole_DescriptionOrderByCompany("Admin");
+        List<User> userList = userRepository.getAllByOrderByCompanyAndRole("Admin");
 
         if (loggedInUser.getRole().getDescription().equals("Root User")) {
             return userList.stream().map(user -> mapperUtil.convert(user, new UserDTO()))
@@ -104,20 +104,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Long id) {
 
-        User user = userRepository.findById(id).get();
-        UserDTO userDTO = mapperUtil.convert(user, new UserDTO());
-        if (isOnlyAdmin(userDTO)) {
-            userDTO.setOnlyAdmin(true);
-
-        } else {
-
+            User user = userRepository.findById(id).get();
             user.setIsDeleted(true);
-            user.setEnabled(false);
             user.setUsername(user.getUsername() + "-" + user.getId());
             userRepository.save(user);
-
-            log.info(" User is deleted");
-        }
 
     }
 
