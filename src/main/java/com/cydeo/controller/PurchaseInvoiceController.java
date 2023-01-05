@@ -79,7 +79,7 @@ public class PurchaseInvoiceController {
 
 
 
-        return "invoice/purchase-invoice-update";
+        return "redirect:/purchaseInvoices/update/" + invoiceDTO.getId().toString();
 
 
     }
@@ -101,29 +101,33 @@ public class PurchaseInvoiceController {
 
 
     @PostMapping("/update/{id}")
-    public String updatePurchaseInvoice( @PathVariable("id") Long id, InvoiceDTO invoiceDTO){
+    public String updatePurchaseInvoice( @PathVariable("id") Long id, @ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
-        invoiceService.update(invoiceDTO, id);
-        return "redirect:/purchaseInvoices/update/" + id;
+        if(bindingResult.hasErrors()){
+            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            return "invoice/purchase-invoice-create";
+        }
+        InvoiceDTO invoiceDTO1 = invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
+
+        invoiceService.update(invoiceDTO1, id);
+        return "redirect:/purchaseInvoices/list/";
 
     }
 
     @GetMapping("/removeInvoiceProduct/{id}/{invoiceProductId}")
-    public String removeInvoiceProduct(@PathVariable("id") Long id, @PathVariable("invoiceProductId") Long invoiceProductId, BindingResult bindingResult, Model model){
-        if(bindingResult.hasErrors()){
-            model.addAttribute("invoice", invoiceService.findById(id));
-        }
-        invoiceProductService.removeInvoiceProduct( invoiceProductId);
+    public String removeInvoiceProduct(@PathVariable("id") Long id, @PathVariable("invoiceProductId") Long invoiceProductId){
 
-
+        invoiceProductService.removeInvoiceProduct(invoiceProductId);
         return "redirect:/purchaseInvoices/update/" + id;
     }
+
 
     @PostMapping("/addInvoiceProduct/{id}")
     public String addInvoiceProduct(@PathVariable("id") Long invoiceId, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model) throws Exception {
         if(bindingResult.hasErrors()){
             model.addAttribute("invoice", invoiceService.findById(invoiceId));
             model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
             model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceId));
             model.addAttribute("products", productService.listAllProducts());
 
@@ -141,7 +145,7 @@ public class PurchaseInvoiceController {
 
         model.addAttribute("invoice", invoiceService.findById(id));
         model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("company", companyService.getCompaniesByLoggedInUser());
+        model.addAttribute("company", companyService.getCompanyByLoggedInUser());
         return "/invoice/invoice_print";
 
     }
