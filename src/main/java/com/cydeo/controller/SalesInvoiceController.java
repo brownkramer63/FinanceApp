@@ -135,7 +135,7 @@ public class SalesInvoiceController {
 
         model.addAttribute("invoice", invoiceService.findById(id));
         model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("company", companyService.getCompaniesByLoggedInUser());
+        model.addAttribute("company", companyService.getCompanyByLoggedInUser());
         return "/invoice/invoice_print";
 
     }
