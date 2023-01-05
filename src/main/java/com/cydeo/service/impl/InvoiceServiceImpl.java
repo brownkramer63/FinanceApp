@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -69,9 +70,9 @@ public class InvoiceServiceImpl implements InvoiceService {
                         .stream()
                         .map(invoice -> {
                             InvoiceDTO invoiceDTO = mapperUtil.convert(invoice, new InvoiceDTO());
-                            invoiceDTO.setTax(totalTaxOfInvoice(invoiceDTO.getId()).intValueExact());
-                            invoiceDTO.setPrice(totalPriceOfInvoice(invoice.getId()));
-                            invoiceDTO.setTotal(totalPriceOfInvoice(invoice.getId()).subtract(totalTaxOfInvoice(invoice.getId())));
+                            invoiceDTO.setTax(totalTaxOfInvoice(invoiceDTO.getId()).intValue());
+                            invoiceDTO.setPrice(totalPriceOfInvoice(invoiceDTO.getId()).subtract(totalTaxOfInvoice(invoiceDTO.getId())));
+                            invoiceDTO.setTotal(totalPriceOfInvoice(invoiceDTO.getId()).subtract(totalTaxOfInvoice(invoiceDTO.getId())).add(totalTaxOfInvoice(invoiceDTO.getId())));
 
 
                             return invoiceDTO;
@@ -86,23 +87,28 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceListByType;
     }
 
-
-    private  BigDecimal totalTaxOfInvoice(Long id){
-
+    private BigDecimal totalTaxOfInvoice(Long id){
         List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findByInvoiceProductId(id);
 
         if(invoiceProductDTOList != null){
 
-           invoiceProductDTOList.stream().map(invoiceProductDTO -> {
-
-               BigDecimal price = invoiceProductDTO.getPrice().multiply(BigDecimal.valueOf(invoiceProductDTO.getQuantity()));
-               BigDecimal tax = BigDecimal.valueOf(invoiceProductDTO.getTax()).divide(BigDecimal.valueOf(100));
-               return price.multiply(tax);
-                   }).reduce(BigDecimal.ZERO, BigDecimal::add);
+            return invoiceProductDTOList.stream().map(invoiceProductDto -> {
+                BigDecimal price = invoiceProductDto.getPrice();
+                Integer quantityOfProduct = invoiceProductDto.getQuantity();
+                price = price.multiply(BigDecimal.valueOf(quantityOfProduct));
+                BigDecimal tax = BigDecimal.valueOf(invoiceProductDto.getTax()).divide(BigDecimal.valueOf(100));
+                return price.multiply(tax);
+            }).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
         }
         return BigDecimal.ZERO;
-
     }
+
+
+
+
+
+
+
 
 
 
@@ -137,13 +143,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void delete(Long id) {
        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+           invoice.setIsDeleted(true);
+           invoiceRepository.save(invoice);
+       }
 
-
-            invoice.setIsDeleted(true);
-            invoiceRepository.save(invoice);
-            invoiceProductService.delete(id);
-
-        }
 
 
     @Override
@@ -198,9 +201,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceDTO.setCompanyDTO(mapperUtil.convert(company, new CompanyDTO()));
         invoiceDTO.setInvoiceType(invoiceType);
         invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
-        invoiceRepository.save(mapperUtil.convert(invoiceDTO, new Invoice()));
+        Invoice invoice = invoiceRepository.save(mapperUtil.convert(invoiceDTO, new Invoice()));
 
-        return invoiceDTO;
+        return mapperUtil.convert(invoice, new InvoiceDTO());
 
     }
 
@@ -240,6 +243,21 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     }
 
+    @Override
+    public InvoiceDTO update(InvoiceDTO invoiceDTO, Long id) {
 
 
-}
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        Invoice convertedInvoice = mapperUtil.convert(invoiceDTO, new Invoice());
+
+         convertedInvoice.setInvoiceNo(convertedInvoice.getInvoiceNo());
+         invoice.setClientVendor(convertedInvoice.getClientVendor());
+         convertedInvoice.setDate(convertedInvoice.getDate());
+        invoiceRepository.save(invoice);
+        return invoiceDTO;
+
+
+
+        }
+
+    }

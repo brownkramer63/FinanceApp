@@ -1,6 +1,7 @@
 package com.cydeo.service;
 
 import com.cydeo.dto.InvoiceDTO;
+import com.cydeo.dto.InvoiceProductDTO;
 import com.cydeo.enums.InvoiceType;
 
 import java.math.BigDecimal;
@@ -25,6 +26,8 @@ public interface InvoiceService {
     InvoiceDTO getNewSalesInvoice();
 
     InvoiceDTO save(InvoiceDTO invoiceDTO, InvoiceType invoiceType);
+
+    InvoiceDTO update(InvoiceDTO invoiceDTO, Long id);
 
     BigDecimal calculateProfitLoss(Long id);
 }
