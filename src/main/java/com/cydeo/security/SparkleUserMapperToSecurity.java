@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,10 +24,13 @@ public class SparkleUserMapperToSecurity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
+//        GrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().getDescription());
+//        log.info("logged in user role is " + authority.getAuthority());
+//        return List.of(authority);
+        List<GrantedAuthority> authorityList = new ArrayList<>();
         GrantedAuthority authority = new SimpleGrantedAuthority(this.user.getRole().getDescription());
-        log.info("logged in user role is " + authority.getAuthority());
-        return List.of(authority);
-
+        authorityList.add(authority);
+        return authorityList;
 
     }
 
