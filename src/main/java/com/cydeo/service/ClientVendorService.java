@@ -10,11 +10,11 @@ public interface ClientVendorService {
 
     ClientVendorDTO findById(Long id);
 
-    public void save(ClientVendorDTO clientVendorDTO);
+    public ClientVendorDTO save(ClientVendorDTO clientVendorDTO);
 
     void delete(Long id);
 
-    void update(ClientVendorDTO clientVendorDTO);
+    ClientVendorDTO update(ClientVendorDTO clientVendorDTO, Long clientVendorId);
 
     List<ClientVendorDTO> listAllClientVendors();
 
