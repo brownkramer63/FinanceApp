@@ -40,14 +40,20 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public void save(ClientVendorDTO clientVendorDTO) {
-        clientVendorDTO.setCompany(companyService.getCompaniesByLoggedInUser().get(0));
+        clientVendorDTO.setCompany(companyService.getCompanyByLoggedInUser());
         ClientVendor clientVendor = mapperUtil.convert(clientVendorDTO, new ClientVendor());
         clientVendorRepository.save(clientVendor);
     }
 
     @Override
     public void delete(Long id) {
-        //need to implement a soft delete for this
+        Optional <ClientVendor> clientVendor= clientVendorRepository.findById(id);
+        if (clientVendor.isPresent()){
+            clientVendor.get().setIsDeleted(true);
+            clientVendorRepository.save(clientVendor.get());
+        }else {
+            throw new NoSuchElementException("client or vendor does not exist with select Id");
+        }
     }
 
     @Override
@@ -63,7 +69,8 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     @Override
     public List<ClientVendorDTO> listAllClientVendors() {
         return clientVendorRepository.findAll(Sort.by("clientVendorType")).stream().filter(clientVendor ->
-                clientVendor.getCompany().getId().equals(securityService.getLoggedInUser().getCompany().getId())).map(
+                clientVendor.getCompany().getId().equals(securityService.getLoggedInUser().getCompany().getId())).
+                filter(clientVendor -> clientVendor.getIsDeleted().equals(false)).map(
                 clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDTO())).collect(Collectors.toList());
 
     }

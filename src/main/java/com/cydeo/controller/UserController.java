@@ -35,7 +35,7 @@ public class UserController {
 
         model.addAttribute("newUser", new UserDTO());
         model.addAttribute("userRoles", roleService.listRoles());
-        model.addAttribute("companies", companyService.getCompaniesByLoggedInUser());
+        model.addAttribute("companies", companyService.getCompaniesByLoggedInUserForRoot());
 
         return "user/user-create";
     }
@@ -65,10 +65,10 @@ public class UserController {
         return "redirect:/users/list";
     }
 
-        @DeleteMapping("/{id}")
+        @GetMapping("/delete/{id}")
         public String deleteUser (@PathVariable("id") Long id){
             userService.delete(id);
-            return "redirect:/user/user-list";
+            return "redirect:/users/list";
         }
     }
 

@@ -1,7 +1,9 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.CompanyDTO;
+import com.cydeo.dto.RoleDTO;
 import com.cydeo.dto.UserDTO;
-import com.cydeo.entity.User;
+import com.cydeo.entity.*;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CompanyRepository;
 import com.cydeo.repository.RoleRepository;
@@ -20,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
@@ -31,9 +34,10 @@ public class UserServiceImpl implements UserService {
     private final RoleService roleService;
     private final SecurityService securityService;
     private final PasswordEncoder passwordEncoder;
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil,@Lazy RoleService roleService,
+
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, @Lazy RoleService roleService,
                            SecurityService securityService, CompanyRepository companyRepository,
-                           RoleRepository roleRepository,@Lazy CompanyService companyService,
+                           RoleRepository roleRepository, @Lazy CompanyService companyService,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
@@ -44,12 +48,13 @@ public class UserServiceImpl implements UserService {
         this.companyService = companyService;
         this.passwordEncoder = passwordEncoder;
     }
+
     @Override
     public List<UserDTO> findAllByLoggedInUser() {
 
         UserDTO loggedInUser = securityService.getLoggedInUser();
 
-        List<User> userList = userRepository.findAllByRole_DescriptionOrderByCompany("Admin");
+        List<User> userList = userRepository.getAllByOrderByCompanyAndRole("Admin");
 
         if (loggedInUser.getRole().getDescription().equals("Root User")) {
             return userList.stream().map(user -> mapperUtil.convert(user, new UserDTO()))
@@ -61,11 +66,13 @@ public class UserServiceImpl implements UserService {
         }
         return Collections.emptyList();
     }
+
     @Override
     public UserDTO findById(Long id) {
         Optional<User> user = userRepository.findById(id);
         return mapperUtil.convert(user, new UserDTO());
     }
+
     @Override
     public UserDTO save(UserDTO userDTO) {
         User user = mapperUtil.convert(userDTO, new User());
@@ -74,6 +81,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return mapperUtil.convert(user, new UserDTO());
     }
+
     @Override
     public UserDTO update(UserDTO userDTO) {
 
@@ -85,13 +93,24 @@ public class UserServiceImpl implements UserService {
         return mapperUtil.convert(convertedUser, new UserDTO());
     }
 
+    public boolean isOnlyAdmin(UserDTO userDTO) {
+
+        List<User> admin = userRepository.findAllByCompanyId(userDTO.getId()).stream()
+                .filter(user -> user.getRole().getDescription().equals("Admin"))
+                .collect(Collectors.toList());
+
+        return admin.size() == 1;
+    }
     @Override
     public void delete(Long id) {
-        Optional<User> user = Optional.ofNullable(userRepository.findByIdAndIsDeleted(id, false));
-        user.get().setIsDeleted(true);
-        user.get().setUsername(user.get().getUsername() + "-" + user.get().getId());
-        userRepository.save(user.get());
+
+            User user = userRepository.findById(id).get();
+            user.setIsDeleted(true);
+            user.setUsername(user.getUsername() + "-" + user.getId());
+            userRepository.save(user);
+
     }
+
     @Override
     public UserDTO findByUsername(String username) {
 
@@ -101,3 +120,10 @@ public class UserServiceImpl implements UserService {
 
 
 }
+
+
+
+
+
+
+

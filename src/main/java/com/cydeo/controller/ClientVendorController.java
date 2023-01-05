@@ -9,8 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.LifecycleState;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,8 +48,14 @@ public class ClientVendorController {
         return "clientVendor/clientVendor-create";
     }
     @PostMapping("/create")
-    public String insertClientVendor(@ModelAttribute("newClientVendor") ClientVendorDTO clientVendorDTO, Model model){
+    public String insertClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDTO clientVendorDTO, BindingResult bindingResult, Model model){
 
+        if (bindingResult.hasErrors()){
+            List<ClientVendorType> clientVendorTypes = Arrays.asList(ClientVendorType.values());
+            log.info("size of clientVendorTypes" +clientVendorTypes.size());
+            model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
+            return "/clientVendor/clientVendor-create";
+        }
         clientVendorService.save(clientVendorDTO);
         return "redirect:/clientVendors/list";
     }
@@ -61,11 +69,24 @@ public class ClientVendorController {
     }
 
     @PostMapping("/update/{clientVendorId}")
-    public String editClientVendor(@ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, @PathVariable("clientVendorId") Long clientVendorId,Model model){
+    public String editClientVendor( @Valid @ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, @PathVariable("clientVendorId") Long clientVendorId, BindingResult bindingResult, Model model){
 
+        if (bindingResult.hasErrors()){
+            model.addAttribute("clientVendor", clientVendorDTO);
+            model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
+            model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
+            return "clientVendor/clientVendor-update";
+
+        }
         clientVendorService.save(clientVendorDTO);
         return "redirect:/clientVendors/list";
 
+    }
+    @GetMapping("/delete/{clientVendorId}")
+    public String deleteClientVendorById(@PathVariable("clientVendorId") Long clientVendorId, Model model){
+        model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
+        clientVendorService.delete(clientVendorId);
+        return "redirect:/clientVendors/list";
     }
 
 
