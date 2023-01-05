@@ -4,6 +4,7 @@ import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
 import com.cydeo.entity.Invoice;
 import com.cydeo.entity.InvoiceProduct;
+import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.repository.InvoiceRepository;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,15 +29,15 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final MapperUtil mapperUtil;
 
     private final InvoiceService invoiceService;
-    private final InvoiceRepository invoiceRepository;
+
     private final InvoiceProductRepository invoiceProductRepository;
 
-    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceRepository invoiceRepository, InvoiceProductRepository invoiceProductRepository) {
+    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceProductRepository invoiceProductRepository) {
 
         this.mapperUtil = mapperUtil;
 
         this.invoiceService = invoiceService;
-        this.invoiceRepository = invoiceRepository;
+
         this.invoiceProductRepository = invoiceProductRepository;
     }
 
@@ -53,51 +56,59 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     }
 
-    @Override
-    public void update(InvoiceDTO invoiceDTO, Long id) {
-
-        Optional<Invoice> invoice = invoiceRepository.findById(invoiceDTO.getId());
-        Invoice convertedInvoice = mapperUtil.convert(invoiceDTO, new Invoice());
-
-        if (invoice.isPresent()) {
-            convertedInvoice.setInvoiceNo(convertedInvoice.getInvoiceNo());
-            convertedInvoice.setClientVendor(convertedInvoice.getClientVendor());
-            convertedInvoice.setDate(convertedInvoice.getDate());
-
-        }
-        invoiceRepository.save(invoice.orElseThrow());
-
-    }
-
-    @Override
-    public void removeInvoiceProduct(Long id) {
-        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
-        invoiceProduct.setIsDeleted(true);
-        invoiceProductRepository.save(invoiceProduct);
-    }
 
     @Override
     public InvoiceProductDTO addInvoiceProduct(Long id, InvoiceProductDTO invoiceProductDTO) {
         InvoiceDTO invoiceDTO = invoiceService.findById(id);
-        InvoiceProductDTO invoiceProductDTO1 = new InvoiceProductDTO();
-        invoiceProductDTO1.setInvoice(invoiceDTO);
-        invoiceProductDTO1.setProduct(invoiceProductDTO.getProduct());
-        invoiceProductDTO1.setQuantity(invoiceProductDTO.getQuantity());
-        invoiceProductDTO1.setPrice(invoiceDTO.getPrice());
-        invoiceProductDTO1.setTax(invoiceDTO.getTax());
-        invoiceProductDTO1.setProfitLoss(BigDecimal.valueOf(10));
-         InvoiceProduct invoiceProduct = invoiceProductRepository.save(mapperUtil.convert(invoiceProductDTO1, new InvoiceProduct()));
 
-         return mapperUtil.convert(invoiceProduct, new InvoiceProductDTO());
+        if(invoiceProductDTO.getTotal() != null){
+
+            invoiceProductDTO.setInvoice(invoiceDTO);
+            InvoiceProduct invoiceProduct = invoiceProductRepository.findById(invoiceProductDTO.getId()).orElseThrow();
+            invoiceProduct.setProfitLoss(invoiceProductDTO.getProfitLoss());
+            invoiceProduct.setRemainingQuantity(invoiceProductDTO.getRemainingQuantity());
+            invoiceProductRepository.save(invoiceProduct);
+
+            return mapperUtil.convert(invoiceProduct, new InvoiceProductDTO());
+
+
+        }else{
+            InvoiceProductDTO invoiceProduct = new InvoiceProductDTO();
+            invoiceProduct.setInvoice(invoiceDTO);
+            invoiceProduct.setPrice(invoiceProductDTO.getPrice());
+            invoiceProduct.setQuantity(invoiceProductDTO.getQuantity());
+            invoiceProduct.setTax(invoiceProductDTO.getTax());
+            invoiceProduct.setProfitLoss(invoiceProductDTO.getProfitLoss());
+            invoiceProduct.setProduct(invoiceProductDTO.getProduct());
+
+
+            InvoiceProduct invoiceProduct_res = mapperUtil.convert(invoiceProduct, new InvoiceProduct());
+
+            InvoiceProduct invoiceProduct_con = invoiceProductRepository.save(invoiceProduct_res);
+
+            return mapperUtil.convert(invoiceProduct_con,new InvoiceProductDTO());
+
+        }
 
     }
 
+
+        @Override
+        public void removeInvoiceProduct (Long id){
+           InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
+
+            invoiceProduct.setIsDeleted(true);
+            invoiceProductRepository.save(invoiceProduct);
+
+        }
+
+
     @Override
     public void delete(Long id) {
-        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
 
-        invoiceProduct.setIsDeleted(true);
-        invoiceProductRepository.save(invoiceProduct);
+        List<InvoiceProduct> invoiceProduct = invoiceProductRepository.findByInvoiceId(id);
+
+        invoiceProduct.stream().forEach(invoiceProduct1 -> delete(invoiceProduct1.getId()));
 
 
     }

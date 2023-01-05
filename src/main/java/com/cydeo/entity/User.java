@@ -1,6 +1,7 @@
 package com.cydeo.entity;
 
 import com.cydeo.entity.common.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Where(clause = "is_deleted=false")
 public class User extends BaseEntity {
 
