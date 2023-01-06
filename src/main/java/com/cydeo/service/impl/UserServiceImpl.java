@@ -111,8 +111,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isEmailAlreadyExists(UserDTO userDTO) {
         Optional<User> userToVerify = userRepository.findByUsername(userDTO.getUsername());
-
-
         return userToVerify.filter(user-> !user.getId().equals(userDTO.getId())).isPresent();
     }
 
