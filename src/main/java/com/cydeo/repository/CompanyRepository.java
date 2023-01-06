@@ -1,5 +1,6 @@
 package com.cydeo.repository;
 
+import com.cydeo.dto.CompanyDTO;
 import com.cydeo.entity.Company;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,5 +22,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     @Query("SELECT c FROM Company c WHERE c.id <> 1 ORDER BY c.title ASC ")
     List<Company> findCompaniesOrderByCompanyTitle();
+
+    Company findByTitle(String Title);
 
 }
