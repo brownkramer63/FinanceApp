@@ -12,4 +12,6 @@ public interface UserService {
     void delete(Long id);
     UserDTO findByUsername(String username);
     List<UserDTO> findAllByLoggedInUser();
+    boolean isOnlyAdmin(UserDTO userDTO);
+    boolean isEmailAlreadyExists(UserDTO userDTO);
 }
