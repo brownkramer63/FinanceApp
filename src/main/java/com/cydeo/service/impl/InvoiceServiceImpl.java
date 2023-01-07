@@ -5,7 +5,6 @@ import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
 import com.cydeo.entity.Company;
 import com.cydeo.entity.Invoice;
-import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
@@ -88,7 +87,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private BigDecimal totalTaxOfInvoice(Long id){
-        List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findByInvoiceProductId(id);
+        List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findAllInvoiceProductByInvoiceId(id);
 
         if(invoiceProductDTOList != null){
 
@@ -114,7 +113,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private  BigDecimal totalPriceOfInvoice(Long id){
 
-        List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findByInvoiceProductId(id);
+        List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findAllInvoiceProductByInvoiceId(id);
 
         if(invoiceProductDTOList != null){
 
@@ -142,11 +141,14 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void delete(Long id) {
-       Invoice invoice = invoiceRepository.findById(id).orElseThrow();
-           invoice.setIsDeleted(true);
-           invoiceRepository.save(invoice);
-       }
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        invoice.setIsDeleted(true);
 
+        invoiceRepository.save(invoice);
+
+
+
+    }
 
 
     @Override

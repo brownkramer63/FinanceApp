@@ -55,7 +55,7 @@ public class SalesInvoiceController {
         model.addAttribute("clients", clientVendorService.listAllClientVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("products", productService.listAllProducts());
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(id));
+        model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(id));
 
         return"/invoice/sales-invoice-update";
     }
@@ -90,7 +90,7 @@ public class SalesInvoiceController {
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("clients", clientVendorService.listAllClientVendors());
             model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
-            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceProductDTO.getId()));
+            model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceProductDTO.getId()));
             model.addAttribute("products", productService.listAllProducts());
 
 
@@ -124,7 +124,7 @@ public class SalesInvoiceController {
         model.addAttribute("invoice", invoiceDTO);
         model.addAttribute("clients", clientVendorService.listAllClientVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceDTO.getId()));
+        model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceDTO.getId()));
         model.addAttribute("products", productService.listAllProducts());
 
 

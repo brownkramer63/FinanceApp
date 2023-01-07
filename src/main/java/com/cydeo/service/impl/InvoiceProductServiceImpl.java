@@ -4,6 +4,7 @@ import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
 import com.cydeo.entity.Invoice;
 import com.cydeo.entity.InvoiceProduct;
+import com.cydeo.entity.Product;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
@@ -11,6 +12,7 @@ import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 
@@ -32,6 +34,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     private final InvoiceProductRepository invoiceProductRepository;
 
+
     public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceProductRepository invoiceProductRepository) {
 
         this.mapperUtil = mapperUtil;
@@ -48,7 +51,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public List<InvoiceProductDTO> findByInvoiceProductId(Long id) {
+    public List<InvoiceProductDTO> findAllInvoiceProductByInvoiceId(Long id) {
         return invoiceProductRepository.findByInvoiceId(id).stream()
                 .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDTO()))
                 .collect(Collectors.toList());
@@ -59,6 +62,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public InvoiceProductDTO addInvoiceProduct(Long id, InvoiceProductDTO invoiceProductDTO) {
+
         InvoiceDTO invoiceDTO = invoiceService.findById(id);
 
         if(invoiceProductDTO.getTotal() != null){
@@ -67,6 +71,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
             InvoiceProduct invoiceProduct = invoiceProductRepository.findById(invoiceProductDTO.getId()).orElseThrow();
             invoiceProduct.setProfitLoss(invoiceProductDTO.getProfitLoss());
             invoiceProduct.setRemainingQuantity(invoiceProductDTO.getRemainingQuantity());
+           // product.quantityInStock + quantity
             invoiceProductRepository.save(invoiceProduct);
 
             return mapperUtil.convert(invoiceProduct, new InvoiceProductDTO());
@@ -91,6 +96,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         }
 
     }
+
+
 
 
         @Override
