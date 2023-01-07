@@ -6,7 +6,10 @@ import com.cydeo.service.RoleService;
 import com.cydeo.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/users")
@@ -41,36 +44,63 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public String insertUser(@ModelAttribute("user") UserDTO userDTO) {
+    public String insertUser(@Valid @ModelAttribute("newUser") UserDTO userDTO, BindingResult bindingResult, Model model) {
+
+        if (bindingResult.hasErrors() || userService.isEmailAlreadyExists(userDTO)) {
+            if (userService.isEmailAlreadyExists(userDTO)) {
+                bindingResult.rejectValue("username", " ", "Username is already exists. Please enter a different username");
+            }
+            model.addAttribute("newUser", userDTO);
+            model.addAttribute("userRoles", roleService.listRoles());
+            model.addAttribute("companies", companyService.getCompaniesByLoggedInUserForRoot());
+            return "user/user-create";
+        }
         userService.save(userDTO);
         return "redirect:/users/list";
     }
+
 
     @GetMapping("/update/{id}")
     public String updateUser(@PathVariable("id") Long id, Model model) {
         model.addAttribute("user", userService.findById(id));
         model.addAttribute("userRoles", roleService.listRoles());
-        model.addAttribute("companies", companyService.listAllCompanies());
+        model.addAttribute("companies", companyService.getCompaniesByLoggedInUserForRoot());
 
         return "user/user-update";
     }
 
     @PostMapping("/update/{id}")
-    public String insertUpdatedUser(@PathVariable("id") Long id, Model model, UserDTO userDTO) {
-        model.addAttribute("user", userService.findById(id));
-        model.addAttribute("userRoles", roleService.listRoles());
-        model.addAttribute("companies", companyService.listAllCompanies());
+    public String insertUpdatedUser(@PathVariable("id") Long id, @Valid @ModelAttribute("user")  UserDTO userDTO, BindingResult bindingResult,Model model) {
+        if (bindingResult.hasErrors() || userService.isEmailAlreadyExists(userDTO)) {
+            if (userService.isEmailAlreadyExists(userDTO)) {
+                bindingResult.rejectValue("username", " ", "Username is already exists. Please enter a different username");
+            }
+            model.addAttribute("newUser", userDTO);
+            model.addAttribute("userRoles", roleService.listRoles());
+            model.addAttribute("companies", companyService.getCompaniesByLoggedInUserForRoot());
+            return "user/user-update";
+        }
+
         userDTO.setId(id);
         userService.update(userDTO);
         return "redirect:/users/list";
     }
 
-        @GetMapping("/delete/{id}")
-        public String deleteUser (@PathVariable("id") Long id){
-            userService.delete(id);
-            return "redirect:/users/list";
-        }
+
+
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Long id) {
+        userService.delete(id);
+        return "redirect:/users/list";
     }
+    @GetMapping()
+    public String reset(UserDTO userDTO,Model model){
+
+        model.addAttribute("newUser", userDTO);
+
+        return "user/user-create";
+    }
+}
 
 
 

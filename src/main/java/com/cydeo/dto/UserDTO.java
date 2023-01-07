@@ -12,24 +12,27 @@ import javax.validation.constraints.*;
 public class UserDTO {
 
     private Long id;
-    @NotBlank
-    @Email
+    @NotBlank(message = "Username is required field.")
+    @Email(message = "Email must be in a valid email format")
     private String username;
-    @NotBlank
-    @Pattern(regexp = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,}")
+    @NotBlank(message = "Password is required field.")
+    @Pattern(regexp = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,}", message =
+    "should be at least be 4 characters long and needs to contain 1 capital letter, 1 small letter and 1 special character or number.")
     private String password;
-    @NotNull
+    @NotNull(message = "Password should match)")
     private String confirmPassword;
-    @NotBlank
-    @Size(max = 50, min = 2)
+    @NotBlank(message = "First name is required field" )
+    @Size(max = 50, min = 2, message ="must be between 2-50 characters long")
     private String firstname;
-    @NotBlank
-    @Size(max = 50, min = 2)
+    @NotBlank(message = "Last name is required field")
+    @Size(max = 50, min = 2, message = "must be between 2-50 characters long")
     private String lastname;
-    @NotBlank
-    @Pattern(regexp = "^\\d{10}$")
+    @NotBlank(message = "Phone is required field")
+    @Pattern(regexp = "^(\\+\\d{1,2}\\s?)?1?\\-?\\.?\\s?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$", message = "must be in any valid phone number format")
     private String phone;
+    @NotNull(message = "Please select a role")
     private RoleDTO role;
+    @NotNull(message = "Please select a company")
     private CompanyDTO company;
     private boolean isOnlyAdmin;
 
@@ -119,7 +122,7 @@ public class UserDTO {
     }
 
     public void setOnlyAdmin(boolean onlyAdmin) {
-        this.isOnlyAdmin = false;
-
+        isOnlyAdmin = onlyAdmin;
     }
+
 }
