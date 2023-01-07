@@ -1,14 +1,13 @@
 package com.cydeo.service.impl;
 
 
-import com.cydeo.dto.CategoryDTO;
 import com.cydeo.dto.CompanyDTO;
 import com.cydeo.dto.ProductDTO;
-import com.cydeo.entity.Company;
 import com.cydeo.entity.Product;
 import com.cydeo.enums.ProductUnit;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.ProductRepository;
+import com.cydeo.service.CompanyService;
 import com.cydeo.service.ProductService;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +17,15 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-    public ProductServiceImpl(ProductRepository productRepository, MapperUtil mapperUtil) {
+    public ProductServiceImpl(ProductRepository productRepository, MapperUtil mapperUtil, CompanyService companyService) {
         this.productRepository = productRepository;
         this.mapperUtil = mapperUtil;
+        this.companyService = companyService;
     }
 
     private final ProductRepository productRepository;
     private final MapperUtil mapperUtil;
+    private final CompanyService companyService;
 
 
     @Override
@@ -38,11 +39,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDTO> listAllProducts() {
+        CompanyDTO companyDTO=companyService.getCompanyByLoggedInUser();
         List<Product>  productList = productRepository.findAllByIsDeletedOrderByCategoryAsc(false);
-        return productList.stream().map(product-> mapperUtil.convert(product, new ProductDTO()))
+        List<Product> filteredList=productList.stream()
+                .filter(product -> product
+                        .getCategory()
+                        .getCompany().getId()==(companyDTO.getId()))
                 .collect(Collectors.toList());
 
-
+        //log.info(filteredList(1));
+        return filteredList.stream().map(product-> mapperUtil.convert(product, new ProductDTO()))
+                .collect(Collectors.toList());
     }
 
     @Override
