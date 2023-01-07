@@ -4,7 +4,7 @@ import lombok.Getter;
 
 
 public enum ProductUnit {
-    LBS("Libre"),GALLON("Gallon"),PCS("Pieces"),KG("Kilogram"),METER("Meter"),INCH("Inch"),FEET("Feet");
+    LBS("Libre"),GALLON("Gallon"),PCS("PCs"),KG("Kilogram"),METER("Meter"),INCH("Inch"),FEET("Feet");
 
     private final String value;
 

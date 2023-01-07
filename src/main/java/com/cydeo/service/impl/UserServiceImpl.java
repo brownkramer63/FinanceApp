@@ -17,10 +17,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,16 +52,22 @@ public class UserServiceImpl implements UserService {
         UserDTO loggedInUser = securityService.getLoggedInUser();
 
         List<User> userList = userRepository.getAllByOrderByCompanyAndRole("Admin");
+        List<User> allByCompany = userRepository.getAllByCompanyAndRole();
+
 
         if (loggedInUser.getRole().getDescription().equals("Root User")) {
             return userList.stream().map(user -> mapperUtil.convert(user, new UserDTO()))
                     .collect(Collectors.toList());
 
         } else if (loggedInUser.getRole().getDescription().equals("Admin")) {
-            List<User> allByCompanyId = userRepository.findAllByCompanyId(loggedInUser.getCompany().getId());
-            return allByCompanyId.stream().map(each -> mapperUtil.convert(each, new UserDTO())).collect(Collectors.toList());
+
+            return allByCompany.stream()
+                    .filter(each -> each.getCompany().getId().equals(loggedInUser.getCompany().getId()))
+                    .map(each -> mapperUtil.convert(each, new UserDTO()))
+                    .collect(Collectors.toList());
         }
-        return Collections.emptyList();
+        return allByCompany.stream().map(each -> mapperUtil.convert(each, new UserDTO()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -95,12 +98,18 @@ public class UserServiceImpl implements UserService {
 
     public boolean isOnlyAdmin(UserDTO userDTO) {
 
-        List<User> admin = userRepository.findAllByCompanyId(userDTO.getId()).stream()
+        List<User> admin = userRepository.findAllByCompanyId(userDTO.getCompany().getId()).stream()
                 .filter(user -> user.getRole().getDescription().equals("Admin"))
                 .collect(Collectors.toList());
 
         return admin.size() == 1;
     }
+
+    @Override
+    public boolean isEmailAlreadyExists(UserDTO userDTO) {
+        return userRepository.findByUsername(userDTO.getUsername()).isPresent();
+    }
+
     @Override
     public void delete(Long id) {
 
@@ -114,7 +123,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findByUsername(String username) {
 
-        User user = userRepository.findUserByUsernameAndIsDeleted(username, false);
+        Optional<User> user = userRepository.findByUsername(username);
         return mapperUtil.convert(user, new UserDTO());
     }
 
