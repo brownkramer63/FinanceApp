@@ -30,4 +30,11 @@ public class ReportingServiceImpl implements ReportingService {
         return null;
     }
     //same for this one
+    @Override
+    public List<InvoiceProductDTO> getStockReport() {
+        return invoiceProductService.listAllBasedOnStatusOrderByDateDesc();
+    }
+
+
+
 }
