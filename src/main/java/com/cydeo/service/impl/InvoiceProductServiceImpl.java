@@ -2,23 +2,17 @@ package com.cydeo.service.impl;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
-import com.cydeo.entity.Invoice;
 import com.cydeo.entity.InvoiceProduct;
-import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
-import com.cydeo.repository.InvoiceRepository;
+import com.cydeo.service.CompanyService;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -31,14 +25,16 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final InvoiceService invoiceService;
 
     private final InvoiceProductRepository invoiceProductRepository;
+    private final CompanyService companyService;
 
-    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceProductRepository invoiceProductRepository) {
+    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceProductRepository invoiceProductRepository, CompanyService companyService) {
 
         this.mapperUtil = mapperUtil;
 
         this.invoiceService = invoiceService;
 
         this.invoiceProductRepository = invoiceProductRepository;
+        this.companyService = companyService;
     }
 
 
@@ -111,6 +107,15 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         invoiceProduct.stream().forEach(invoiceProduct1 -> delete(invoiceProduct1.getId()));
 
 
+    }
+
+    @Override
+    public List<InvoiceProductDTO> listAllBasedOnStatusOrderByDateDesc() {
+        List<InvoiceProduct> list = invoiceProductRepository.retrieveAllBasedOnStatusOrderByDateDesc();
+        return list.stream()
+                .filter(c->c.getInvoice().getCompany().getTitle().equals(companyService.getCompanyByLoggedInUser().getTitle()))
+                .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDTO()))
+                .collect(Collectors.toList());
     }
 
 
