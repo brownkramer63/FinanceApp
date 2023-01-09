@@ -54,6 +54,7 @@ public class RoleServiceImpl implements RoleService {
 
         List<Role> roleList = roleRepository.findAll();                     //findRolesBy(loggedInUser.getRole().getId());  //find roles by logged in user
         if (loggedInUser.getRole().getDescription().equals("Root User")) {
+            log.info("List " + roleList.size());
             return roleList.stream()
                     .filter(role -> role.getDescription().equals("Admin"))
                     .map(role -> mapperUtil.convert(role, new RoleDTO()))
@@ -61,31 +62,15 @@ public class RoleServiceImpl implements RoleService {
 
         } else if (loggedInUser.getRole().getDescription().equals("Admin")) {                   //if admin loggedIn
             List<User> userList = userRepository.findAllByCompanyId(loggedInUser.getCompany().getId());
-            log.info("User Roles size " + roleList.size());
+            log.info("User Roles size " + userList.size() + loggedInUser.getCompany().getTitle());
             return roleList.stream()
-                    .filter(role -> !role.getDescription().equals("Root User"))
+                    .filter(user -> !user.getDescription().equals("Root User"))
                     .map(role -> mapperUtil.convert(role, new RoleDTO()))
                     .collect(Collectors.toList());
+
         }
         return Collections.emptyList();
 
     }
 
-
-
-    public List<RoleDTO> getRolesByLoggedInUserForRoot() {
-
-        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
-
-        if (user.getRole().getDescription().equals("Root User")) {
-            List<Role> roleList = roleRepository.findAllByDescription("Admin");
-
-            return roleList.stream().map(role -> mapperUtil.convert(role, new RoleDTO())).collect(Collectors.toList());
-
-        } else {
-            Role role = user.getRole();
-            RoleDTO roleDTO = mapperUtil.convert(role, new RoleDTO());
-            return Arrays.asList(roleDTO);
-        }
-    }
 }
