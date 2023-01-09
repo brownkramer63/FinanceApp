@@ -4,6 +4,7 @@ import com.cydeo.dto.CompanyDTO;
 import com.cydeo.dto.RoleDTO;
 import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.*;
+import com.cydeo.exception.UserNotFoundException;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CompanyRepository;
 import com.cydeo.repository.RoleRepository;
@@ -71,8 +72,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO findById(Long id) {
-        Optional<User> user = userRepository.findById(id);
+    public UserDTO findById(Long id){
+        Optional<User> user = Optional.ofNullable(userRepository.findById(id)).orElseThrow(() -> new UserNotFoundException("User does not exist"));
         return mapperUtil.convert(user, new UserDTO());
     }
 
@@ -96,13 +97,14 @@ public class UserServiceImpl implements UserService {
         return mapperUtil.convert(convertedUser, new UserDTO());
     }
 
+    @Override
     public boolean isOnlyAdmin(UserDTO userDTO) {
 
-        List<User> admin = userRepository.findAllByCompanyId(userDTO.getCompany().getId()).stream()
+        long admin = userRepository.findAllByCompanyId(userDTO.getCompany().getId()).stream()
                 .filter(user -> user.getRole().getDescription().equals("Admin"))
-                .collect(Collectors.toList());
+                .count();
 
-        return admin.size() == 1;
+        return admin==1;
     }
 
     @Override
@@ -113,10 +115,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Long id) {
 
-            User user = userRepository.findById(id).get();
-            user.setIsDeleted(true);
-            user.setUsername(user.getUsername() + "-" + user.getId());
-            userRepository.save(user);
+        User user = userRepository.findById(id).get();
+        user.setIsDeleted(true);
+        user.setUsername(user.getUsername() + "-" + user.getId());
+        userRepository.save(user);
 
     }
 
