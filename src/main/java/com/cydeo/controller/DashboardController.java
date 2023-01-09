@@ -1,10 +1,15 @@
 package com.cydeo.controller;
 
+import com.cydeo.dto.ExchangeRateDTO;
 import com.cydeo.dto.InvoiceDTO;
+import com.cydeo.service.DashboardService;
 import com.cydeo.service.InvoiceService;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -17,13 +22,15 @@ import java.util.stream.Collectors;
 
 public class DashboardController {
     private final InvoiceService invoiceService;
+    private final DashboardService dashboardService;
 
-    public DashboardController(InvoiceService invoiceService) {
+    public DashboardController(InvoiceService invoiceService, DashboardService dashboardService) {
         this.invoiceService = invoiceService;
+        this.dashboardService = dashboardService;
     }
 
     @GetMapping("/dashboard")
-    public String navigateToDashboard(Model model){
+    public String navigateToDashboard(Model model) {
         Map<String, Integer> map = new TreeMap<>();
         map.put("totalCost", 7800);
         map.put("totalSales", 800);
@@ -34,6 +41,7 @@ public class DashboardController {
         model.addAttribute("summaryNumbers", map);
         model.addAttribute("invoices", collect);
 
+        model.addAttribute("exchangeRates", dashboardService.getExchangeRates());
 
         return "dashboard";
     }
