@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.Arrays;
@@ -85,14 +86,15 @@ public class ClientVendorController {
 
     }
     @GetMapping("/delete/{clientVendorId}")
-    public String deleteClientVendorById(@PathVariable("clientVendorId") Long clientVendorId, Model model) throws IllegalAccessException {
-        if (invoiceRepository.existsById(clientVendorId)){
-//            String error="cannot delete client/vendor linked to open invoice"; how to return this in HTML page
-//            model.addAttribute("error", error);
+    public String deleteClientVendorById(@PathVariable("clientVendorId") Long clientVendorId, RedirectAttributes redirectAttributes, Model model) throws IllegalAccessException {
+        if (invoiceRepository.existsById(clientVendorId)){//todo call invoice service
+            String error="cannot delete client/vendor linked to open invoice";
+            redirectAttributes.addFlashAttribute("error", error);
+
+            model.addAttribute("error",error);
+;
             return "redirect:/clientVendors/list";
         }
-     //trying to add above
-        model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
         clientVendorService.delete(clientVendorId);
         return "redirect:/clientVendors/list";
     }

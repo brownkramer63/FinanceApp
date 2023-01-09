@@ -64,9 +64,6 @@ public class ClientVendorServiceImpl implements ClientVendorService {
             clientVendor.get().setIsDeleted(true);
             clientVendorRepository.save(clientVendor.get());
         }
-//        else {
-//            throw new NoSuchElementException("client or vendor does not exist with select Id");
-//        }
 
     }
 
