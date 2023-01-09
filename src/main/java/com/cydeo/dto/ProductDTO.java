@@ -35,4 +35,6 @@ public class ProductDTO {
 
     @NotNull
     private CategoryDTO category;
+
+    private InvoiceProductDTO invoiceProductDTO;
 }
