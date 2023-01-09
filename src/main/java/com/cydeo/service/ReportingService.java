@@ -14,4 +14,6 @@ public interface ReportingService {
     //need user so i know which invoices to pull dont know which ones
 
     Map<String, BigDecimal> profitLossPerMonth();
+
+    List<InvoiceProductDTO> getStockReport();
 }

@@ -18,6 +18,8 @@ public interface InvoiceProductService {
 
     void delete(Long id);
 
+    public List<InvoiceProductDTO> listAllBasedOnStatusOrderByDateDesc();
+
 
 
 }

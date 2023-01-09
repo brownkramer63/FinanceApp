@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/report")
+@RequestMapping("/reports")
 public class ReportingController {
 
 private final ReportingService reportingService;
@@ -16,10 +16,10 @@ private final ReportingService reportingService;
         this.reportingService = reportingService;
     }
 
-    @GetMapping("/stock-report")
+    @GetMapping("/stockData")
     public String listAllValidStockData(Model model){
 
-        //need logic here
+        model.addAttribute("invoiceProducts", reportingService.getStockReport());
 
         return "report/stock-report";
     }
