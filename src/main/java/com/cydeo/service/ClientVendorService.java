@@ -12,9 +12,12 @@ public interface ClientVendorService {
 
     public ClientVendorDTO save(ClientVendorDTO clientVendorDTO);
 
-    void delete(Long id);
+    void delete(Long id) throws IllegalAccessException;
 
-    ClientVendorDTO update(ClientVendorDTO clientVendorDTO, Long clientVendorId);
+//    void update(ClientVendorDTO clientVendorDTO, Long clientVendorId);
+
+//    ClientVendorDTO update(ClientVendorDTO clientVendorDTO, Long clientVendorId);
+    ClientVendorDTO update(ClientVendorDTO clientVendorDTO);
 
     List<ClientVendorDTO> listAllClientVendors();
 
