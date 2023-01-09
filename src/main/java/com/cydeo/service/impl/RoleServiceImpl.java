@@ -63,8 +63,8 @@ public class RoleServiceImpl implements RoleService {
         } else if (loggedInUser.getRole().getDescription().equals("Admin")) {                   //if admin loggedIn
             List<User> userList = userRepository.findAllByCompanyId(loggedInUser.getCompany().getId());
             log.info("User Roles size " + userList.size() + loggedInUser.getCompany().getTitle());
-            return userList.stream()
-                    .filter(user -> !user.getRole().getDescription().equals("Root User"))
+            return roleList.stream()
+                    .filter(user -> !user.getDescription().equals("Root User"))
                     .map(role -> mapperUtil.convert(role, new RoleDTO()))
                     .collect(Collectors.toList());
 
