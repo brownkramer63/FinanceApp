@@ -1,7 +1,9 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.CompanyDTO;
 import com.cydeo.dto.RoleDTO;
 import com.cydeo.dto.UserDTO;
+import com.cydeo.entity.Company;
 import com.cydeo.entity.Role;
 import com.cydeo.entity.User;
 import com.cydeo.mapper.MapperUtil;
@@ -16,6 +18,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,10 +41,12 @@ public class RoleServiceImpl implements RoleService {
         this.companyService = companyService;
         this.userRepository = userRepository;
     }
+
     @Override
     public RoleDTO findById(Long id) {
         return mapperUtil.convert(roleRepository.findById(id), new RoleDTO());
     }
+
     @Override
     public List<RoleDTO> listRoles() {
 
@@ -64,5 +69,23 @@ public class RoleServiceImpl implements RoleService {
         }
         return Collections.emptyList();
 
+    }
+
+
+
+    public List<RoleDTO> getRolesByLoggedInUserForRoot() {
+
+        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
+
+        if (user.getRole().getDescription().equals("Root User")) {
+            List<Role> roleList = roleRepository.findAllByDescription("Admin");
+
+            return roleList.stream().map(role -> mapperUtil.convert(role, new RoleDTO())).collect(Collectors.toList());
+
+        } else {
+            Role role = user.getRole();
+            RoleDTO roleDTO = mapperUtil.convert(role, new RoleDTO());
+            return Arrays.asList(roleDTO);
+        }
     }
 }
