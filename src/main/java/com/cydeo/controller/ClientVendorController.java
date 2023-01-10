@@ -5,6 +5,7 @@ import com.cydeo.enums.ClientVendorType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.ClientVendorService;
+import com.cydeo.service.impl.InvoiceServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,11 +25,13 @@ public class ClientVendorController {
     private final ClientVendorService clientVendorService;
 
     private final InvoiceRepository invoiceRepository;
+    private final InvoiceServiceImpl invoiceService;
     private final MapperUtil mapperUtil;
 
-    public ClientVendorController(ClientVendorService clientVendorService, InvoiceRepository invoiceRepository, MapperUtil mapperUtil) {
+    public ClientVendorController(ClientVendorService clientVendorService, InvoiceRepository invoiceRepository, InvoiceServiceImpl invoiceService, MapperUtil mapperUtil) {
         this.clientVendorService = clientVendorService;
         this.invoiceRepository = invoiceRepository;
+        this.invoiceService = invoiceService;
         this.mapperUtil = mapperUtil;
     }
 
@@ -87,7 +90,7 @@ public class ClientVendorController {
     }
     @GetMapping("/delete/{clientVendorId}")
     public String deleteClientVendorById(@PathVariable("clientVendorId") Long clientVendorId, RedirectAttributes redirectAttributes, Model model) throws IllegalAccessException {
-        if (invoiceRepository.existsById(clientVendorId)){//todo call invoice service
+        if (invoiceService.existsById(clientVendorId)){
             String error="cannot delete client/vendor linked to open invoice";
             redirectAttributes.addFlashAttribute("error", error);
 
