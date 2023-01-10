@@ -39,13 +39,15 @@ public class SalesInvoiceController {
 
     @GetMapping("/delete/{id}")
     public String deleteSalesInvoice(@PathVariable("id") Long id){
-        invoiceService.delete(id);
+        invoiceService.deleteByInvoiceId(id);
         return "redirect:/salesInvoices/list";
     }
 
     @GetMapping("/approve/{id}")
     public String approveSalesInvoice(@PathVariable("id") Long id){
         invoiceService.approve(id);
+        invoiceService.updateQuantityInStock(id);
+        invoiceService.updateQuantityAfterApproval(id);
         return "redirect:/salesInvoices/list";
     }
 
@@ -139,8 +141,10 @@ public class SalesInvoiceController {
 
 
         model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("invoice", invoiceService.findById(id));
         model.addAttribute("company", companyService.getCompanyByLoggedInUser());
+        model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(id));
+
+
         return "/invoice/invoice_print";
 
     }

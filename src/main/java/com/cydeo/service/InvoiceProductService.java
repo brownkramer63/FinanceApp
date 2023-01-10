@@ -15,6 +15,7 @@ public interface InvoiceProductService {
     InvoiceProductDTO addInvoiceProduct(Long id, InvoiceProductDTO invoiceProductDTO) throws Exception;
 
     void delete(Long id);
+    void deleteProductByInvoiceId(Long id);
 
 
 

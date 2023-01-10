@@ -8,6 +8,7 @@ import com.sun.xml.bind.v2.TODO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
+@Where(clause = "is_deleted = false")
 public class Invoice extends BaseEntity {
 
 

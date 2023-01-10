@@ -33,6 +33,7 @@ public class InvoiceProduct extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
+    private BigDecimal total;
 
 
 }

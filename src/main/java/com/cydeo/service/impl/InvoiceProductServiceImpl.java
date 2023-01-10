@@ -2,25 +2,19 @@ package com.cydeo.service.impl;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
-import com.cydeo.entity.Invoice;
+import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.InvoiceProduct;
-import com.cydeo.entity.Product;
-import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
-import com.cydeo.repository.InvoiceRepository;
+import com.cydeo.security.SecurityService;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -33,15 +27,17 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final InvoiceService invoiceService;
 
     private final InvoiceProductRepository invoiceProductRepository;
+    private final SecurityService securityService;
 
 
-    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceProductRepository invoiceProductRepository) {
+    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceProductRepository invoiceProductRepository, SecurityService securityService) {
 
         this.mapperUtil = mapperUtil;
 
         this.invoiceService = invoiceService;
 
         this.invoiceProductRepository = invoiceProductRepository;
+        this.securityService = securityService;
     }
 
 
@@ -65,13 +61,13 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
         InvoiceDTO invoiceDTO = invoiceService.findById(id);
 
-        if(invoiceProductDTO.getTotal() != null){
 
+        if(invoiceProductDTO.getTotal()!=null){
             invoiceProductDTO.setInvoice(invoiceDTO);
             InvoiceProduct invoiceProduct = invoiceProductRepository.findById(invoiceProductDTO.getId()).orElseThrow();
             invoiceProduct.setProfitLoss(invoiceProductDTO.getProfitLoss());
             invoiceProduct.setRemainingQuantity(invoiceProductDTO.getRemainingQuantity());
-           // product.quantityInStock + quantity
+
             invoiceProductRepository.save(invoiceProduct);
 
             return mapperUtil.convert(invoiceProduct, new InvoiceProductDTO());
@@ -85,7 +81,9 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
             invoiceProduct.setTax(invoiceProductDTO.getTax());
             invoiceProduct.setProfitLoss(invoiceProductDTO.getProfitLoss());
             invoiceProduct.setProduct(invoiceProductDTO.getProduct());
-
+            invoiceProduct.setTotal(invoiceProductDTO.getPrice()
+                    .multiply(BigDecimal.valueOf(invoiceProductDTO.getQuantity()).multiply(BigDecimal.valueOf(invoiceProductDTO.getTax()).divide(BigDecimal.valueOf(100))))
+                    .add(invoiceProductDTO.getPrice().multiply(BigDecimal.valueOf(invoiceProductDTO.getQuantity()))));
 
             InvoiceProduct invoiceProduct_res = mapperUtil.convert(invoiceProduct, new InvoiceProduct());
 
@@ -100,7 +98,10 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
 
 
-        @Override
+
+
+
+    @Override
         public void removeInvoiceProduct (Long id){
            InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
 
@@ -113,12 +114,20 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     @Override
     public void delete(Long id) {
 
-        List<InvoiceProduct> invoiceProduct = invoiceProductRepository.findByInvoiceId(id);
-
-        invoiceProduct.stream().forEach(invoiceProduct1 -> delete(invoiceProduct1.getId()));
-
-
+        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
+        invoiceProduct.setIsDeleted(true);
+        invoiceProductRepository.save(invoiceProduct);
     }
+
+    public void deleteProductByInvoiceId(Long id){
+        UserDTO loggedInUser = securityService.getLoggedInUser();
+        List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findByInvoiceId(id);
+
+        invoiceProductList.stream()
+                .filter(invoiceProduct -> invoiceProduct.getInvoice().getCompany().getId()
+                        .equals(loggedInUser.getCompany().getId())).forEach(invoiceProduct -> delete(invoiceProduct.getId()));
+    }
+
 
 
 }

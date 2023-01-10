@@ -10,6 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.math.BigDecimal;
+
 @Controller
 @RequestMapping("/purchaseInvoices")
 public class PurchaseInvoiceController {
@@ -38,7 +41,7 @@ public class PurchaseInvoiceController {
 
     @GetMapping("/delete/{id}")
     public String deletePurchaseInvoice(@PathVariable("id") Long id){
-        invoiceService.delete(id);
+        invoiceService.deleteByInvoiceId(id);
         return "redirect:/purchaseInvoices/list";
     }
 
@@ -46,13 +49,21 @@ public class PurchaseInvoiceController {
     @GetMapping("/approve/{id}")
     public String approvePurchaseInvoice(@PathVariable("id") Long id){
         invoiceService.approve(id);
+        invoiceService.updateQuantityInStock(id);
+        invoiceService.updateQuantityAfterApproval(id);
         return "redirect:/purchaseInvoices/list";
 
     }
 
 
     @GetMapping("/create")
-    public String createPurchaseInvoice(Model model){
+    public String createPurchaseInvoice(Model model,@Valid InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Long id){
+
+        if(invoiceService.checkIfStockIsEnough(invoiceProductDTO, id)){
+            bindingResult.rejectValue("quantity", " ", "Not enough stock");
+            return "/invoice/purchase-invoice-update";
+        }
+
 
         model.addAttribute("newPurchaseInvoice", invoiceService.getNewPurchaseInvoice());
         model.addAttribute("vendors", clientVendorService.listAllClientVendors());
@@ -123,7 +134,7 @@ public class PurchaseInvoiceController {
 
 
     @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProduct(@PathVariable("id") Long invoiceId, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model) throws Exception {
+    public String addInvoiceProduct(@PathVariable("id") Long invoiceId, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model) throws Exception {
         if(bindingResult.hasErrors()){
             model.addAttribute("invoice", invoiceService.findById(invoiceId));
             model.addAttribute("vendors", clientVendorService.listAllClientVendors());
@@ -143,9 +154,17 @@ public class PurchaseInvoiceController {
 
 
 
-        model.addAttribute("invoice", invoiceService.findById(id));
+
         model.addAttribute("invoice", invoiceService.findById(id));
         model.addAttribute("company", companyService.getCompanyByLoggedInUser());
+        model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(id));
+
+
+
+
+
+
+
         return "/invoice/invoice_print";
 
     }
