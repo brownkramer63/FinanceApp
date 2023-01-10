@@ -244,6 +244,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    public boolean existsById(Long id) {
+        return invoiceRepository.existsById(id);
+    }
+
+
+
+    @Override
     public InvoiceDTO update(InvoiceDTO invoiceDTO, Long id) {
 
 

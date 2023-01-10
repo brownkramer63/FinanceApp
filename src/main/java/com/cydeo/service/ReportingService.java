@@ -19,12 +19,12 @@ public interface ReportingService {
     List<InvoiceProductDTO> generateReport();
     //need user so i know which invoices to pull dont know which ones
 
-    Map<LocalDate, BigDecimal> profitLossDataMap();
+    Map<String, BigDecimal> profitLossDataMap();
 
-    BigDecimal InvoiceTotalPerTheMonth(LocalDate month);
+    BigDecimal InvoiceTotalPerTheMonth(Month month);
 
-    Map<Integer, LocalDate> MapOfDifferentMonths();
+    Map<Integer, Month> MapOfDifferentMonths();
 
-
+    Map<Integer,String> ReduceToMonth();
 
 }
