@@ -2,6 +2,9 @@ package com.cydeo.service;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
+import com.cydeo.entity.Company;
+import com.cydeo.entity.Invoice;
+import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 
 import java.math.BigDecimal;
@@ -19,7 +22,7 @@ public interface InvoiceService {
 
      InvoiceDTO create(InvoiceDTO invoiceDTO, InvoiceType invoiceType);
 
-
+    boolean existsById(Long id);
 
 
     InvoiceDTO getNewPurchaseInvoice();

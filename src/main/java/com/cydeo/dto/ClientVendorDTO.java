@@ -20,8 +20,8 @@ public class ClientVendorDTO {
 
     private Long id;
 
-    @NotBlank(message = "company name is a required field")
-    @Size(max=50, min=2)
+//    @NotBlank(message = "company name is a required field")
+//    @Size(min=2,max=50, message = "company name is a required field between 2 and 50 characters long")
     private String clientVendorName;
 
     @NotBlank(message = "please enter a valid phone number")
