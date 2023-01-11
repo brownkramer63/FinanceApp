@@ -4,6 +4,7 @@ package com.cydeo.controller;
 import com.cydeo.dto.CompanyDTO;
 import com.cydeo.enums.CompanyStatus;
 import com.cydeo.service.CompanyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Slf4j
 @Controller
 @RequestMapping("companies")
 public class CompanyController {
@@ -63,7 +65,9 @@ public class CompanyController {
     @GetMapping("/deactivate/{id}")
     public String deactivate(@PathVariable("id") Long id) {
 
+
         companyService.activateDeactivateCompanyStatus(id);
+
 
         return "redirect:/companies/list";
     }

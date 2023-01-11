@@ -67,7 +67,7 @@ public class ClientVendorController {
     }
 
     @GetMapping("/update/{clientVendorId}")
-    public String editClientVendor(@PathVariable("clientVendorId") Long clientVendorId, Model model){
+    public String editClientVendor(@PathVariable("id") Long clientVendorId, Model model){
 
         model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
         model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
