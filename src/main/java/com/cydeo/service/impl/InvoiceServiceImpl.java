@@ -246,14 +246,21 @@ public class InvoiceServiceImpl implements InvoiceService {
         CompanyDTO companyDTO =  companyService.getCompanyByLoggedInUser();
         Company company = mapperUtil.convert(companyDTO, new Company());
 
-        Invoice invoice = invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).stream()
-                .max(Comparator.comparing(Invoice::getInvoiceNo)).orElseThrow();
+        if(!invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).isEmpty()){
+            Invoice invoice = invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).stream() // todo make it only companyId
+                    .max(Comparator.comparing(Invoice::getInvoiceNo)).orElseThrow();
+            String invoiceNum = invoice.getInvoiceNo();
+            int res = Integer.parseInt(invoiceNum.substring(2)) + 1;
+            String numberPart = String.format("%03d", res);
+            String generatedNumber = invoiceNum.substring(0, 2) + numberPart;
+            return generatedNumber;
+        }
 
-        String invoiceNum = invoice.getInvoiceNo();
-        int res = Integer.parseInt(invoiceNum.substring(2)) + 1;
-        String numberPart = String.format("%03d", res);
-        String generatedNumber = invoiceNum.substring(0, 2) + numberPart;
-        return generatedNumber;
+
+
+        return "P-001";
+
+
     }
 
 

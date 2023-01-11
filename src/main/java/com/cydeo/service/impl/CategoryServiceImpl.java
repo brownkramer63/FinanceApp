@@ -56,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
             log.info("cat  company : " + categoryDTO.getCompany().getId());
             Category category = mapperUtil.convert(categoryDTO , new Category());
             Company company = mapperUtil.convert(companyDTO, new Company());
-            List<Category> list = categoryRepository.findAllByIsDeletedAndCompany(false,company);
+            List<Category> list = categoryRepository.findAllByIsDeletedAndCompany(false,company); // todo Kadifa
             List<String> descList=list.stream().map(Category::getDescription).collect(Collectors.toList());
             // log.info(" cat description : " + descList);
             if(descList.contains(category.getDescription())){
