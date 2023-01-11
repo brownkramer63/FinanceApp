@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> findAllByLoggedInUser() {
 
         UserDTO loggedInUser = securityService.getLoggedInUser();
+        log.info("LoggedIn user is; " + loggedInUser.getRole().getDescription());
         List<User> allByCompany = userRepository.getAllByCompanyAndRole();
         List<User> allByCompanyAndRole=userRepository.getAllByCompanyAndRole();
 
@@ -55,6 +56,11 @@ public class UserServiceImpl implements UserService {
             return allByCompany.stream()
                     .filter(each -> each.getCompany().getId().equals(loggedInUser.getCompany().getId()))
                     .map(each -> mapperUtil.convert(each, new UserDTO()))
+                    .peek(userDTO -> {
+                        if (isOnlyAdmin(userDTO)) {
+                            userDTO.setOnlyAdmin(true);
+                        }
+                    })
                     .collect(Collectors.toList());
         }
         return allByCompany.stream().map(each -> mapperUtil.convert(each, new UserDTO()))
@@ -114,7 +120,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findByUsername(String username) {
 
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User does not exist")));
         return mapperUtil.convert(user, new UserDTO());
     }
 
