@@ -52,7 +52,7 @@ public class ReportingServiceImpl implements ReportingService {
     public Map<String, BigDecimal> profitLossDataMap() {
         Map<String, BigDecimal> profitPerAMonthMap = new HashMap<>();
         int counter = 1;
-        while (profitPerAMonthMap.size() < MapOfDifferentMonths().size()) {
+        while (profitPerAMonthMap.size() != MapOfDifferentMonths().size()) {
             profitPerAMonthMap.put((ReduceToMonth().get(counter)), InvoiceTotalPerTheMonth(MapOfDifferentMonths().get(counter)));
             counter++;
         }
