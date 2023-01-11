@@ -5,6 +5,7 @@ import com.cydeo.entity.common.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 
 import javax.persistence.Entity;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
+@Where(clause = "is_deleted = false")
 public class InvoiceProduct extends BaseEntity {
 
     private Integer quantity;
@@ -31,6 +33,7 @@ public class InvoiceProduct extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
+    private BigDecimal total;
 
 
 }

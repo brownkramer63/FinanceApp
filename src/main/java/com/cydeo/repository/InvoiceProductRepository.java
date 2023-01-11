@@ -16,6 +16,8 @@ import java.util.List;
 public interface InvoiceProductRepository extends JpaRepository<InvoiceProduct, Long> {
 
     List<InvoiceProduct> findByInvoiceId(Long id);
+    void deleteInvoiceProductsById(Long id);
+    InvoiceProduct findInvoiceProductById(Long id);
 
     List<InvoiceProduct> findAllByInvoice_CompanyAndInvoice_InvoiceStatusAndInvoice_InvoiceType(Company company,InvoiceStatus invoiceStatus, InvoiceType invoiceType);
     @Query(value = "SELECT * FROM invoice_products ip JOIN invoices i ON i.id =ip.invoice_id WHERE i.invoice_status ='APPROVED' ORDER BY i.date DESC ", nativeQuery = true)

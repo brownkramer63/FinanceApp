@@ -39,13 +39,15 @@ public class SalesInvoiceController {
 
     @GetMapping("/delete/{id}")
     public String deleteSalesInvoice(@PathVariable("id") Long id){
-        invoiceService.delete(id);
+        invoiceService.deleteByInvoiceId(id);
         return "redirect:/salesInvoices/list";
     }
 
     @GetMapping("/approve/{id}")
     public String approveSalesInvoice(@PathVariable("id") Long id){
         invoiceService.approve(id);
+        invoiceService.updateQuantityInStock(id);
+        invoiceService.updateQuantityAfterApproval(id);
         return "redirect:/salesInvoices/list";
     }
 
@@ -55,20 +57,25 @@ public class SalesInvoiceController {
         model.addAttribute("clients", clientVendorService.listAllClientVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("products", productService.listAllProducts());
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(id));
+        model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(id));
 
         return"/invoice/sales-invoice-update";
     }
 
     @PostMapping("/update/{id}")
-    public String updateSalesInvoice(@PathVariable("id") Long id, @ModelAttribute("invoice")InvoiceDTO invoiceDTO){
+    public String updatePurchaseInvoice( @PathVariable("id") Long id, @ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
+        if(bindingResult.hasErrors()){
+            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            return "invoice/sales-invoice-create";
+        }
+        InvoiceDTO invoiceDTO1 = invoiceService.save(newPurchaseInvoice, InvoiceType.SALES);
 
-        invoiceService.update(invoiceDTO, id);
-        return "redirect:/salesInvoices/update";
-
+        invoiceService.update(invoiceDTO1, id);
+        return "redirect:/salesInvoices/list";
 
     }
+
 
     @GetMapping("/removeInvoiceProduct/{id}/{invoiceProductId}")
     public String removeInvoiceProduct(@PathVariable("id") Long id, @PathVariable("invoiceProductId") Long invoiceProductId){
@@ -85,7 +92,7 @@ public class SalesInvoiceController {
             model.addAttribute("invoice", invoiceService.findById(id));
             model.addAttribute("clients", clientVendorService.listAllClientVendors());
             model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
-            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceProductDTO.getId()));
+            model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceProductDTO.getId()));
             model.addAttribute("products", productService.listAllProducts());
 
 
@@ -119,7 +126,7 @@ public class SalesInvoiceController {
         model.addAttribute("invoice", invoiceDTO);
         model.addAttribute("clients", clientVendorService.listAllClientVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceDTO.getId()));
+        model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceDTO.getId()));
         model.addAttribute("products", productService.listAllProducts());
 
 
@@ -133,9 +140,11 @@ public class SalesInvoiceController {
 
 
 
-        model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("invoice", invoiceService.findByInvoiceId(id));
         model.addAttribute("company", companyService.getCompanyByLoggedInUser());
+        model.addAttribute("invoiceProducts", invoiceProductService.printInvoice(id));
+
+
         return "/invoice/invoice_print";
 
     }

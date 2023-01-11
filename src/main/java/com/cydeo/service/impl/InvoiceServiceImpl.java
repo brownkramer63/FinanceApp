@@ -6,11 +6,14 @@ import com.cydeo.dto.InvoiceProductDTO;
 import com.cydeo.entity.Company;
 import com.cydeo.entity.Invoice;
 import com.cydeo.entity.InvoiceProduct;
+import com.cydeo.entity.Product;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.repository.InvoiceRepository;
+import com.cydeo.repository.ProductRepository;
+import com.cydeo.security.SecurityService;
 import com.cydeo.service.CompanyService;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
@@ -35,10 +38,13 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final CompanyService companyService;
     private final InvoiceProductRepository invoiceProductRepository;
+    private final SecurityService securityService;
+
+    private final ProductRepository productRepository;
 
 
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, InvoiceProductService invoiceProductService, CompanyService companyService, InvoiceProductRepository invoiceProductRepository) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, InvoiceProductService invoiceProductService, CompanyService companyService, InvoiceProductRepository invoiceProductRepository, SecurityService securityService, ProductRepository productRepository) {
         this.invoiceRepository = invoiceRepository;
 
         this.mapperUtil = mapperUtil;
@@ -47,6 +53,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
         this.invoiceProductRepository = invoiceProductRepository;
+        this.securityService = securityService;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -87,8 +95,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceListByType;
     }
 
-    private BigDecimal totalTaxOfInvoice(Long id){
-        List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findByInvoiceProductId(id);
+    public BigDecimal totalTaxOfInvoice(Long id){
+        List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findAllInvoiceProductByInvoiceId(id);
 
         if(invoiceProductDTOList != null){
 
@@ -112,9 +120,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
 
-    private  BigDecimal totalPriceOfInvoice(Long id){
+    public  BigDecimal totalPriceOfInvoice(Long id){
 
-        List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findByInvoiceProductId(id);
+        List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findAllInvoiceProductByInvoiceId(id);
 
         if(invoiceProductDTOList != null){
 
@@ -140,12 +148,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
 
-    @Override
-    public void delete(Long id) {
-       Invoice invoice = invoiceRepository.findById(id).orElseThrow();
-           invoice.setIsDeleted(true);
-           invoiceRepository.save(invoice);
-       }
 
 
 
@@ -166,8 +168,35 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         if(invoice.isPresent()){
             invoice.get().setInvoiceStatus(InvoiceStatus.APPROVED);
+            // stream invoice
+            // for each invoice product we need quantity and remaining quantity
+            // q in stock = q in stock + quantity
+            // rem q -> q in stock
+            List<InvoiceProductDTO> invoiceProducts = invoiceProductService.findAllInvoiceProductByInvoiceId(id);
+                           invoiceProducts .forEach(invoiceProductDTO -> {
+                           Integer remainingQuantity = invoiceProductDTO.getQuantity() + invoiceProductDTO.getProduct().getQuantityInStock();
+
+                           invoiceProductDTO.setRemainingQuantity(remainingQuantity);
+                          invoiceProductDTO.getProduct().setQuantityInStock(remainingQuantity);
+
+
+
+                               ;
+                           });
+
+
+            invoice.get().setDate(LocalDate.now());
             invoiceRepository.save(invoice.get());
         }
+
+
+
+    }
+
+
+    public void approvePurchaseInvoice(Long id){
+
+        //
     }
 
 
@@ -232,9 +261,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDTO create(InvoiceDTO invoiceDTO, InvoiceType invoiceType) {
 
-        Company company = invoiceRepository.findAll().stream()
-                .findAny().get().getCompany();
-        invoiceDTO.setCompanyDTO(mapperUtil.convert(company, new CompanyDTO()));
+        invoiceDTO.setCompanyDTO(companyService.getCompanyByLoggedInUser());
         invoiceDTO.setInvoiceType(invoiceType);
         invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         invoiceRepository.save(mapperUtil.convert(invoiceDTO, new Invoice()));
@@ -267,4 +294,102 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         }
 
+
+
+
+    public void deleteByInvoiceId(Long id){
+
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        invoice.setIsDeleted(true);
+        invoiceRepository.save(invoice);
+        invoiceProductService.deleteProductByInvoiceId(id);
+
     }
+
+
+
+
+    public void updateQuantityInStock(Long id){
+
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        List<InvoiceProduct> invoiceProduct = invoiceProductRepository.findByInvoiceId(id);
+        if(invoice.getInvoiceType().equals(InvoiceType.PURCHASE)) {
+            for (InvoiceProduct each : invoiceProduct) {
+                Product product = productRepository.findById(each.getProduct().getId()).orElseThrow();
+                product.setQuantityInStock(product.getQuantityInStock() + each.getQuantity());
+                productRepository.save(product);
+            }
+        }
+        else {
+            for (InvoiceProduct each : invoiceProduct) {
+                Product product = productRepository.findById(each.getProduct().getId()).orElseThrow();
+                product.setQuantityInStock(product.getQuantityInStock() - each.getQuantity());
+                productRepository.save(product);
+            }
+        }
+
+    }
+
+    public void updateQuantityAfterApproval(Long id){
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        List<InvoiceProduct> invoiceProduct = invoiceProductRepository.findByInvoiceId(id);
+        if(invoice.getInvoiceType().equals(InvoiceType.PURCHASE) && invoice.getInvoiceStatus().equals(InvoiceStatus.APPROVED)){
+            for(InvoiceProduct each: invoiceProduct){
+
+                InvoiceProduct invoiceProduct1 = invoiceProductRepository.findById(each.getId()).orElseThrow();
+                invoiceProduct1.setRemainingQuantity(invoiceProduct1.getQuantity());
+                invoiceProduct1.setProfitLoss(BigDecimal.valueOf(10));
+                invoiceProductRepository.save(invoiceProduct1);
+                Product product = productRepository.findById(each.getProduct().getId()).orElseThrow();
+                product.setQuantityInStock(invoiceProduct1.getRemainingQuantity());
+
+                }
+            }else if(invoice.getInvoiceType().equals(InvoiceType.SALES) && invoice.getInvoiceStatus().equals(InvoiceStatus.APPROVED)){
+                List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findByInvoiceId(id);
+
+                for(InvoiceProduct each: invoiceProductList){
+
+                InvoiceProduct invoiceProduct1 = invoiceProductRepository.findById(each.getId()).orElseThrow();
+                invoiceProduct1.setRemainingQuantity(invoiceProduct1.getProduct().getQuantityInStock() - invoiceProduct1.getQuantity());
+                invoiceProduct1.setProfitLoss(BigDecimal.valueOf(10));
+                invoiceProductRepository.save(invoiceProduct1);
+                Product product = productRepository.findById(each.getProduct().getId()).orElseThrow();
+                product.setQuantityInStock(invoiceProduct1.getRemainingQuantity());
+
+            }
+
+            }
+        }
+
+
+        @Override
+    public boolean checkIfStockIsEnough( Long id){
+//
+//        InvoiceProductDTO invoiceProductDTO1 = invoiceProductService.findById(id);
+//
+//        InvoiceProduct invoiceProducts = invoiceProductRepository.findInvoiceProductById(invoiceProductDTO1.getId());
+//
+//            if(invoiceProductDTO1.getQuantity() > invoiceProducts.getProduct().getQuantityInStock()){
+//                return false;
+//            }
+
+
+        return true;
+    }
+
+    public InvoiceDTO findByInvoiceId(Long id){
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        InvoiceDTO invoiceDTO = mapperUtil.convert(invoice, new InvoiceDTO());
+
+        if(!invoiceProductService.printInvoice(invoice.getId()).isEmpty()){
+            invoiceDTO.setTax(totalTaxOfInvoice(id).intValue());
+            invoiceDTO.setPrice(totalPriceOfInvoice(invoiceDTO.getId()));
+            invoiceDTO.setTotal(totalPriceOfInvoice(invoiceDTO.getId()));
+        }
+        return invoiceDTO;
+    }
+
+
+
+
+}

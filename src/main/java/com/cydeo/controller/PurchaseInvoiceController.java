@@ -10,6 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.math.BigDecimal;
+
 @Controller
 @RequestMapping("/purchaseInvoices")
 public class PurchaseInvoiceController {
@@ -38,7 +41,7 @@ public class PurchaseInvoiceController {
 
     @GetMapping("/delete/{id}")
     public String deletePurchaseInvoice(@PathVariable("id") Long id){
-        invoiceService.delete(id);
+        invoiceService.deleteByInvoiceId(id);
         return "redirect:/purchaseInvoices/list";
     }
 
@@ -46,13 +49,21 @@ public class PurchaseInvoiceController {
     @GetMapping("/approve/{id}")
     public String approvePurchaseInvoice(@PathVariable("id") Long id){
         invoiceService.approve(id);
+        invoiceService.updateQuantityInStock(id);
+        invoiceService.updateQuantityAfterApproval(id);
         return "redirect:/purchaseInvoices/list";
 
     }
 
 
     @GetMapping("/create")
-    public String createPurchaseInvoice(Model model){
+    public String createPurchaseInvoice(Model model,@Valid InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult){
+
+//        if(invoiceService.checkIfStockIsEnough(invoiceProductDTO.getId())){
+//            bindingResult.rejectValue("quantity", " ", "Not enough stock");
+//            return "/invoice/purchase-invoice-update";
+//        }
+
 
         model.addAttribute("newPurchaseInvoice", invoiceService.getNewPurchaseInvoice());
         model.addAttribute("vendors", clientVendorService.listAllClientVendors());
@@ -74,12 +85,12 @@ public class PurchaseInvoiceController {
         model.addAttribute("invoice", invoiceDTO);
         model.addAttribute("vendors", clientVendorService.listAllClientVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceDTO.getId()));
+        model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceDTO.getId()));
         model.addAttribute("products", productService.listAllProducts());
 
 
 
-        return "invoice/purchase-invoice-update";
+        return "redirect:/purchaseInvoices/update/" + invoiceDTO.getId().toString();
 
 
     }
@@ -92,7 +103,7 @@ public class PurchaseInvoiceController {
         model.addAttribute("invoice", invoiceService.findById(id));
         model.addAttribute("vendors", clientVendorService.listAllClientVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(id));
+        model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(id));
         model.addAttribute("products", productService.listAllProducts());
 
 
@@ -101,30 +112,34 @@ public class PurchaseInvoiceController {
 
 
     @PostMapping("/update/{id}")
-    public String updatePurchaseInvoice( @PathVariable("id") Long id, InvoiceDTO invoiceDTO){
+    public String updatePurchaseInvoice( @PathVariable("id") Long id, @ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
-        invoiceService.update(invoiceDTO, id);
-        return "redirect:/purchaseInvoices/update/" + id;
+        if(bindingResult.hasErrors()){
+            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            return "invoice/purchase-invoice-create";
+        }
+        InvoiceDTO invoiceDTO1 = invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
+
+        invoiceService.update(invoiceDTO1, id);
+        return "redirect:/purchaseInvoices/list/";
 
     }
 
     @GetMapping("/removeInvoiceProduct/{id}/{invoiceProductId}")
-    public String removeInvoiceProduct(@PathVariable("id") Long id, @PathVariable("invoiceProductId") Long invoiceProductId, BindingResult bindingResult, Model model){
-        if(bindingResult.hasErrors()){
-            model.addAttribute("invoice", invoiceService.findById(id));
-        }
-        invoiceProductService.removeInvoiceProduct( invoiceProductId);
+    public String removeInvoiceProduct(@PathVariable("id") Long id, @PathVariable("invoiceProductId") Long invoiceProductId){
 
-
+        invoiceProductService.removeInvoiceProduct(invoiceProductId);
         return "redirect:/purchaseInvoices/update/" + id;
     }
 
+
     @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProduct(@PathVariable("id") Long invoiceId, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model) throws Exception {
+    public String addInvoiceProduct(@PathVariable("id") Long invoiceId, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model) throws Exception {
         if(bindingResult.hasErrors()){
             model.addAttribute("invoice", invoiceService.findById(invoiceId));
             model.addAttribute("vendors", clientVendorService.listAllClientVendors());
-            model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceProductId(invoiceId));
+            model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
+            model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceId));
             model.addAttribute("products", productService.listAllProducts());
 
             return "invoice/purchase-invoice-update";
@@ -138,10 +153,11 @@ public class PurchaseInvoiceController {
     public String printPurchaseInvoice(@PathVariable("id") Long id, Model model){
 
 
-
-        model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("invoice", invoiceService.findByInvoiceId(id));
         model.addAttribute("company", companyService.getCompanyByLoggedInUser());
+        model.addAttribute("invoiceProducts", invoiceProductService.printInvoice(id));
+
+
         return "/invoice/invoice_print";
 
     }
