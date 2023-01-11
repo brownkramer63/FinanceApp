@@ -128,4 +128,14 @@ public class CompanyServiceImpl implements CompanyService {
 
     }
 
+    @Override
+    public boolean titleAlreadyExists(String title) {
+
+        if (companyRepository.findByTitle(title) != null) {
+            return title.equals((companyRepository.findByTitle(title).getTitle()));
+        }
+        return false;
+    }
+
+
 }

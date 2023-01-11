@@ -1,19 +1,14 @@
 package com.cydeo.service.impl;
 
-import com.cydeo.dto.CompanyDTO;
-import com.cydeo.dto.RoleDTO;
+
 import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.*;
+import com.cydeo.exception.UserNotFoundException;
 import com.cydeo.mapper.MapperUtil;
-import com.cydeo.repository.CompanyRepository;
-import com.cydeo.repository.RoleRepository;
 import com.cydeo.repository.UserRepository;
-import com.cydeo.service.CompanyService;
-import com.cydeo.service.RoleService;
 import com.cydeo.security.SecurityService;
 import com.cydeo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,26 +18,15 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
-    private final RoleRepository roleRepository;
-    private final CompanyRepository companyRepository;
-    private final CompanyService companyService;
     private final UserRepository userRepository;
     private final MapperUtil mapperUtil;
-    private final RoleService roleService;
     private final SecurityService securityService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, @Lazy RoleService roleService,
-                           SecurityService securityService, CompanyRepository companyRepository,
-                           RoleRepository roleRepository, @Lazy CompanyService companyService,
-                           PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, SecurityService securityService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
-        this.roleService = roleService;
         this.securityService = securityService;
-        this.companyRepository = companyRepository;
-        this.roleRepository = roleRepository;
-        this.companyService = companyService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -50,13 +34,21 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> findAllByLoggedInUser() {
 
         UserDTO loggedInUser = securityService.getLoggedInUser();
-
-        List<User> userList = userRepository.getAllByOrderByCompanyAndRole("Admin");
+        log.info("LoggedIn user is; " + loggedInUser.getRole().getDescription());
         List<User> allByCompany = userRepository.getAllByCompanyAndRole();
+        List<User> allByCompanyAndRole=userRepository.getAllByCompanyAndRole();
 
 
         if (loggedInUser.getRole().getDescription().equals("Root User")) {
-            return userList.stream().map(user -> mapperUtil.convert(user, new UserDTO()))
+            log.info("getting all the admins");
+            return allByCompanyAndRole.stream()
+                    .filter(user -> user.getRole().getDescription().equals("Admin"))
+                    .map(user -> mapperUtil.convert(user, new UserDTO()))
+                    .peek(userDTO -> {
+                        if(isOnlyAdmin(userDTO)){
+                            userDTO.setOnlyAdmin(true);
+                        }
+                    })
                     .collect(Collectors.toList());
 
         } else if (loggedInUser.getRole().getDescription().equals("Admin")) {
@@ -64,6 +56,11 @@ public class UserServiceImpl implements UserService {
             return allByCompany.stream()
                     .filter(each -> each.getCompany().getId().equals(loggedInUser.getCompany().getId()))
                     .map(each -> mapperUtil.convert(each, new UserDTO()))
+                    .peek(userDTO -> {
+                        if (isOnlyAdmin(userDTO)) {
+                            userDTO.setOnlyAdmin(true);
+                        }
+                    })
                     .collect(Collectors.toList());
         }
         return allByCompany.stream().map(each -> mapperUtil.convert(each, new UserDTO()))
@@ -71,8 +68,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO findById(Long id) {
-        Optional<User> user = userRepository.findById(id);
+    public UserDTO findById(Long id){
+        Optional<User> user = Optional.ofNullable(userRepository.findById(id)).orElseThrow(() -> new UserNotFoundException("User does not exist"));
         return mapperUtil.convert(user, new UserDTO());
     }
 
@@ -96,13 +93,14 @@ public class UserServiceImpl implements UserService {
         return mapperUtil.convert(convertedUser, new UserDTO());
     }
 
+    @Override
     public boolean isOnlyAdmin(UserDTO userDTO) {
 
-        List<User> admin = userRepository.findAllByCompanyId(userDTO.getCompany().getId()).stream()
+        long admin = userRepository.findAllByCompanyId(userDTO.getCompany().getId()).stream()
                 .filter(user -> user.getRole().getDescription().equals("Admin"))
-                .collect(Collectors.toList());
+                .count();
 
-        return admin.size() == 1;
+        return admin==1;
     }
 
     @Override
@@ -112,18 +110,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(Long id) {
-
-            User user = userRepository.findById(id).get();
-            user.setIsDeleted(true);
-            user.setUsername(user.getUsername() + "-" + user.getId());
-            userRepository.save(user);
+        User user = userRepository.findById(id).get();
+        user.setIsDeleted(true);
+        user.setUsername(user.getUsername() + "-" + user.getId());
+        userRepository.save(user);
 
     }
 
     @Override
     public UserDTO findByUsername(String username) {
 
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User does not exist")));
         return mapperUtil.convert(user, new UserDTO());
     }
 

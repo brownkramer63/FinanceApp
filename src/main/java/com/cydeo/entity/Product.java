@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 
 @Getter
@@ -26,4 +27,7 @@ public class Product extends BaseEntity {
     private int quantityInStock;
     @ManyToOne (fetch = FetchType.LAZY)
     private Category category;
+
+    @OneToMany(mappedBy = "product")
+    List<InvoiceProduct > invoiceProduct;
 }

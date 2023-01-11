@@ -1,24 +1,18 @@
 package com.cydeo.service.impl;
 
-import com.cydeo.dto.CompanyDTO;
 import com.cydeo.dto.RoleDTO;
 import com.cydeo.dto.UserDTO;
-import com.cydeo.entity.Company;
 import com.cydeo.entity.Role;
 import com.cydeo.entity.User;
+import com.cydeo.exception.RoleNotFoundException;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.RoleRepository;
 import com.cydeo.repository.UserRepository;
 import com.cydeo.security.SecurityService;
-import com.cydeo.service.CompanyService;
 import com.cydeo.service.RoleService;
-import com.cydeo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,23 +22,20 @@ public class RoleServiceImpl implements RoleService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final MapperUtil mapperUtil;
-    private final UserService userService;
     private final SecurityService securityService;
-    private final CompanyService companyService;
 
-    public RoleServiceImpl(RoleRepository roleRepository, MapperUtil mapperUtil, UserService userService, SecurityService securityService, CompanyService companyService,
+    public RoleServiceImpl(RoleRepository roleRepository, MapperUtil mapperUtil,  SecurityService securityService,
                            UserRepository userRepository) {
         this.roleRepository = roleRepository;
         this.mapperUtil = mapperUtil;
-        this.userService = userService;
         this.securityService = securityService;
-        this.companyService = companyService;
         this.userRepository = userRepository;
     }
 
     @Override
     public RoleDTO findById(Long id) {
-        return mapperUtil.convert(roleRepository.findById(id), new RoleDTO());
+        return mapperUtil.convert(roleRepository.findById(id)
+                .orElseThrow(()->new RoleNotFoundException("Role does not exist")), new RoleDTO());
     }
 
     @Override
@@ -54,6 +45,7 @@ public class RoleServiceImpl implements RoleService {
 
         List<Role> roleList = roleRepository.findAll();                     //findRolesBy(loggedInUser.getRole().getId());  //find roles by logged in user
         if (loggedInUser.getRole().getDescription().equals("Root User")) {
+            log.info("List of users: " + roleList.size());
             return roleList.stream()
                     .filter(role -> role.getDescription().equals("Admin"))
                     .map(role -> mapperUtil.convert(role, new RoleDTO()))
@@ -61,31 +53,15 @@ public class RoleServiceImpl implements RoleService {
 
         } else if (loggedInUser.getRole().getDescription().equals("Admin")) {                   //if admin loggedIn
             List<User> userList = userRepository.findAllByCompanyId(loggedInUser.getCompany().getId());
-            log.info("User Roles size " + roleList.size());
+            log.info("Users size: " + userList.size() + loggedInUser.getCompany().getTitle());
             return roleList.stream()
-                    .filter(role -> !role.getDescription().equals("Root User"))
+                    .filter(user -> !user.getDescription().equals("Root User"))
                     .map(role -> mapperUtil.convert(role, new RoleDTO()))
                     .collect(Collectors.toList());
+
         }
         return Collections.emptyList();
 
     }
 
-
-
-    public List<RoleDTO> getRolesByLoggedInUserForRoot() {
-
-        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
-
-        if (user.getRole().getDescription().equals("Root User")) {
-            List<Role> roleList = roleRepository.findAllByDescription("Admin");
-
-            return roleList.stream().map(role -> mapperUtil.convert(role, new RoleDTO())).collect(Collectors.toList());
-
-        } else {
-            Role role = user.getRole();
-            RoleDTO roleDTO = mapperUtil.convert(role, new RoleDTO());
-            return Arrays.asList(roleDTO);
-        }
-    }
 }

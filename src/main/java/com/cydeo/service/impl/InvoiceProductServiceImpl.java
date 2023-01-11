@@ -3,10 +3,16 @@ package com.cydeo.service.impl;
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
 import com.cydeo.dto.UserDTO;
-import com.cydeo.entity.InvoiceProduct;
-import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.security.SecurityService;
+import com.cydeo.entity.Company;
+import com.cydeo.entity.Invoice;
+import com.cydeo.entity.InvoiceProduct;
+import com.cydeo.enums.InvoiceStatus;
+import com.cydeo.enums.InvoiceType;
+import com.cydeo.mapper.MapperUtil;
+import com.cydeo.repository.InvoiceProductRepository;
+import com.cydeo.service.CompanyService;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
 import org.springframework.context.annotation.Lazy;
@@ -27,17 +33,24 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final InvoiceService invoiceService;
 
     private final InvoiceProductRepository invoiceProductRepository;
+
     private final SecurityService securityService;
 
+    private final CompanyService companyService;
 
-    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceProductRepository invoiceProductRepository, SecurityService securityService) {
+    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceProductRepository invoiceProductRepository, CompanyService companyService) {
+
 
         this.mapperUtil = mapperUtil;
 
         this.invoiceService = invoiceService;
 
         this.invoiceProductRepository = invoiceProductRepository;
+
         this.securityService = securityService;
+
+        this.companyService = companyService;
+
     }
 
 
@@ -140,6 +153,20 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                     return invoiceProductDTO;
 
                 }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<InvoiceProductDTO> listAllBasedOnStatusOrderByDateDesc() {
+        List<InvoiceProduct> list = invoiceProductRepository.retrieveAllBasedOnStatusOrderByDateDesc();
+        return list.stream()
+                .filter(c->c.getInvoice().getCompany().getTitle().equals(companyService.getCompanyByLoggedInUser().getTitle()))
+                .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDTO()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<InvoiceProduct> findAllByCompanyAndInvoiceTypeAndInvoiceStatus(Company company, InvoiceType invoiceType, InvoiceStatus invoiceStatus) {
+        return invoiceProductRepository.findAllByInvoice_CompanyAndInvoice_InvoiceStatusAndInvoice_InvoiceType(company,invoiceStatus,invoiceType);
     }
 
 

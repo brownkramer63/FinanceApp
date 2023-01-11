@@ -24,5 +24,7 @@ public interface CompanyService {
 
     CompanyDTO getCompanyByLoggedInUser();
 
+    boolean titleAlreadyExists(String title);
+
 
 }

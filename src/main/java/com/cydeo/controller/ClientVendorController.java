@@ -1,16 +1,17 @@
 package com.cydeo.controller;
 
 import com.cydeo.dto.ClientVendorDTO;
-import com.cydeo.entity.ClientVendor;
 import com.cydeo.enums.ClientVendorType;
 import com.cydeo.mapper.MapperUtil;
+import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.ClientVendorService;
+import com.cydeo.service.impl.InvoiceServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.LifecycleState;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.Arrays;
@@ -22,10 +23,15 @@ import java.util.List;
 public class ClientVendorController {
 
     private final ClientVendorService clientVendorService;
+
+    private final InvoiceRepository invoiceRepository;
+    private final InvoiceServiceImpl invoiceService;
     private final MapperUtil mapperUtil;
 
-    public ClientVendorController(ClientVendorService clientVendorService, MapperUtil mapperUtil) {
+    public ClientVendorController(ClientVendorService clientVendorService, InvoiceRepository invoiceRepository, InvoiceServiceImpl invoiceService, MapperUtil mapperUtil) {
         this.clientVendorService = clientVendorService;
+        this.invoiceRepository = invoiceRepository;
+        this.invoiceService = invoiceService;
         this.mapperUtil = mapperUtil;
     }
 
@@ -61,7 +67,7 @@ public class ClientVendorController {
     }
 
     @GetMapping("/update/{clientVendorId}")
-    public String editClientVendor(@PathVariable("clientVendorId") Long clientVendorId, Model model){
+    public String editClientVendor(@PathVariable("id") Long clientVendorId, Model model){
 
         model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
         model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
@@ -76,15 +82,22 @@ public class ClientVendorController {
             model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
             model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
             return "clientVendor/clientVendor-update";
-
         }
-        clientVendorService.save(clientVendorDTO);
+        clientVendorDTO.setId(clientVendorId);
+        clientVendorService.update(clientVendorDTO);
         return "redirect:/clientVendors/list";
 
     }
     @GetMapping("/delete/{clientVendorId}")
-    public String deleteClientVendorById(@PathVariable("clientVendorId") Long clientVendorId, Model model){
-        model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
+    public String deleteClientVendorById(@PathVariable("clientVendorId") Long clientVendorId, RedirectAttributes redirectAttributes, Model model) throws IllegalAccessException {
+        if (invoiceService.existsById(clientVendorId)){
+            String error="cannot delete client/vendor linked to open invoice";
+            redirectAttributes.addFlashAttribute("error", error);
+
+            model.addAttribute("error",error);
+;
+            return "redirect:/clientVendors/list";
+        }
         clientVendorService.delete(clientVendorId);
         return "redirect:/clientVendors/list";
     }
