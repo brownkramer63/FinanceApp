@@ -6,7 +6,6 @@ import com.cydeo.dto.UserDTO;
 import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.security.SecurityService;
 import com.cydeo.entity.Company;
-import com.cydeo.entity.Invoice;
 import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
@@ -17,7 +16,6 @@ import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,20 +36,14 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     private final CompanyService companyService;
 
-    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceProductRepository invoiceProductRepository, CompanyService companyService) {
-
-
+    public InvoiceProductServiceImpl(MapperUtil mapperUtil, @Lazy InvoiceService invoiceService, InvoiceProductRepository invoiceProductRepository, SecurityService securityService, CompanyService companyService) {
         this.mapperUtil = mapperUtil;
-
         this.invoiceService = invoiceService;
-
         this.invoiceProductRepository = invoiceProductRepository;
-
         this.securityService = securityService;
-
         this.companyService = companyService;
-
     }
+    //todo @Adelia check whether any field needs @Lazy in constructor
 
 
     @Override
