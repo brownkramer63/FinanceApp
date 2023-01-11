@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
@@ -61,7 +62,12 @@ public class UserController {
 
 
     @GetMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") Long id, Model model) {
+    public String updateUser(@PathVariable("id") Long id, UserDTO userDTO,BindingResult result, RedirectAttributes redirectAttributes, Model model) {
+       if (userDTO.isOnlyAdmin()){
+          model.addAttribute("message","This user is the only admin of" + userDTO.getCompany().getTitle() +
+                   "company. You cant change his/her company");
+
+       }
         model.addAttribute("user", userService.findById(id));
         model.addAttribute("userRoles", roleService.listRoles());
         model.addAttribute("companies", companyService.getCompaniesByLoggedInUserForRoot());
@@ -71,15 +77,12 @@ public class UserController {
 
     @PostMapping("/update/{id}")
     public String insertUpdatedUser(@PathVariable("id") Long id, @Valid @ModelAttribute("user")  UserDTO userDTO, BindingResult bindingResult,Model model) {
-        if (bindingResult.hasErrors() || userService.isEmailAlreadyExists(userDTO)) {
-            if (userService.isEmailAlreadyExists(userDTO)) {
-                bindingResult.rejectValue("username", " ", "Username is already exists. Please enter a different username");
-            }
+        if (bindingResult.hasErrors()) {   //jan11, bug fix
             model.addAttribute("newUser", userDTO);
             model.addAttribute("userRoles", roleService.listRoles());
             model.addAttribute("companies", companyService.getCompaniesByLoggedInUserForRoot());
             return "user/user-update";
-        }
+            }
 
         userDTO.setId(id);
         userService.update(userDTO);
