@@ -57,12 +57,12 @@ public class PurchaseInvoiceController {
 
 
     @GetMapping("/create")
-    public String createPurchaseInvoice(Model model,@Valid InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Long id){
+    public String createPurchaseInvoice(Model model,@Valid InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult){
 
-        if(invoiceService.checkIfStockIsEnough(invoiceProductDTO, id)){
-            bindingResult.rejectValue("quantity", " ", "Not enough stock");
-            return "/invoice/purchase-invoice-update";
-        }
+//        if(invoiceService.checkIfStockIsEnough(invoiceProductDTO.getId())){
+//            bindingResult.rejectValue("quantity", " ", "Not enough stock");
+//            return "/invoice/purchase-invoice-update";
+//        }
 
 
         model.addAttribute("newPurchaseInvoice", invoiceService.getNewPurchaseInvoice());
@@ -153,16 +153,9 @@ public class PurchaseInvoiceController {
     public String printPurchaseInvoice(@PathVariable("id") Long id, Model model){
 
 
-
-
-        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("invoice", invoiceService.findByInvoiceId(id));
         model.addAttribute("company", companyService.getCompanyByLoggedInUser());
-        model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(id));
-
-
-
-
-
+        model.addAttribute("invoiceProducts", invoiceProductService.printInvoice(id));
 
 
         return "/invoice/invoice_print";

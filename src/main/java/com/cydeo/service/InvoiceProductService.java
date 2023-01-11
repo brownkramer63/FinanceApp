@@ -16,6 +16,7 @@ public interface InvoiceProductService {
 
     void delete(Long id);
     void deleteProductByInvoiceId(Long id);
+    List<InvoiceProductDTO> printInvoice(Long id);
 
 
 

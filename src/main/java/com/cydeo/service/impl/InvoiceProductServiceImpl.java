@@ -128,6 +128,21 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                         .equals(loggedInUser.getCompany().getId())).forEach(invoiceProduct -> delete(invoiceProduct.getId()));
     }
 
+    public List<InvoiceProductDTO> printInvoice(Long id){
+
+        return invoiceProductRepository.findByInvoiceId(id)
+                .stream().map(invoiceProduct -> {
+                    InvoiceProductDTO invoiceProductDTO = mapperUtil.convert(invoiceProduct, new InvoiceProductDTO());
+                    BigDecimal totalPrice = invoiceProduct.getPrice().multiply(BigDecimal.valueOf(invoiceProduct.getQuantity()));
+                    Integer taxRate = invoiceProduct.getPrice().multiply(BigDecimal.valueOf(invoiceProduct.getTax()).divide(BigDecimal.valueOf(100))).intValue();
+                    BigDecimal totalPriceWithTax = totalPrice.add(BigDecimal.valueOf(taxRate).multiply(BigDecimal.valueOf(invoiceProductDTO.getQuantity())));
+                    invoiceProductDTO.setTotal(totalPriceWithTax);
+                    return invoiceProductDTO;
+
+                }).collect(Collectors.toList());
+    }
+
+
 
 
 }

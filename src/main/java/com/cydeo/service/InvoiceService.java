@@ -38,9 +38,10 @@ public interface InvoiceService {
     BigDecimal totalPriceOfInvoice(Long id);
 
     void deleteByInvoiceId(Long id);
-    boolean checkIfStockIsEnough(InvoiceProductDTO invoiceProductDTO, Long id);
+    boolean checkIfStockIsEnough(Long id);
 
     void updateQuantityInStock(Long id);
     void updateQuantityAfterApproval(Long id);
-    List<InvoiceProductDTO> printInvoice(Long id);
+    InvoiceDTO findByInvoiceId(Long id);
+
 }

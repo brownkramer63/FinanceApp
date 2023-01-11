@@ -300,6 +300,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
 
+
+
     public void updateQuantityInStock(Long id){
 
         Invoice invoice = invoiceRepository.findById(id).orElseThrow();
@@ -353,31 +355,34 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
 
-    public boolean checkIfStockIsEnough(InvoiceProductDTO invoiceProductDTO, Long id){
-
-
-        InvoiceProduct invoiceProducts = invoiceProductRepository.findInvoiceProductById(id);
-
-            if(invoiceProductDTO.getQuantity() > invoiceProducts.getProduct().getQuantityInStock()){
-                return false;
-            }
+        @Override
+    public boolean checkIfStockIsEnough( Long id){
+//
+//        InvoiceProductDTO invoiceProductDTO1 = invoiceProductService.findById(id);
+//
+//        InvoiceProduct invoiceProducts = invoiceProductRepository.findInvoiceProductById(invoiceProductDTO1.getId());
+//
+//            if(invoiceProductDTO1.getQuantity() > invoiceProducts.getProduct().getQuantityInStock()){
+//                return false;
+//            }
 
 
         return true;
     }
 
-    public List<InvoiceProductDTO> printInvoice(Long id){
+    public InvoiceDTO findByInvoiceId(Long id){
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        InvoiceDTO invoiceDTO = mapperUtil.convert(invoice, new InvoiceDTO());
 
-
-        return null;
-//        return invoiceProductRepository.findByInvoiceId(id)
-//                .stream().map(invoiceProduct -> {
-//
-//
-//
-//
-//                }).collect(Collectors.toList());
+        if(!invoiceProductService.printInvoice(invoice.getId()).isEmpty()){
+            invoiceDTO.setTax(totalTaxOfInvoice(id).intValue());
+            invoiceDTO.setPrice(totalPriceOfInvoice(invoiceDTO.getId()));
+            invoiceDTO.setTotal(totalPriceOfInvoice(invoiceDTO.getId()));
+        }
+        return invoiceDTO;
     }
+
+
 
 
 }
