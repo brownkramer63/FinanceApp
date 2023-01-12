@@ -5,6 +5,7 @@ import com.cydeo.dto.CompanyDTO;
 import com.cydeo.entity.Category;
 import com.cydeo.entity.Company;
 import com.cydeo.entity.Product;
+import com.cydeo.exception.CategoryNotFoundException;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CategoryRepository;
 
@@ -41,9 +42,9 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public CategoryDTO findById(Long Id) {
+    public CategoryDTO findById(Long id) {
 
-        Category category = categoryRepository.findById(Id).get();
+        Optional<Category> category = Optional.of(categoryRepository.findById(id)).orElseThrow(()-> new CategoryNotFoundException("Category does not exist"));
         return mapperUtil.convert(category, new CategoryDTO());
     }
 
