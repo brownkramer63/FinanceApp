@@ -35,7 +35,7 @@ public class DashboardController {
         map.put("totalCost", 7800);
         map.put("totalSales", 800);
         map.put("profitLoss", 2000);
-        List<InvoiceDTO> collect = invoiceService.listAllInvoice()
+        List<InvoiceDTO> collect = invoiceService.listAllApprovedInvoices()
                 .stream().limit(3).collect(Collectors.toList());
 
         model.addAttribute("summaryNumbers", map);
