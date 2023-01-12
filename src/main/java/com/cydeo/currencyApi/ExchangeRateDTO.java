@@ -1,9 +1,12 @@
-package com.cydeo.dto;
+package com.cydeo.currencyApi;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -14,13 +17,12 @@ import lombok.*;
 @Builder
 public class ExchangeRateDTO {
 
-    @JsonIgnore
-    private Long id;
+    private String date;
 
-    private Double euro;
-    private Double britishPound;
-    private Double canadianDollar;
-    private Double japaneseYen;
-    private Double indianRupee;
+    private BigDecimal euro;
+    private BigDecimal britishPound;
+    private BigDecimal canadianDollar;
+    private BigDecimal japaneseYen;
+    private BigDecimal indianRupee;
 
 }
