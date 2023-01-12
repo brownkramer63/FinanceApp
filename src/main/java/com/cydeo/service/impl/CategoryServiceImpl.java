@@ -7,17 +7,17 @@ import com.cydeo.entity.Company;
 import com.cydeo.entity.Product;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CategoryRepository;
-import com.cydeo.repository.CompanyRepository;
+
 import com.cydeo.repository.ProductRepository;
 import com.cydeo.service.CategoryService;
 import com.cydeo.service.CompanyService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
+
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.util.Arrays;
+
 import java.util.List;
+
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -44,48 +44,42 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDTO findById(Long Id) {
 
         Category category = categoryRepository.findById(Id).get();
-        return  mapperUtil.convert(category , new CategoryDTO());
+        return mapperUtil.convert(category, new CategoryDTO());
     }
 
     @Override
     public void save(CategoryDTO categoryDTO) {
 
-            CompanyDTO companyDTO = companyService.getCompanyByLoggedInUser();
-            log.info("cat description : " + companyDTO.getId());
-            categoryDTO.setCompany(companyDTO);
-            log.info("cat  company : " + categoryDTO.getCompany().getId());
-            Category category = mapperUtil.convert(categoryDTO , new Category());
-            Company company = mapperUtil.convert(companyDTO, new Company());
-            List<Category> list = categoryRepository.findAllByIsDeletedAndCompany(false,company); // todo Kadifa
-            List<String> descList=list.stream().map(Category::getDescription).collect(Collectors.toList());
-            // log.info(" cat description : " + descList);
-            if(descList.contains(category.getDescription())){
-                return;
-            }else{
-                categoryRepository.save(category);
-            }
 
+        CompanyDTO companyDTO = companyService.getCompanyByLoggedInUser();
+        log.info("cat description : " + companyDTO.getId());
+        categoryDTO.setCompany(companyDTO);
+        log.info("cat  company : " + categoryDTO.getCompany().getId());
+        Category category = mapperUtil.convert(categoryDTO, new Category());
+        Company company = mapperUtil.convert(companyDTO, new Company());
+        List<Category> list = categoryRepository.findAllByIsDeletedAndCompanyId(false, company.getId());
+        List<String> descList = list.stream().map(Category::getDescription).collect(Collectors.toList());
+        if (descList.contains(category.getDescription())) {
+            return;
+        } else {
+            categoryRepository.save(category);
 
         }
 
 
+    }
 
 
-    @Override
-    public void update(CategoryDTO categoryDTO) {//this is find categoryDTO from DB
+ @Override
+    public CategoryDTO update(CategoryDTO categoryDTO) {
 
         CompanyDTO companyDTO = companyService.getCompanyByLoggedInUser();
         categoryDTO.setCompany(companyDTO);
-        //Company company = mapperUtil.convert(companyDTO, new Company());
 
-        //Category category = categoryRepository.findByIdAndIsDeletedAndCompany(categoryDTO.getId(),false,company);
-        //convert DTO to entity
         Category convertedCategory = mapperUtil.convert(categoryDTO, new Category());
         convertedCategory.setId(categoryDTO.getId());
         categoryRepository.save(convertedCategory);
-
-
-
+        return categoryDTO;
 
 
     }
@@ -93,13 +87,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delete(Long id) {
 
-        Optional<Category> foundCategory=categoryRepository.findById(id);
+        Optional<Category> foundCategory = categoryRepository.findById(id);
         boolean result = checkIfCategoryCanBeDeleted(foundCategory.get());
-        if(result ) {
+        if (result) {
             foundCategory.get().setIsDeleted(true);
             categoryRepository.save(foundCategory.get());
-        }else{
-            CategoryDTO categoryDTO=mapperUtil.convert(foundCategory.get(), new CategoryDTO());
+        } else {
+            CategoryDTO categoryDTO = mapperUtil.convert(foundCategory.get(), new CategoryDTO());
             categoryDTO.setHasProduct(true);
         }
 
@@ -111,17 +105,26 @@ public class CategoryServiceImpl implements CategoryService {
         CompanyDTO companyDTO = companyService.getCompanyByLoggedInUser();
         Company company = mapperUtil.convert(companyDTO, new Company());
 
-        List<Category> listCategory= categoryRepository.findAllByIsDeletedAndCompany(false, company);
-        List<CategoryDTO> categoryDTOList = listCategory.stream().map(category-> mapperUtil.convert(category, new CategoryDTO()))
-                   .collect(Collectors.toList());
-                for (int i = 0, j=0; i < categoryDTOList.size() ; i++ ,j++) {
-                    if(!(checkIfCategoryCanBeDeleted(listCategory.get(i)))){
-                        (categoryDTOList.get(i)).setHasProduct(true);
-                    }
-
+        List<Category> listCategory = categoryRepository.findAllByIsDeletedAndCompanyId(false, company.getId());
+        List<CategoryDTO> categoryDTOList = listCategory.stream().map(category -> mapperUtil.convert(category, new CategoryDTO()))
+                .collect(Collectors.toList());
+        for (int i = 0, j = 0; i < categoryDTOList.size(); i++, j++) {
+            if (!(checkIfCategoryCanBeDeleted(listCategory.get(i)))) {
+                (categoryDTOList.get(i)).setHasProduct(true);
+            }
         }
-                return categoryDTOList;
+        return categoryDTOList;
     }
+
+    @Override
+    public boolean isCategoryExist(CategoryDTO categoryDTO, CompanyDTO companyDTO) {
+        Company company = mapperUtil.convert(companyDTO, new Company());
+        Category category = mapperUtil.convert(categoryDTO, new Category());
+        List<Category> list = categoryRepository.findAllByIsDeletedAndCompanyId(false, company.getId());
+        return list.contains(category);
+
+    }
+
 
     private boolean checkIfCategoryCanBeDeleted(Category category) {
         List<Product> productList = productRepository.findProductByCategory(category);
@@ -135,4 +138,9 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     }
+
+
 }
+
+
+
