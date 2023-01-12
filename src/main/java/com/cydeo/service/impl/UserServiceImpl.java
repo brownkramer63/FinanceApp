@@ -89,6 +89,7 @@ public class UserServiceImpl implements UserService {
         User convertedUser = mapperUtil.convert(userDTO, new User());
         convertedUser.setId(user.get().getId());
         convertedUser.setPassword(user.get().getPassword());
+        convertedUser.setEnabled(true);                                   //jan11 added bug fix
         userRepository.save(convertedUser);
         return mapperUtil.convert(convertedUser, new UserDTO());
     }

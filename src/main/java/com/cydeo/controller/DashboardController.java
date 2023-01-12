@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,11 +32,13 @@ public class DashboardController {
 
     @GetMapping("/dashboard")
     public String navigateToDashboard(Model model) {
-        Map<String, Integer> map = new TreeMap<>();
-        map.put("totalCost", 7800);
-        map.put("totalSales", 800);
-        map.put("profitLoss", 2000);
+
+        Map<String, BigDecimal> map = new TreeMap<>();
+        map.put("totalCost",invoiceService.totalCostOfApprovedInvoices());
+        map.put("totalSales", invoiceService.totalSalesOfApprovedInvoices());
+        map.put("profitLoss", invoiceService.totalCostOfApprovedInvoices());
         List<InvoiceDTO> collect = invoiceService.listAllInvoice()
+
                 .stream().limit(3).collect(Collectors.toList());
 
         model.addAttribute("summaryNumbers", map);
@@ -45,6 +48,7 @@ public class DashboardController {
 
         return "dashboard";
     }
+
 
 }
 
