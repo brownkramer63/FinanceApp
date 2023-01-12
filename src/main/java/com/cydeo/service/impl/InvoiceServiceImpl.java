@@ -399,4 +399,24 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
 
+    @Override
+    public BigDecimal totalCostOfApprovedInvoices(){
+        List<InvoiceDTO> listOfPurchase = listAllInvoicesByType(InvoiceType.PURCHASE);
+        BigDecimal totalCost = listOfPurchase.stream()
+                .filter(invoiceDTO -> invoiceDTO.getInvoiceStatus().equals(InvoiceStatus.APPROVED))
+                .map(invoiceDTO -> invoiceDTO.getTotal()).reduce(BigDecimal::add).get();
+      return totalCost;
+
+    }
+
+    @Override
+    public BigDecimal totalSalesOfApprovedInvoices(){
+        List<InvoiceDTO> listOfSales = listAllInvoicesByType(InvoiceType.SALES);
+        BigDecimal totalSale = listOfSales.stream()
+                .filter(invoiceDTO -> invoiceDTO.getInvoiceStatus().equals(InvoiceStatus.APPROVED))
+                .map(invoiceDTO -> invoiceDTO.getTotal()).reduce(BigDecimal::add).get();
+        return totalSale;
+
+    }
+
 }

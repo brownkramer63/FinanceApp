@@ -49,5 +49,7 @@ public interface InvoiceService {
     void updateQuantityInStock(Long id);
     void updateQuantityAfterApproval(Long id);
     InvoiceDTO findByInvoiceId(Long id);
+    BigDecimal totalCostOfApprovedInvoices();
+    BigDecimal totalSalesOfApprovedInvoices();
 
 }
