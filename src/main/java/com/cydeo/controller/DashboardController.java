@@ -32,11 +32,13 @@ public class DashboardController {
 
     @GetMapping("/dashboard")
     public String navigateToDashboard(Model model) {
+
         Map<String, BigDecimal> map = new TreeMap<>();
         map.put("totalCost",invoiceService.totalCostOfApprovedInvoices());
         map.put("totalSales", invoiceService.totalSalesOfApprovedInvoices());
         map.put("profitLoss", invoiceService.totalCostOfApprovedInvoices());
         List<InvoiceDTO> collect = invoiceService.listAllInvoice()
+
                 .stream().limit(3).collect(Collectors.toList());
 
         model.addAttribute("summaryNumbers", map);

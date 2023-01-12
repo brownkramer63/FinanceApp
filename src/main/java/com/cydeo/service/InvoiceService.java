@@ -13,21 +13,15 @@ import java.util.List;
 public interface InvoiceService {
 
     InvoiceDTO findById(Long id);
-
     List<InvoiceDTO> listAllInvoicesByType(InvoiceType invoiceType);
 
-
-
     List<InvoiceDTO> listAllInvoice();
-
 
     void approve(Long id);
 
     InvoiceDTO create(InvoiceDTO invoiceDTO, InvoiceType invoiceType);
 
     boolean existsById(Long id);
-
-
 
     InvoiceDTO getNewPurchaseInvoice();
 
@@ -51,5 +45,9 @@ public interface InvoiceService {
     InvoiceDTO findByInvoiceId(Long id);
     BigDecimal totalCostOfApprovedInvoices();
     BigDecimal totalSalesOfApprovedInvoices();
+
+    List<InvoiceDTO> listAllApprovedInvoices();
+
+
 
 }
