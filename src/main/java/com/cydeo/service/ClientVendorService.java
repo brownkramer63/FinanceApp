@@ -23,4 +23,8 @@ public interface ClientVendorService {
 
     public List<ClientVendor> findAllByClientVendorName(String name);
 
+    public List<ClientVendorDTO> findAllClients();
+
+    public List<ClientVendorDTO> findAllVendors();
+
 }
