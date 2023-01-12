@@ -66,7 +66,7 @@ public class ClientVendorController {
         return "redirect:/clientVendors/list";
     }
 
-    @GetMapping("/update/{clientVendorId}")
+    @GetMapping("/update/{id}") //replaced clientVendorId with id
     public String editClientVendor(@PathVariable("id") Long clientVendorId, Model model){
 
         model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
@@ -74,8 +74,8 @@ public class ClientVendorController {
     return "clientVendor/clientVendor-update";
     }
 
-    @PostMapping("/update/{clientVendorId}")
-    public String editClientVendor( @Valid @ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, @PathVariable("clientVendorId") Long clientVendorId, BindingResult bindingResult, Model model){
+    @PostMapping("/update/{id}") //replaced clientVendorId with id
+    public String editClientVendor( @Valid @ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, @PathVariable("id") Long clientVendorId, BindingResult bindingResult, Model model){
 
         if (bindingResult.hasErrors()){
             model.addAttribute("clientVendor", clientVendorDTO);
@@ -88,8 +88,8 @@ public class ClientVendorController {
         return "redirect:/clientVendors/list";
 
     }
-    @GetMapping("/delete/{clientVendorId}")
-    public String deleteClientVendorById(@PathVariable("clientVendorId") Long clientVendorId, RedirectAttributes redirectAttributes, Model model) throws IllegalAccessException {
+    @GetMapping("/delete/{id}") //replaced clientVendorId with id
+    public String deleteClientVendorById(@PathVariable("id") Long clientVendorId, RedirectAttributes redirectAttributes, Model model) throws IllegalAccessException {
         if (invoiceService.existsById(clientVendorId)){
             String error="cannot delete client/vendor linked to open invoice";
             redirectAttributes.addFlashAttribute("error", error);
