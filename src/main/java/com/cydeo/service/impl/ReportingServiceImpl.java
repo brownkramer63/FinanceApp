@@ -71,7 +71,7 @@ public class ReportingServiceImpl implements ReportingService {
         for (InvoiceProduct each : monthOfInvoices
         ) {
 //            total = total.add(each.getProfitLoss()); //new formula add here
-            total=total.add(profitLossPerInvoice(each));
+            total = total.add(profitLossPerInvoice(each));
         }
         return total;
 
@@ -120,22 +120,22 @@ public class ReportingServiceImpl implements ReportingService {
         Integer taxRate = invoiceProduct.getPrice().multiply(BigDecimal.valueOf(invoiceProduct.getTax()).divide(BigDecimal.valueOf(100))).intValue();
         BigDecimal totalPrice = invoiceProduct.getPrice().multiply(BigDecimal.valueOf(invoiceProduct.getQuantity()));
         BigDecimal totalPriceWithTax = totalPrice.add(BigDecimal.valueOf(taxRate).multiply(BigDecimal.valueOf(invoiceProduct.getQuantity())));
-       //total sale price above
-        int quantityOfInvoiceProduct= invoiceProduct.getQuantity();
-        Product typeOfProduct= invoiceProduct.getProduct();
-        List<InvoiceProduct> listOfPurchaseInvoicesOfProductType= invoiceProductRepository.findAll().stream().filter(invoiceProduct1 -> invoiceProduct1.getInvoice().getInvoiceType().getValue().equals("Purchase"))
+        //total sale price above
+        int quantityOfInvoiceProduct = invoiceProduct.getQuantity();
+        Product typeOfProduct = invoiceProduct.getProduct();
+        List<InvoiceProduct> listOfPurchaseInvoicesOfProductType = invoiceProductRepository.findAll().stream().filter(invoiceProduct1 -> invoiceProduct1.getInvoice().getInvoiceType().getValue().equals("Purchase"))
                 .filter(invoiceProduct1 -> invoiceProduct1.getProduct().equals(typeOfProduct)).collect(Collectors.toList());
         //list of purchase invoices of product type above now can find median cost
-        int totalQuantityOfProduct= 0;
-        BigDecimal totalPriceOfProduct=new BigDecimal(0);
-        for (InvoiceProduct each:listOfPurchaseInvoicesOfProductType
-             ) {
-            totalQuantityOfProduct=totalQuantityOfProduct+each.getQuantity();
-            totalPriceOfProduct=totalPriceOfProduct.add(each.getPrice());
+        int totalQuantityOfProduct = 0;
+        BigDecimal totalPriceOfProduct = new BigDecimal(0);
+        for (InvoiceProduct each : listOfPurchaseInvoicesOfProductType
+        ) {
+            totalQuantityOfProduct = totalQuantityOfProduct + each.getQuantity();
+            totalPriceOfProduct = totalPriceOfProduct.add(each.getPrice());
         }
-        BigDecimal medianProductCost=totalPriceOfProduct.divide(BigDecimal.valueOf(totalQuantityOfProduct));
+        BigDecimal medianProductCost = totalPriceOfProduct.divide(BigDecimal.valueOf(totalQuantityOfProduct));
 //median cost found above
-BigDecimal profitOrLossPerInvoice= totalPriceWithTax.subtract(medianProductCost.multiply(BigDecimal.valueOf(quantityOfInvoiceProduct)));
+        BigDecimal profitOrLossPerInvoice = totalPriceWithTax.subtract(medianProductCost.multiply(BigDecimal.valueOf(quantityOfInvoiceProduct)));
 
         return profitOrLossPerInvoice;
     }
