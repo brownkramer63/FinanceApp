@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(url = "https://www.universal-tutorial.com/api", name = "Countries-List")
+@FeignClient(url = "${address.api.url}", name = "Countries-List")
 public interface ConsumeCountriesAPI {
 
     //need to send api token i got when i signed up and my email and receive auth token
-@GetMapping( "/getaccesstoken")
-AccessTokenDTO getAccessToken(@RequestHeader(name = "api-token") String token, @RequestHeader(name = "user-email") String email);
+    @GetMapping("/getaccesstoken")
+    AccessTokenDTO getAccessToken(@RequestHeader(name = "api-token") String token, @RequestHeader(name = "user-email") String email);
 
-//with auth token retrieve list of countries
-    @GetMapping( "/countries")
+    //with auth token retrieve list of countries
+    @GetMapping("/countries")
     List<CountryListDTO> getListOfCountries(@RequestHeader(name = "Authorization") String auth);
 
 }
