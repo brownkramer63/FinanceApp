@@ -25,7 +25,7 @@ public interface ReportingService {
 
     Map<Integer,String> ReduceToMonth();
 
-    Map<String, BigDecimal> profitLossPerMonth();
-
     List<InvoiceProductDTO> getStockReport();
+
+    public BigDecimal profitLossPerInvoice(InvoiceProduct invoiceProduct);
 }

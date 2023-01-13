@@ -132,6 +132,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public BigDecimal calculateProfitLoss(Long id) {
+
+
         return null;
     }
 

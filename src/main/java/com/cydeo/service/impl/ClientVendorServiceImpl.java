@@ -106,13 +106,15 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     @Override
     public List<ClientVendorDTO> findAllClients() {
         return clientVendorRepository.findAll().stream().filter(clientVendor -> clientVendor.getClientVendorType()
-                .getValue().equals("Client")).map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDTO())).collect(Collectors.toList());
+                .getValue().equals("Client")).filter(clientVendor ->
+                clientVendor.getCompany().getId().equals(securityService.getLoggedInUser().getCompany().getId())).map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDTO())).collect(Collectors.toList());
     }
 
     @Override
     public List<ClientVendorDTO> findAllVendors() {
         return clientVendorRepository.findAll().stream().filter(clientVendor -> clientVendor.getClientVendorType()
-                .getValue().equals("Vendor")).map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDTO())).collect(Collectors.toList());
+                .getValue().equals("Vendor")).filter(clientVendor ->
+                clientVendor.getCompany().getId().equals(securityService.getLoggedInUser().getCompany().getId())).map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDTO())).collect(Collectors.toList());
 
     }
 
