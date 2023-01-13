@@ -8,17 +8,13 @@ import com.cydeo.entity.Product;
 import com.cydeo.exception.CategoryNotFoundException;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CategoryRepository;
-
 import com.cydeo.repository.ProductRepository;
 import com.cydeo.service.CategoryService;
 import com.cydeo.service.CompanyService;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 
-
 import java.util.List;
-
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -44,34 +40,47 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO findById(Long id) {
 
-        Optional<Category> category = Optional.of(categoryRepository.findById(id)).orElseThrow(()-> new CategoryNotFoundException("Category does not exist"));
+        Optional<Category> category = Optional.of(categoryRepository.findById(id))
+                .orElseThrow(() -> new CategoryNotFoundException("Category does not exist"));
+
         return mapperUtil.convert(category, new CategoryDTO());
     }
 
     @Override
-    public void save(CategoryDTO categoryDTO) {
+    public CategoryDTO save(CategoryDTO categoryDTO) {
 
 
+        //company of logged in user
         CompanyDTO companyDTO = companyService.getCompanyByLoggedInUser();
-        log.info("cat description : " + companyDTO.getId());
+        log.info("category belongs to company : " + companyDTO.getTitle());
         categoryDTO.setCompany(companyDTO);
-        log.info("cat  company : " + categoryDTO.getCompany().getId());
+        log.info("category updated for company : " + categoryDTO.getCompany().getTitle());
         Category category = mapperUtil.convert(categoryDTO, new Category());
-        Company company = mapperUtil.convert(companyDTO, new Company());
-        List<Category> list = categoryRepository.findAllByIsDeletedAndCompanyId(false, company.getId());
+
+
+        List<Category> list = categoryRepository.findAllByIsDeletedAndCompanyId(false, companyDTO.getId());
+
+        // list of categories : computer and Phone
+
+
+        //find all description of categories of the company
         List<String> descList = list.stream().map(Category::getDescription).collect(Collectors.toList());
-        if (descList.contains(category.getDescription())) {
-            return;
+        //  list of categories : computer and Phone
+
+        Category savedCategory;
+
+        if (descList.contains(category.getDescription().toLowerCase())) { // category is exist
+            return categoryDTO;
         } else {
-            categoryRepository.save(category);
+            savedCategory = categoryRepository.save(category);
+
 
         }
-
-
+        return mapperUtil.convert(savedCategory, new CategoryDTO());
     }
 
 
- @Override
+    @Override
     public CategoryDTO update(CategoryDTO categoryDTO) {
 
         CompanyDTO companyDTO = companyService.getCompanyByLoggedInUser();
@@ -79,8 +88,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category convertedCategory = mapperUtil.convert(categoryDTO, new Category());
         convertedCategory.setId(categoryDTO.getId());
-        categoryRepository.save(convertedCategory);
-        return categoryDTO;
+        Category updatedCategory = categoryRepository.save(convertedCategory);
+
+        return mapperUtil.convert(updatedCategory, new CategoryDTO());
 
 
     }

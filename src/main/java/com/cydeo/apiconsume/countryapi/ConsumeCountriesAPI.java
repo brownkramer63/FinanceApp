@@ -1,4 +1,4 @@
-package com.cydeo.client;
+package com.cydeo.apiconsume.countryapi;
 
 import com.cydeo.dto.AccessTokenDTO;
 import com.cydeo.dto.AddressDTO;

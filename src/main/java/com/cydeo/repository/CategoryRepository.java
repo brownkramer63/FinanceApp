@@ -13,7 +13,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findAllByIsDeleted(Boolean isDeleted);
 
-    List<Category> findAllByIsDeletedAndCompany(Boolean isdeleted, Company company);
+    List<Category> findAllByIsDeletedAndCompanyId(Boolean isdeleted, Long companyid);
 
 
 }

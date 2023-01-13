@@ -68,8 +68,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO findById(Long id) {
-
+    public UserDTO findById(Long id){
         Optional<User> user = Optional.ofNullable(userRepository.findById(id)).orElseThrow(() -> new UserNotFoundException("User does not exist"));
         UserDTO userDTO = mapperUtil.convert(user, new UserDTO());
         if(user.isPresent()){
