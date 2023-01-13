@@ -5,6 +5,7 @@ import com.cydeo.enums.ClientVendorType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.ClientVendorService;
+import com.cydeo.service.impl.AddressServiceImpl;
 import com.cydeo.service.impl.InvoiceServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -28,11 +29,14 @@ public class ClientVendorController {
     private final InvoiceServiceImpl invoiceService;
     private final MapperUtil mapperUtil;
 
-    public ClientVendorController(ClientVendorService clientVendorService, InvoiceRepository invoiceRepository, InvoiceServiceImpl invoiceService, MapperUtil mapperUtil) {
+    private final AddressServiceImpl addressService;
+
+    public ClientVendorController(ClientVendorService clientVendorService, InvoiceRepository invoiceRepository, InvoiceServiceImpl invoiceService, MapperUtil mapperUtil, AddressServiceImpl addressService) {
         this.clientVendorService = clientVendorService;
         this.invoiceRepository = invoiceRepository;
         this.invoiceService = invoiceService;
         this.mapperUtil = mapperUtil;
+        this.addressService = addressService;
     }
 
     @GetMapping("/list")
@@ -49,6 +53,7 @@ public class ClientVendorController {
         List<ClientVendorType> clientVendorTypes = Arrays.asList(ClientVendorType.values());
         log.info("size of clientVendorTypes" +clientVendorTypes.size());
         model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
+        model.addAttribute("countries", addressService.getListOfCountries() ); //added
 
 
         return "clientVendor/clientVendor-create";
@@ -71,6 +76,7 @@ public class ClientVendorController {
 
         model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
         model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
+        model.addAttribute("countries", addressService.getListOfCountries() ); //added
     return "clientVendor/clientVendor-update";
     }
 
