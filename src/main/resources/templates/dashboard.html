@@ -236,12 +236,16 @@
                                                 <th scope="col">Currency</th>
                                                 <th scope="col">Exchange Rate</th>
                                             </tr>
+                                            <tr>
+                                                <th scope="col">Date</th>
+                                                <th scope="col" th:text="${exchangeRates.getDate()}"></th>
+                                            </tr>
                                             </thead>
                                             <tbody>
                                             <tr>
                                                 <td>Euro</td>
 <!--                                                <td th:text="0.940959"></td>-->
-                                                <td th:text="${exchangeRates.getEuro()}"></td>
+                                                    <td th:text="${exchangeRates.getEuro()}"></td>
                                             </tr>
                                             <tr>
                                                 <td>British Pound</td>
