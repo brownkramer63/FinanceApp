@@ -3,12 +3,14 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
+import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -57,13 +59,7 @@ public class PurchaseInvoiceController {
 
 
     @GetMapping("/create")
-    public String createPurchaseInvoice(Model model,@Valid InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult){
-
-//        if(invoiceService.checkIfStockIsEnough(invoiceProductDTO.getId())){
-//            bindingResult.rejectValue("quantity", " ", "Not enough stock");
-//            return "/invoice/purchase-invoice-update";
-//        }
-
+    public String createPurchaseInvoice(Model model){
 
         model.addAttribute("newPurchaseInvoice", invoiceService.getNewPurchaseInvoice());
         model.addAttribute("vendors", clientVendorService.listAllClientVendors());
@@ -74,7 +70,7 @@ public class PurchaseInvoiceController {
     }
 
     @PostMapping("/create")
-    public String savePurchaseInvoice( @ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
+    public String savePurchaseInvoice(@ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
         if(bindingResult.hasErrors()){
             model.addAttribute("vendors", clientVendorService.listAllClientVendors());
@@ -144,6 +140,9 @@ public class PurchaseInvoiceController {
 
             return "invoice/purchase-invoice-update";
         }
+
+
+
         invoiceProductService.addInvoiceProduct(invoiceId, invoiceProductDTO);
         return "redirect:/purchaseInvoices/update/" + invoiceId ;
     }

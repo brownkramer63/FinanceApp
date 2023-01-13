@@ -9,6 +9,7 @@ import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.entity.Product;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
+import com.cydeo.exception.InvoiceNotFoundException;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.repository.InvoiceRepository;
@@ -60,7 +61,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDTO findById(Long id) {
 
-        return mapperUtil.convert(invoiceRepository.findById(id), new InvoiceDTO());
+        Invoice invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
+
+        return mapperUtil.convert(invoice, new InvoiceDTO());
 
     }
 
@@ -168,10 +172,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         if(invoice.isPresent()){
             invoice.get().setInvoiceStatus(InvoiceStatus.APPROVED);
-            // stream invoice
-            // for each invoice product we need quantity and remaining quantity
-            // q in stock = q in stock + quantity
-            // rem q -> q in stock
             List<InvoiceProductDTO> invoiceProducts = invoiceProductService.findAllInvoiceProductByInvoiceId(id);
                            invoiceProducts .forEach(invoiceProductDTO -> {
                            Integer remainingQuantity = invoiceProductDTO.getQuantity() + invoiceProductDTO.getProduct().getQuantityInStock();
@@ -194,10 +194,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
 
-    public void approvePurchaseInvoice(Long id){
 
-        //
-    }
 
 
     @Override
@@ -206,7 +203,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         InvoiceDTO invoiceDTO = new InvoiceDTO();
         invoiceDTO.setDate(LocalDate.now());
         invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
-        invoiceDTO.setInvoiceNo(generateInvoiceNumber(InvoiceType.PURCHASE));
+        invoiceDTO.setInvoiceNo(generatePurchaseInvoiceNumber(InvoiceType.PURCHASE));
 
         return invoiceDTO;
 
@@ -218,7 +215,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             InvoiceDTO invoiceDTO = new InvoiceDTO();
             invoiceDTO.setDate(LocalDate.now());
             invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
-            invoiceDTO.setInvoiceNo(generateInvoiceNumber(InvoiceType.SALES));
+            invoiceDTO.setInvoiceNo(generateSalesInvoiceNumber(InvoiceType.SALES));
 
             return invoiceDTO;
     }
@@ -239,7 +236,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
 
-    private String generateInvoiceNumber(InvoiceType invoiceType){
+    private String generatePurchaseInvoiceNumber(InvoiceType invoiceType){
 
 
 
@@ -262,6 +259,33 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
     }
+
+
+    private String generateSalesInvoiceNumber(InvoiceType invoiceType){
+
+
+
+        CompanyDTO companyDTO =  companyService.getCompanyByLoggedInUser();
+        Company company = mapperUtil.convert(companyDTO, new Company());
+
+        if(!invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).isEmpty()){
+            Invoice invoice = invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).stream() // todo make it only companyId
+                    .max(Comparator.comparing(Invoice::getInvoiceNo)).orElseThrow();
+            String invoiceNum = invoice.getInvoiceNo();
+            int res = Integer.parseInt(invoiceNum.substring(2)) + 1;
+            String numberPart = String.format("%03d", res);
+            String generatedNumber = invoiceNum.substring(0, 2) + numberPart;
+            return generatedNumber;
+        }
+
+
+
+        return "S-001";
+
+
+    }
+
+
 
 
 
@@ -288,7 +312,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceDTO update(InvoiceDTO invoiceDTO, Long id) {
 
 
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         Invoice convertedInvoice = mapperUtil.convert(invoiceDTO, new Invoice());
 
          convertedInvoice.setInvoiceNo(convertedInvoice.getInvoiceNo());
@@ -306,7 +330,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     public void deleteByInvoiceId(Long id){
 
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         invoice.setIsDeleted(true);
         invoiceRepository.save(invoice);
         invoiceProductService.deleteProductByInvoiceId(id);
@@ -318,7 +342,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     public void updateQuantityInStock(Long id){
 
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         List<InvoiceProduct> invoiceProduct = invoiceProductRepository.findByInvoiceId(id);
         if(invoice.getInvoiceType().equals(InvoiceType.PURCHASE)) {
             for (InvoiceProduct each : invoiceProduct) {
@@ -338,7 +362,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     public void updateQuantityAfterApproval(Long id){
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         List<InvoiceProduct> invoiceProduct = invoiceProductRepository.findByInvoiceId(id);
         if(invoice.getInvoiceType().equals(InvoiceType.PURCHASE) && invoice.getInvoiceStatus().equals(InvoiceStatus.APPROVED)){
             for(InvoiceProduct each: invoiceProduct){
@@ -370,22 +394,15 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
         @Override
-    public boolean checkIfStockIsEnough( Long id){
-//
-//        InvoiceProductDTO invoiceProductDTO1 = invoiceProductService.findById(id);
-//
-//        InvoiceProduct invoiceProducts = invoiceProductRepository.findInvoiceProductById(invoiceProductDTO1.getId());
-//
-//            if(invoiceProductDTO1.getQuantity() > invoiceProducts.getProduct().getQuantityInStock()){
-//                return false;
-//            }
+    public boolean checkIfStockIsEnough(InvoiceProductDTO invoiceProductDTO){
+
+        return invoiceProductDTO.getQuantity() > invoiceProductDTO.getProduct().getQuantityInStock();
 
 
-        return true;
     }
 
     public InvoiceDTO findByInvoiceId(Long id){
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         InvoiceDTO invoiceDTO = mapperUtil.convert(invoice, new InvoiceDTO());
 
         if(!invoiceProductService.printInvoice(invoice.getId()).isEmpty()){

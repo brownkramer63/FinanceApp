@@ -9,6 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.validation.Valid;
 
 @Slf4j
 
@@ -86,7 +89,7 @@ public class SalesInvoiceController {
     }
 
     @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProduct(@PathVariable("id") Long id, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model) throws Exception {
+    public String addInvoiceProduct(@PathVariable("id") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) throws Exception {
 
         if(bindingResult.hasErrors()){
             model.addAttribute("invoice", invoiceService.findById(id));
@@ -99,6 +102,11 @@ public class SalesInvoiceController {
 
             return "invoice/sales-invoice-update";
         }
+        if(invoiceService.checkIfStockIsEnough(invoiceProductDTO)){
+            redirectAttributes.addFlashAttribute("error", "Not enough quantity of product " + invoiceProductDTO.getProduct().getName());
+            return "redirect:/salesInvoices/update/" +id ;
+        }
+
         invoiceProductService.addInvoiceProduct(id, invoiceProductDTO);
         return "redirect:/salesInvoices/update/" +id ;
     }
