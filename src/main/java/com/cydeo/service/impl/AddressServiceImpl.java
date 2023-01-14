@@ -1,8 +1,7 @@
 package com.cydeo.service.impl;
 
-import com.cydeo.client.ConsumeCountriesAPI;
+import com.cydeo.apiconsume.countryapi.ConsumeCountriesAPI;
 import com.cydeo.dto.AccessTokenDTO;
-import com.cydeo.dto.AddressDTO;
 import com.cydeo.dto.CountryListDTO;
 import com.cydeo.repository.AddressRepository;
 import com.cydeo.service.AddressService;

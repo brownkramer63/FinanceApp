@@ -1,9 +1,8 @@
-package com.cydeo.currencyApi;
+package com.cydeo.apiconsume.currencyApi;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -24,5 +23,6 @@ public class ExchangeRateDTO {
     private BigDecimal canadianDollar;
     private BigDecimal japaneseYen;
     private BigDecimal indianRupee;
+
 
 }
