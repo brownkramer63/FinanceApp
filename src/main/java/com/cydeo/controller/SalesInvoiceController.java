@@ -57,7 +57,7 @@ public class SalesInvoiceController {
     @GetMapping("/update/{id}")
     public String editSalesInvoice(@PathVariable("id") Long id, Model model){
         model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("clients", clientVendorService.listAllClientVendors());
+        model.addAttribute("clients", clientVendorService.findAllClients());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("products", productService.listAllProducts());
         model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(id));
@@ -69,7 +69,7 @@ public class SalesInvoiceController {
     public String updatePurchaseInvoice( @PathVariable("id") Long id, @ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            model.addAttribute("vendors", clientVendorService.findAllClients());
             return "invoice/sales-invoice-create";
         }
         InvoiceDTO invoiceDTO1 = invoiceService.save(newPurchaseInvoice, InvoiceType.SALES);
@@ -93,7 +93,7 @@ public class SalesInvoiceController {
 
         if(bindingResult.hasErrors()){
             model.addAttribute("invoice", invoiceService.findById(id));
-            model.addAttribute("clients", clientVendorService.listAllClientVendors());
+            model.addAttribute("clients", clientVendorService.findAllClients());
             model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
             model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceProductDTO.getId()));
             model.addAttribute("products", productService.listAllProducts());
@@ -115,7 +115,7 @@ public class SalesInvoiceController {
     public String createSalesInvoice(Model model){
 
         model.addAttribute("newSalesInvoice", invoiceService.getNewSalesInvoice());
-        model.addAttribute("clients", clientVendorService.listAllClientVendors());
+        model.addAttribute("clients", clientVendorService.findAllClients());
         return "/invoice/sales-invoice-create";
     }
 
@@ -124,7 +124,7 @@ public class SalesInvoiceController {
     public String saveSalesInvoice( @ModelAttribute("newSalesInvoice") InvoiceDTO newSalesInvoice, BindingResult bindingResult, Model model){
 
             if(bindingResult.hasErrors()){
-                model.addAttribute("clients", clientVendorService.listAllClientVendors());
+                model.addAttribute("clients", clientVendorService.findAllClients());
                 return "invoice/sales-invoice-create";
             }
 
@@ -132,7 +132,7 @@ public class SalesInvoiceController {
 
             log.info(" invoice getId" + invoiceDTO.getId());
         model.addAttribute("invoice", invoiceDTO);
-        model.addAttribute("clients", clientVendorService.listAllClientVendors());
+        model.addAttribute("clients", clientVendorService.findAllClients());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceDTO.getId()));
         model.addAttribute("products", productService.listAllProducts());

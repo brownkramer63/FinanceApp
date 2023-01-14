@@ -62,7 +62,7 @@ public class PurchaseInvoiceController {
     public String createPurchaseInvoice(Model model){
 
         model.addAttribute("newPurchaseInvoice", invoiceService.getNewPurchaseInvoice());
-        model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+        model.addAttribute("vendors", clientVendorService.findAllVendors());
 
 
 
@@ -73,13 +73,13 @@ public class PurchaseInvoiceController {
     public String savePurchaseInvoice(@ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            model.addAttribute("vendors", clientVendorService.findAllVendors());
             return "invoice/purchase-invoice-create";
         }
         InvoiceDTO invoiceDTO = invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
 
         model.addAttribute("invoice", invoiceDTO);
-        model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+        model.addAttribute("vendors", clientVendorService.findAllVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceDTO.getId()));
         model.addAttribute("products", productService.listAllProducts());
@@ -97,7 +97,7 @@ public class PurchaseInvoiceController {
     @GetMapping("/update/{id}")
     public String editPurchaseInvoice(@PathVariable("id") Long id, Model model){
         model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+        model.addAttribute("vendors", clientVendorService.findAllVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(id));
         model.addAttribute("products", productService.listAllProducts());
@@ -111,7 +111,7 @@ public class PurchaseInvoiceController {
     public String updatePurchaseInvoice( @PathVariable("id") Long id, @ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            model.addAttribute("vendors", clientVendorService.findAllVendors());
             return "invoice/purchase-invoice-create";
         }
         InvoiceDTO invoiceDTO1 = invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
@@ -133,7 +133,7 @@ public class PurchaseInvoiceController {
     public String addInvoiceProduct(@PathVariable("id") Long invoiceId, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model) throws Exception {
         if(bindingResult.hasErrors()){
             model.addAttribute("invoice", invoiceService.findById(invoiceId));
-            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            model.addAttribute("vendors", clientVendorService.findAllVendors());
             model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
             model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceId));
             model.addAttribute("products", productService.listAllProducts());
