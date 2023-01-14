@@ -2,7 +2,9 @@ package com.cydeo.service.impl;
 
 import com.cydeo.dto.InvoiceProductDTO;
 import com.cydeo.entity.Company;
+import com.cydeo.entity.Invoice;
 import com.cydeo.entity.InvoiceProduct;
+import com.cydeo.entity.Product;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
@@ -52,7 +54,7 @@ public class ReportingServiceImpl implements ReportingService {
     public Map<String, BigDecimal> profitLossDataMap() {
         Map<String, BigDecimal> profitPerAMonthMap = new HashMap<>();
         int counter = 1;
-        while (profitPerAMonthMap.size() < MapOfDifferentMonths().size()) {
+        while (profitPerAMonthMap.size() != MapOfDifferentMonths().size()) {
             profitPerAMonthMap.put((ReduceToMonth().get(counter)), InvoiceTotalPerTheMonth(MapOfDifferentMonths().get(counter)));
             counter++;
         }
@@ -68,9 +70,11 @@ public class ReportingServiceImpl implements ReportingService {
                 .filter(invoiceProduct -> invoiceProduct.getInvoice().getDate().getMonth().equals(month)).collect(Collectors.toList());
         for (InvoiceProduct each : monthOfInvoices
         ) {
-            total = total.add(each.getProfitLoss());
+//            total = total.add(each.getProfitLoss()); //new formula add here
+            total=total.add(profitLossPerInvoice(each));
         }
         return total;
+
     }
 
     @Override
@@ -81,7 +85,7 @@ public class ReportingServiceImpl implements ReportingService {
         Map<Integer, Month> findings = new HashMap<>();
         int placement = 1;
         for (InvoiceProduct each : listofMonths
-        ) { //need to fix my validation here its messing up everything
+        ) {
 
             if (!findings.containsValue(each.getInvoice().getDate().getMonth())) {
                 findings.put(placement, each.getInvoice().getDate().getMonth());
@@ -110,9 +114,30 @@ public class ReportingServiceImpl implements ReportingService {
         return convertedDates;
     }
 
+
     @Override
-    public Map<String, BigDecimal> profitLossPerMonth() {
-        return null;
+    public BigDecimal profitLossPerInvoice(InvoiceProduct invoiceProduct) {
+        Integer taxRate = invoiceProduct.getPrice().multiply(BigDecimal.valueOf(invoiceProduct.getTax()).divide(BigDecimal.valueOf(100))).intValue();
+        BigDecimal totalPrice = invoiceProduct.getPrice().multiply(BigDecimal.valueOf(invoiceProduct.getQuantity()));
+        BigDecimal totalPriceWithTax = totalPrice.add(BigDecimal.valueOf(taxRate).multiply(BigDecimal.valueOf(invoiceProduct.getQuantity())));
+       //total sale price above
+        int quantityOfInvoiceProduct= invoiceProduct.getQuantity();
+        Product typeOfProduct= invoiceProduct.getProduct();
+        List<InvoiceProduct> listOfPurchaseInvoicesOfProductType= invoiceProductRepository.findAll().stream().filter(invoiceProduct1 -> invoiceProduct1.getInvoice().getInvoiceType().getValue().equals("Purchase"))
+                .filter(invoiceProduct1 -> invoiceProduct1.getProduct().equals(typeOfProduct)).collect(Collectors.toList());
+        //list of purchase invoices of product type above now can find median cost
+        int totalQuantityOfProduct= 0;
+        BigDecimal totalPriceOfProduct=new BigDecimal(0);
+        for (InvoiceProduct each:listOfPurchaseInvoicesOfProductType
+             ) {
+            totalQuantityOfProduct=totalQuantityOfProduct+each.getQuantity();
+            totalPriceOfProduct=totalPriceOfProduct.add(each.getPrice());
+        }
+        BigDecimal medianProductCost=totalPriceOfProduct.divide(BigDecimal.valueOf(totalQuantityOfProduct));
+//median cost found above
+BigDecimal profitOrLossPerInvoice= totalPriceWithTax.subtract(medianProductCost.multiply(BigDecimal.valueOf(quantityOfInvoiceProduct)));
+
+        return profitOrLossPerInvoice;
     }
 
     //same for this one

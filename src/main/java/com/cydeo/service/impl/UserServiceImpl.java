@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
         UserDTO loggedInUser = securityService.getLoggedInUser();
         log.info("LoggedIn user is; " + loggedInUser.getRole().getDescription());
         List<User> allByCompany = userRepository.getAllByCompanyAndRole();
-        List<User> allByCompanyAndRole=userRepository.getAllByCompanyAndRole();
+        List<User> allByCompanyAndRole = userRepository.getAllByCompanyAndRole();
 
 
         if (loggedInUser.getRole().getDescription().equals("Root User")) {
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
                     .filter(user -> user.getRole().getDescription().equals("Admin"))
                     .map(user -> mapperUtil.convert(user, new UserDTO()))
                     .peek(userDTO -> {
-                        if(isOnlyAdmin(userDTO)){
+                        if (isOnlyAdmin(userDTO)) {
                             userDTO.setOnlyAdmin(true);
                         }
                     })
@@ -70,7 +70,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findById(Long id){
         Optional<User> user = Optional.ofNullable(userRepository.findById(id)).orElseThrow(() -> new UserNotFoundException("User does not exist"));
-        return mapperUtil.convert(user, new UserDTO());
+        UserDTO userDTO = mapperUtil.convert(user, new UserDTO());
+        if(user.isPresent()){
+            if (isOnlyAdmin(userDTO)){
+                userDTO.setOnlyAdmin(true);
+            }
+        }
+        return userDTO;
     }
 
     @Override
@@ -86,6 +92,10 @@ public class UserServiceImpl implements UserService {
     public UserDTO update(UserDTO userDTO) {
 
         Optional<User> user = userRepository.findById(userDTO.getId());
+        if(isOnlyAdmin(userDTO)){
+            userDTO.setOnlyAdmin(true);
+            return userDTO;
+        }
         User convertedUser = mapperUtil.convert(userDTO, new User());
         convertedUser.setId(user.get().getId());
         convertedUser.setPassword(user.get().getPassword());
@@ -101,7 +111,7 @@ public class UserServiceImpl implements UserService {
                 .filter(user -> user.getRole().getDescription().equals("Admin"))
                 .count();
 
-        return admin==1;
+        return admin == 1;
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.cydeo.enums.ClientVendorType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.ClientVendorService;
+import com.cydeo.service.impl.AddressServiceImpl;
 import com.cydeo.service.impl.InvoiceServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -28,11 +29,14 @@ public class ClientVendorController {
     private final InvoiceServiceImpl invoiceService;
     private final MapperUtil mapperUtil;
 
-    public ClientVendorController(ClientVendorService clientVendorService, InvoiceRepository invoiceRepository, InvoiceServiceImpl invoiceService, MapperUtil mapperUtil) {
+    private final AddressServiceImpl addressService;
+
+    public ClientVendorController(ClientVendorService clientVendorService, InvoiceRepository invoiceRepository, InvoiceServiceImpl invoiceService, MapperUtil mapperUtil, AddressServiceImpl addressService) {
         this.clientVendorService = clientVendorService;
         this.invoiceRepository = invoiceRepository;
         this.invoiceService = invoiceService;
         this.mapperUtil = mapperUtil;
+        this.addressService = addressService;
     }
 
     @GetMapping("/list")
@@ -49,6 +53,7 @@ public class ClientVendorController {
         List<ClientVendorType> clientVendorTypes = Arrays.asList(ClientVendorType.values());
         log.info("size of clientVendorTypes" +clientVendorTypes.size());
         model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
+        model.addAttribute("countries", addressService.getListOfCountries() ); //added
 
 
         return "clientVendor/clientVendor-create";
@@ -66,16 +71,17 @@ public class ClientVendorController {
         return "redirect:/clientVendors/list";
     }
 
-    @GetMapping("/update/{clientVendorId}")
+    @GetMapping("/update/{id}") //replaced clientVendorId with id
     public String editClientVendor(@PathVariable("id") Long clientVendorId, Model model){
 
         model.addAttribute("clientVendor", clientVendorService.findById(clientVendorId));
         model.addAttribute("clientVendorTypes", Arrays.asList(ClientVendorType.values()));
+        model.addAttribute("countries", addressService.getListOfCountries() ); //added
     return "clientVendor/clientVendor-update";
     }
 
-    @PostMapping("/update/{clientVendorId}")
-    public String editClientVendor( @Valid @ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, @PathVariable("clientVendorId") Long clientVendorId, BindingResult bindingResult, Model model){
+    @PostMapping("/update/{id}") //replaced clientVendorId with id
+    public String editClientVendor( @Valid @ModelAttribute("clientVendor") ClientVendorDTO clientVendorDTO, @PathVariable("id") Long clientVendorId, BindingResult bindingResult, Model model){
 
         if (bindingResult.hasErrors()){
             model.addAttribute("clientVendor", clientVendorDTO);
@@ -88,8 +94,8 @@ public class ClientVendorController {
         return "redirect:/clientVendors/list";
 
     }
-    @GetMapping("/delete/{clientVendorId}")
-    public String deleteClientVendorById(@PathVariable("clientVendorId") Long clientVendorId, RedirectAttributes redirectAttributes, Model model) throws IllegalAccessException {
+    @GetMapping("/delete/{id}") //replaced clientVendorId with id
+    public String deleteClientVendorById(@PathVariable("id") Long clientVendorId, RedirectAttributes redirectAttributes, Model model) throws IllegalAccessException {
         if (invoiceService.existsById(clientVendorId)){
             String error="cannot delete client/vendor linked to open invoice";
             redirectAttributes.addFlashAttribute("error", error);

@@ -1,9 +1,7 @@
 package com.cydeo.service;
 
-import com.cydeo.dto.CurrencyDTO;
-import com.cydeo.dto.ExchangeRateDTO;
 
-import java.util.List;
+import com.cydeo.apiconsume.currencyApi.ExchangeRateDTO;
 
 public interface DashboardService {
 

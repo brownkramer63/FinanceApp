@@ -60,6 +60,7 @@ public class CategoryController {
 
         model.addAttribute("category", categoryService.findById(id));
 
+
         return "category/category-update";
 
     }

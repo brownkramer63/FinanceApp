@@ -1,4 +1,3 @@
-
 package com.cydeo.dto;
 
 import java.util.HashMap;
@@ -13,37 +12,24 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "date",
-    "usd"
+        "auth_token"
 })
 @Generated("jsonschema2pojo")
-public class CurrencyDTO {
+public class AccessTokenDTO {
 
-    @JsonProperty("date")
-    private String date;
-    @JsonProperty("usd")
-    private UsdDTO usd;
+    @JsonProperty("auth_token")
+    private String authToken;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("date")
-    public String getDate() {
-        return date;
+    @JsonProperty("auth_token")
+    public String getAuthToken() {
+        return authToken;
     }
 
-    @JsonProperty("date")
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    @JsonProperty("usd")
-    public UsdDTO getUsd() {
-        return usd;
-    }
-
-    @JsonProperty("usd")
-    public void setUsd(UsdDTO usd) {
-        this.usd = usd;
+    @JsonProperty("auth_token")
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
     @JsonAnyGetter
@@ -57,3 +43,4 @@ public class CurrencyDTO {
     }
 
 }
+
