@@ -33,7 +33,7 @@ public class DashboardController {
         map.put("totalCost",invoiceService.totalCostOfApprovedInvoices());
         map.put("totalSales", invoiceService.totalSalesOfApprovedInvoices());
         map.put("profitLoss", invoiceService.totalCostOfApprovedInvoices());
-        List<InvoiceDTO> collect = invoiceService.listAllInvoice()
+        List<InvoiceDTO> collect = invoiceService.listAllApprovedInvoices()
 
                 .stream().limit(3).collect(Collectors.toList());
 
