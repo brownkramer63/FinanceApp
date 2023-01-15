@@ -9,6 +9,7 @@ import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.entity.Product;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
+import com.cydeo.exception.InvoiceNotFoundException;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.repository.InvoiceRepository;
@@ -43,6 +44,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final ProductRepository productRepository;
 
 
+
     public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, InvoiceProductService invoiceProductService, CompanyService companyService, InvoiceProductRepository invoiceProductRepository, SecurityService securityService, ProductRepository productRepository) {
         this.invoiceRepository = invoiceRepository;
 
@@ -59,7 +61,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDTO findById(Long id) {
 
-        return mapperUtil.convert(invoiceRepository.findById(id), new InvoiceDTO());
+        Invoice invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
+
+        return mapperUtil.convert(invoice, new InvoiceDTO());
 
     }
 
@@ -73,7 +78,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         List<InvoiceDTO> invoiceListByType =
 
-                invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType)
+                invoiceRepository.findAllByCompanyAndInvoiceType(company ,invoiceType)
                         .stream()
                         .map(invoice -> {
                             InvoiceDTO invoiceDTO = mapperUtil.convert(invoice, new InvoiceDTO());
@@ -89,13 +94,15 @@ public class InvoiceServiceImpl implements InvoiceService {
                         .collect(Collectors.toList());
 
 
+
+
         return invoiceListByType;
     }
 
-    public BigDecimal totalTaxOfInvoice(Long id) {
+    public BigDecimal totalTaxOfInvoice(Long id){
         List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findAllInvoiceProductByInvoiceId(id);
 
-        if (invoiceProductDTOList != null) {
+        if(invoiceProductDTOList != null){
 
             return invoiceProductDTOList.stream().map(invoiceProductDto -> {
                 BigDecimal price = invoiceProductDto.getPrice();
@@ -109,13 +116,21 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
 
-    public BigDecimal totalPriceOfInvoice(Long id) {
+
+
+
+
+
+
+
+
+    public  BigDecimal totalPriceOfInvoice(Long id){
 
         List<InvoiceProductDTO> invoiceProductDTOList = invoiceProductService.findAllInvoiceProductByInvoiceId(id);
 
-        if (invoiceProductDTOList != null) {
+        if(invoiceProductDTOList != null){
 
-            BigDecimal price = invoiceProductDTOList.stream().map(invoiceProductDTO -> {
+            BigDecimal price =  invoiceProductDTOList.stream().map(invoiceProductDTO -> {
 
                 BigDecimal priceWithoutTax = invoiceProductDTO.getPrice().multiply(BigDecimal.valueOf(invoiceProductDTO.getQuantity()));
 
@@ -132,10 +147,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public BigDecimal calculateProfitLoss(Long id) {
-
-
         return null;
     }
+
+
+
+
 
 
     @Override
@@ -147,27 +164,25 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
 
+
     @Override
     public void approve(Long id) {
 
         Optional<Invoice> invoice = invoiceRepository.findById(id);
 
-        if (invoice.isPresent()) {
+        if(invoice.isPresent()){
             invoice.get().setInvoiceStatus(InvoiceStatus.APPROVED);
-            // stream invoice
-            // for each invoice product we need quantity and remaining quantity
-            // q in stock = q in stock + quantity
-            // rem q -> q in stock
             List<InvoiceProductDTO> invoiceProducts = invoiceProductService.findAllInvoiceProductByInvoiceId(id);
-            invoiceProducts.forEach(invoiceProductDTO -> {
-                Integer remainingQuantity = invoiceProductDTO.getQuantity() + invoiceProductDTO.getProduct().getQuantityInStock();
+                           invoiceProducts .forEach(invoiceProductDTO -> {
+                           Integer remainingQuantity = invoiceProductDTO.getQuantity() + invoiceProductDTO.getProduct().getQuantityInStock();
 
-                invoiceProductDTO.setRemainingQuantity(remainingQuantity);
-                invoiceProductDTO.getProduct().setQuantityInStock(remainingQuantity);
+                           invoiceProductDTO.setRemainingQuantity(remainingQuantity);
+                          invoiceProductDTO.getProduct().setQuantityInStock(remainingQuantity);
 
 
-                ;
-            });
+
+                               ;
+                           });
 
 
             invoice.get().setDate(LocalDate.now());
@@ -175,13 +190,11 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
 
+
     }
 
 
-    public void approvePurchaseInvoice(Long id) {
 
-        //
-    }
 
 
     @Override
@@ -190,7 +203,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         InvoiceDTO invoiceDTO = new InvoiceDTO();
         invoiceDTO.setDate(LocalDate.now());
         invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
-        invoiceDTO.setInvoiceNo(generateInvoiceNumber(InvoiceType.PURCHASE));
+        invoiceDTO.setInvoiceNo(generatePurchaseInvoiceNumber(InvoiceType.PURCHASE));
 
         return invoiceDTO;
 
@@ -199,12 +212,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDTO getNewSalesInvoice() {
 
-        InvoiceDTO invoiceDTO = new InvoiceDTO();
-        invoiceDTO.setDate(LocalDate.now());
-        invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
-        invoiceDTO.setInvoiceNo(generateInvoiceNumber(InvoiceType.SALES));
+            InvoiceDTO invoiceDTO = new InvoiceDTO();
+            invoiceDTO.setDate(LocalDate.now());
+            invoiceDTO.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
+            invoiceDTO.setInvoiceNo(generateSalesInvoiceNumber(InvoiceType.SALES));
 
-        return invoiceDTO;
+            return invoiceDTO;
     }
 
     @Override
@@ -221,13 +234,16 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
 
-    private String generateInvoiceNumber(InvoiceType invoiceType) {
 
 
-        CompanyDTO companyDTO = companyService.getCompanyByLoggedInUser();
+    private String generatePurchaseInvoiceNumber(InvoiceType invoiceType){
+
+
+
+        CompanyDTO companyDTO =  companyService.getCompanyByLoggedInUser();
         Company company = mapperUtil.convert(companyDTO, new Company());
 
-        if (!invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).isEmpty()) {
+        if(!invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).isEmpty()){
             Invoice invoice = invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).stream() // todo make it only companyId
                     .max(Comparator.comparing(Invoice::getInvoiceNo)).orElseThrow();
             String invoiceNum = invoice.getInvoiceNo();
@@ -238,10 +254,39 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
 
+
         return "P-001";
 
 
     }
+
+
+    private String generateSalesInvoiceNumber(InvoiceType invoiceType){
+
+
+
+        CompanyDTO companyDTO =  companyService.getCompanyByLoggedInUser();
+        Company company = mapperUtil.convert(companyDTO, new Company());
+
+        if(!invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).isEmpty()){
+            Invoice invoice = invoiceRepository.findAllByCompanyAndInvoiceType(company, invoiceType).stream() // todo make it only companyId
+                    .max(Comparator.comparing(Invoice::getInvoiceNo)).orElseThrow();
+            String invoiceNum = invoice.getInvoiceNo();
+            int res = Integer.parseInt(invoiceNum.substring(2)) + 1;
+            String numberPart = String.format("%03d", res);
+            String generatedNumber = invoiceNum.substring(0, 2) + numberPart;
+            return generatedNumber;
+        }
+
+
+
+        return "S-001";
+
+
+    }
+
+
+
 
 
     @Override
@@ -262,26 +307,30 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
 
+
     @Override
     public InvoiceDTO update(InvoiceDTO invoiceDTO, Long id) {
 
 
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         Invoice convertedInvoice = mapperUtil.convert(invoiceDTO, new Invoice());
 
-        convertedInvoice.setInvoiceNo(convertedInvoice.getInvoiceNo());
-        invoice.setClientVendor(convertedInvoice.getClientVendor());
-        convertedInvoice.setDate(convertedInvoice.getDate());
+         convertedInvoice.setInvoiceNo(convertedInvoice.getInvoiceNo());
+         invoice.setClientVendor(convertedInvoice.getClientVendor());
+         convertedInvoice.setDate(convertedInvoice.getDate());
         invoiceRepository.save(invoice);
         return invoiceDTO;
 
 
-    }
+
+        }
 
 
-    public void deleteByInvoiceId(Long id) {
 
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+
+    public void deleteByInvoiceId(Long id){
+
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         invoice.setIsDeleted(true);
         invoiceRepository.save(invoice);
         invoiceProductService.deleteProductByInvoiceId(id);
@@ -289,17 +338,20 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
 
-    public void updateQuantityInStock(Long id) {
 
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+
+    public void updateQuantityInStock(Long id){
+
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         List<InvoiceProduct> invoiceProduct = invoiceProductRepository.findByInvoiceId(id);
-        if (invoice.getInvoiceType().equals(InvoiceType.PURCHASE)) {
+        if(invoice.getInvoiceType().equals(InvoiceType.PURCHASE)) {
             for (InvoiceProduct each : invoiceProduct) {
                 Product product = productRepository.findById(each.getProduct().getId()).orElseThrow();
                 product.setQuantityInStock(product.getQuantityInStock() + each.getQuantity());
                 productRepository.save(product);
             }
-        } else {
+        }
+        else {
             for (InvoiceProduct each : invoiceProduct) {
                 Product product = productRepository.findById(each.getProduct().getId()).orElseThrow();
                 product.setQuantityInStock(product.getQuantityInStock() - each.getQuantity());
@@ -309,11 +361,11 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     }
 
-    public void updateQuantityAfterApproval(Long id) {
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+    public void updateQuantityAfterApproval(Long id){
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         List<InvoiceProduct> invoiceProduct = invoiceProductRepository.findByInvoiceId(id);
-        if (invoice.getInvoiceType().equals(InvoiceType.PURCHASE) && invoice.getInvoiceStatus().equals(InvoiceStatus.APPROVED)) {
-            for (InvoiceProduct each : invoiceProduct) {
+        if(invoice.getInvoiceType().equals(InvoiceType.PURCHASE) && invoice.getInvoiceStatus().equals(InvoiceStatus.APPROVED)){
+            for(InvoiceProduct each: invoiceProduct){
 
                 InvoiceProduct invoiceProduct1 = invoiceProductRepository.findById(each.getId()).orElseThrow();
                 invoiceProduct1.setRemainingQuantity(invoiceProduct1.getQuantity());
@@ -322,11 +374,11 @@ public class InvoiceServiceImpl implements InvoiceService {
                 Product product = productRepository.findById(each.getProduct().getId()).orElseThrow();
                 product.setQuantityInStock(invoiceProduct1.getRemainingQuantity());
 
-            }
-        } else if (invoice.getInvoiceType().equals(InvoiceType.SALES) && invoice.getInvoiceStatus().equals(InvoiceStatus.APPROVED)) {
-            List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findByInvoiceId(id);
+                }
+            }else if(invoice.getInvoiceType().equals(InvoiceType.SALES) && invoice.getInvoiceStatus().equals(InvoiceStatus.APPROVED)){
+                List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findByInvoiceId(id);
 
-            for (InvoiceProduct each : invoiceProductList) {
+                for(InvoiceProduct each: invoiceProductList){
 
                 InvoiceProduct invoiceProduct1 = invoiceProductRepository.findById(each.getId()).orElseThrow();
                 invoiceProduct1.setRemainingQuantity(invoiceProduct1.getProduct().getQuantityInStock() - invoiceProduct1.getQuantity());
@@ -337,72 +389,31 @@ public class InvoiceServiceImpl implements InvoiceService {
 
             }
 
+            }
         }
+
+
+        @Override
+    public boolean checkIfStockIsEnough(InvoiceProductDTO invoiceProductDTO){
+
+        return invoiceProductDTO.getQuantity() > invoiceProductDTO.getProduct().getQuantityInStock();
+
+
     }
 
-
-    @Override
-    public boolean checkIfStockIsEnough(Long id) {
-//
-//        InvoiceProductDTO invoiceProductDTO1 = invoiceProductService.findById(id);
-//
-//        InvoiceProduct invoiceProducts = invoiceProductRepository.findInvoiceProductById(invoiceProductDTO1.getId());
-//
-//            if(invoiceProductDTO1.getQuantity() > invoiceProducts.getProduct().getQuantityInStock()){
-//                return false;
-//            }
-
-
-        return true;
-    }
-
-    public InvoiceDTO findByInvoiceId(Long id) {
-        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+    public InvoiceDTO findByInvoiceId(Long id){
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() -> new InvoiceNotFoundException("Invoice not found"));
         InvoiceDTO invoiceDTO = mapperUtil.convert(invoice, new InvoiceDTO());
 
-        if (!invoiceProductService.printInvoice(invoice.getId()).isEmpty()) {
+        if(!invoiceProductService.printInvoice(invoice.getId()).isEmpty()){
             invoiceDTO.setTax(totalTaxOfInvoice(id).intValue());
             invoiceDTO.setPrice(totalPriceOfInvoice(invoiceDTO.getId()));
             invoiceDTO.setTotal(totalPriceOfInvoice(invoiceDTO.getId()));
         }
         return invoiceDTO;
     }
-    @Override
-    public List<InvoiceDTO> listAllApprovedInvoices() {
-        List<InvoiceDTO> invoiceDTOList = listAllInvoicesByType(InvoiceType.PURCHASE);
-        List<InvoiceDTO> invoiceDTOList1 = listAllInvoicesByType(InvoiceType.SALES);
-        invoiceDTOList.addAll(invoiceDTOList1);
-
-        List<InvoiceDTO> invoices = invoiceDTOList.stream()
-                .filter(invoiceDTO -> invoiceDTO.getInvoiceStatus().equals(InvoiceStatus.APPROVED))
-
-                .sorted(Comparator.comparing(InvoiceDTO::getDate, Comparator.reverseOrder()))
-                .collect(Collectors.toList());
 
 
-        return invoices;
 
-    }
-
-
-    @Override
-    public BigDecimal totalCostOfApprovedInvoices(){
-        List<InvoiceDTO> listOfPurchase = listAllInvoicesByType(InvoiceType.PURCHASE);
-        BigDecimal totalCost = listOfPurchase.stream()
-                .filter(invoiceDTO -> invoiceDTO.getInvoiceStatus().equals(InvoiceStatus.APPROVED))
-                .map(invoiceDTO -> invoiceDTO.getTotal()).reduce(BigDecimal::add).get();
-      return totalCost;
-
-    }
-
-    @Override
-    public BigDecimal totalSalesOfApprovedInvoices(){
-        List<InvoiceDTO> listOfSales = listAllInvoicesByType(InvoiceType.SALES);
-        BigDecimal totalSale = listOfSales.stream()
-                .filter(invoiceDTO -> invoiceDTO.getInvoiceStatus().equals(InvoiceStatus.APPROVED))
-                .map(invoiceDTO -> invoiceDTO.getTotal()).reduce(BigDecimal::add).get();
-        return totalSale;
-
-    }
 
 }

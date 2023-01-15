@@ -3,12 +3,14 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
+import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -57,16 +59,10 @@ public class PurchaseInvoiceController {
 
 
     @GetMapping("/create")
-    public String createPurchaseInvoice(Model model,@Valid InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult){
-
-//        if(invoiceService.checkIfStockIsEnough(invoiceProductDTO.getId())){
-//            bindingResult.rejectValue("quantity", " ", "Not enough stock");
-//            return "/invoice/purchase-invoice-update";
-//        }
-
+    public String createPurchaseInvoice(Model model){
 
         model.addAttribute("newPurchaseInvoice", invoiceService.getNewPurchaseInvoice());
-        model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+        model.addAttribute("vendors", clientVendorService.findAllVendors());
 
 
 
@@ -74,16 +70,16 @@ public class PurchaseInvoiceController {
     }
 
     @PostMapping("/create")
-    public String savePurchaseInvoice( @ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
+    public String savePurchaseInvoice(@ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            model.addAttribute("vendors", clientVendorService.findAllVendors());
             return "invoice/purchase-invoice-create";
         }
         InvoiceDTO invoiceDTO = invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
 
         model.addAttribute("invoice", invoiceDTO);
-        model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+        model.addAttribute("vendors", clientVendorService.findAllVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceDTO.getId()));
         model.addAttribute("products", productService.listAllProducts());
@@ -101,7 +97,7 @@ public class PurchaseInvoiceController {
     @GetMapping("/update/{id}")
     public String editPurchaseInvoice(@PathVariable("id") Long id, Model model){
         model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+        model.addAttribute("vendors", clientVendorService.findAllVendors());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(id));
         model.addAttribute("products", productService.listAllProducts());
@@ -115,7 +111,7 @@ public class PurchaseInvoiceController {
     public String updatePurchaseInvoice( @PathVariable("id") Long id, @ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            model.addAttribute("vendors", clientVendorService.findAllVendors());
             return "invoice/purchase-invoice-create";
         }
         InvoiceDTO invoiceDTO1 = invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
@@ -137,13 +133,16 @@ public class PurchaseInvoiceController {
     public String addInvoiceProduct(@PathVariable("id") Long invoiceId, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model) throws Exception {
         if(bindingResult.hasErrors()){
             model.addAttribute("invoice", invoiceService.findById(invoiceId));
-            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            model.addAttribute("vendors", clientVendorService.findAllVendors());
             model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
             model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceId));
             model.addAttribute("products", productService.listAllProducts());
 
             return "invoice/purchase-invoice-update";
         }
+
+
+
         invoiceProductService.addInvoiceProduct(invoiceId, invoiceProductDTO);
         return "redirect:/purchaseInvoices/update/" + invoiceId ;
     }

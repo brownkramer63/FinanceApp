@@ -3,6 +3,7 @@ package com.cydeo.service.impl;
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.dto.InvoiceProductDTO;
 import com.cydeo.dto.UserDTO;
+import com.cydeo.exception.InvoiceProductNotFoundException;
 import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.security.SecurityService;
 import com.cydeo.entity.Company;
@@ -48,7 +49,9 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public InvoiceProductDTO findById(Long id) {
-        return mapperUtil.convert(invoiceProductRepository.findById(id), new InvoiceProductDTO());
+        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id)
+                .orElseThrow(() -> new InvoiceProductNotFoundException("Invoice product not found"));
+        return mapperUtil.convert(invoiceProduct, new InvoiceProductDTO());
     }
 
     @Override
@@ -67,7 +70,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         InvoiceDTO invoiceDTO = invoiceService.findById(id);
 
 
-        if(invoiceProductDTO.getTotal()!=null){
+        if(invoiceProductDTO.getTotal()!=null ){
             invoiceProductDTO.setInvoice(invoiceDTO);
             InvoiceProduct invoiceProduct = invoiceProductRepository.findById(invoiceProductDTO.getId()).orElseThrow();
             invoiceProduct.setProfitLoss(invoiceProductDTO.getProfitLoss());
@@ -108,7 +111,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
         public void removeInvoiceProduct (Long id){
-           InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
+           InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id)
+                   .orElseThrow(() -> new InvoiceProductNotFoundException("Invoice product not found"));
 
             invoiceProduct.setIsDeleted(true);
             invoiceProductRepository.save(invoiceProduct);
@@ -119,7 +123,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     @Override
     public void delete(Long id) {
 
-        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
+        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id)
+                .orElseThrow(()-> new InvoiceProductNotFoundException("Invoice Product not found"));
         invoiceProduct.setIsDeleted(true);
         invoiceProductRepository.save(invoiceProduct);
     }

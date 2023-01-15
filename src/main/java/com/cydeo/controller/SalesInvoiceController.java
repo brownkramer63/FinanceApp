@@ -9,6 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.validation.Valid;
 
 @Slf4j
 
@@ -54,7 +57,7 @@ public class SalesInvoiceController {
     @GetMapping("/update/{id}")
     public String editSalesInvoice(@PathVariable("id") Long id, Model model){
         model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("clients", clientVendorService.listAllClientVendors());
+        model.addAttribute("clients", clientVendorService.findAllClients());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("products", productService.listAllProducts());
         model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(id));
@@ -66,7 +69,7 @@ public class SalesInvoiceController {
     public String updatePurchaseInvoice( @PathVariable("id") Long id, @ModelAttribute("newPurchaseInvoice") InvoiceDTO newPurchaseInvoice, BindingResult bindingResult, Model model){
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("vendors", clientVendorService.listAllClientVendors());
+            model.addAttribute("vendors", clientVendorService.findAllClients());
             return "invoice/sales-invoice-create";
         }
         InvoiceDTO invoiceDTO1 = invoiceService.save(newPurchaseInvoice, InvoiceType.SALES);
@@ -86,11 +89,11 @@ public class SalesInvoiceController {
     }
 
     @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProduct(@PathVariable("id") Long id, @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model) throws Exception {
+    public String addInvoiceProduct(@PathVariable("id") Long id, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDTO invoiceProductDTO, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) throws Exception {
 
         if(bindingResult.hasErrors()){
             model.addAttribute("invoice", invoiceService.findById(id));
-            model.addAttribute("clients", clientVendorService.listAllClientVendors());
+            model.addAttribute("clients", clientVendorService.findAllClients());
             model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
             model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceProductDTO.getId()));
             model.addAttribute("products", productService.listAllProducts());
@@ -99,6 +102,11 @@ public class SalesInvoiceController {
 
             return "invoice/sales-invoice-update";
         }
+        if(invoiceService.checkIfStockIsEnough(invoiceProductDTO)){
+            redirectAttributes.addFlashAttribute("error", "Not enough quantity of product " + invoiceProductDTO.getProduct().getName());
+            return "redirect:/salesInvoices/update/" +id ;
+        }
+
         invoiceProductService.addInvoiceProduct(id, invoiceProductDTO);
         return "redirect:/salesInvoices/update/" +id ;
     }
@@ -107,7 +115,7 @@ public class SalesInvoiceController {
     public String createSalesInvoice(Model model){
 
         model.addAttribute("newSalesInvoice", invoiceService.getNewSalesInvoice());
-        model.addAttribute("clients", clientVendorService.listAllClientVendors());
+        model.addAttribute("clients", clientVendorService.findAllClients());
         return "/invoice/sales-invoice-create";
     }
 
@@ -116,7 +124,7 @@ public class SalesInvoiceController {
     public String saveSalesInvoice( @ModelAttribute("newSalesInvoice") InvoiceDTO newSalesInvoice, BindingResult bindingResult, Model model){
 
             if(bindingResult.hasErrors()){
-                model.addAttribute("clients", clientVendorService.listAllClientVendors());
+                model.addAttribute("clients", clientVendorService.findAllClients());
                 return "invoice/sales-invoice-create";
             }
 
@@ -124,7 +132,7 @@ public class SalesInvoiceController {
 
             log.info(" invoice getId" + invoiceDTO.getId());
         model.addAttribute("invoice", invoiceDTO);
-        model.addAttribute("clients", clientVendorService.listAllClientVendors());
+        model.addAttribute("clients", clientVendorService.findAllClients());
         model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
         model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductByInvoiceId(invoiceDTO.getId()));
         model.addAttribute("products", productService.listAllProducts());
