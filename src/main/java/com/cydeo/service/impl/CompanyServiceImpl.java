@@ -4,6 +4,7 @@ import com.cydeo.dto.CompanyDTO;
 import com.cydeo.entity.Company;
 import com.cydeo.entity.User;
 import com.cydeo.enums.CompanyStatus;
+import com.cydeo.exception.CompanyNotFoundException;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CompanyRepository;
 import com.cydeo.repository.UserRepository;
@@ -41,9 +42,8 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     @Override
-    public CompanyDTO findById(Long Id) {
-
-        Company company = companyRepository.findById(Id).get();
+    public CompanyDTO findById(Long Id){
+        Company company = companyRepository.findById(Id).orElseThrow(()-> new CompanyNotFoundException("Company not found"));
         return mapperUtil.convert(company, new CompanyDTO());
     }
 
