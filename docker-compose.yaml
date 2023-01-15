@@ -1,0 +1,17 @@
+
+#This docker compose aims to provide runnig postgresql for sparkle app without PGADMIN
+
+# Use credentials comes from application.properties
+version: '3.1'
+services:
+  db:
+    image: postgres
+    container_name: sparkle_database
+    ports:
+      - 5433:5432
+    volumes:
+      - .m2:/root/.m2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: sparkle
