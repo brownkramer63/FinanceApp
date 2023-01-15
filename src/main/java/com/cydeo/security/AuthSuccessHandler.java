@@ -22,12 +22,10 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         } else if (roles.contains("Admin")) {
             response.sendRedirect("/users/list");
         } else if (roles.contains("Manager")) {
-            response.sendRedirect("/products/list");
+            response.sendRedirect("/dashboard");
         } else if (roles.contains("Employee")) {
-            response.sendRedirect("/products/list");
+            response.sendRedirect("/dashboard");
         }
-        //todo manager and employee need to land to dashboard page. Since dahsboard page is not active yet
-        // both will land product list after page fix by @entisar
-        //that will be /dashboard
+
     }
 }
