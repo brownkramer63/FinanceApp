@@ -1,9 +1,10 @@
-package com.cydeo.service.impl;
+package com.cydeo.service.impl.integration;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.motherOftests.TestData;
+import com.cydeo.service.impl.InvoiceServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
