@@ -2,15 +2,21 @@ package com.cydeo.service.impl;
 
 import com.cydeo.dto.InvoiceDTO;
 import com.cydeo.enums.InvoiceStatus;
+import com.cydeo.enums.InvoiceType;
+import com.cydeo.motherOftests.TestData;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SqlGroup({
         @Sql(value = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 })
-class InvoiceServiceImplTest {
+class InvoiceServiceImplTest extends TestData {
 
     @Autowired
     InvoiceServiceImpl invoiceService;
@@ -37,7 +43,17 @@ class InvoiceServiceImplTest {
     }
 
     @Test
+    @Transactional
+    @WithMockUser(username = "manager@greentech.com", password = "Abc1", roles = "Manager")
     void listAllInvoicesByType() {
+
+        List<InvoiceDTO> invoiceDTOS = invoiceService.listAllInvoicesByType(InvoiceType.PURCHASE);
+
+        log.info("invoice size is :" + invoiceDTOS.size());
+
+
+        assertThat(invoiceDTOS).hasSize(2);
+
     }
 
     @Test
@@ -69,11 +85,27 @@ class InvoiceServiceImplTest {
     }
 
     @Test
+    @Transactional
+    @WithMockUser(username = "manager@greentech.com", password = "Abc1", roles = "Manager")
     void save() {
+        InvoiceDTO testInvoice = TestData.invoiceDTO;
+        InvoiceDTO save = invoiceService.save(testInvoice, InvoiceType.SALES);
+
+        Assertions.assertThat(save).isNotNull();
+        assertThat(save.getInvoiceNo()).isEqualTo("T-001");
+
+
+        Assertions.assertThat(save)
+                .extracting("invoiceNo", "invoiceType")
+                .contains("T-001", "SALES");
+
+
     }
 
     @Test
     void create() {
+
+
     }
 
     @Test

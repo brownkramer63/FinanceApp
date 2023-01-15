@@ -22,9 +22,16 @@ public class BaseEntityListener extends AuditingEntityListener {
         baseEntity.lastUpdateDateTime = LocalDateTime.now();
 
         if (authentication != null && !authentication.getName().equals("anonymousUser")) {
-            SparkleUserMapperToSecurity principal = (SparkleUserMapperToSecurity) authentication.getPrincipal();
-            baseEntity.insertUserId = principal.getId();
-            baseEntity.lastUpdateUserId = principal.getId();
+            try {
+                SparkleUserMapperToSecurity principal = (SparkleUserMapperToSecurity) authentication.getPrincipal();
+                baseEntity.insertUserId = principal.getId();
+                baseEntity.lastUpdateUserId = principal.getId();
+            } catch (ClassCastException classCastException) {
+                // todo these code are expectiong running inly test purpose
+                baseEntity.insertUserId = -1L;
+                baseEntity.lastUpdateUserId = -1L;
+            }
+
         }
     }
 
