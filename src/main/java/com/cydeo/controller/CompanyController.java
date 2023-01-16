@@ -40,7 +40,8 @@ public class CompanyController {
     public String editCompany(@PathVariable("id") Long id, Model model) {
 
         model.addAttribute("company", companyService.findById(id));
-        return "company/company-update"; //may use redirect after finishing update?
+        model.addAttribute("countries", addressService.getListOfCountries());
+        return "company/company-update";
     }
 
     @PostMapping("/update/{id}")

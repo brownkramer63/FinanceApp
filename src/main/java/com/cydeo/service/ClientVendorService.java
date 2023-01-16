@@ -3,8 +3,10 @@ package com.cydeo.service;
 
 import com.cydeo.dto.ClientVendorDTO;
 import com.cydeo.entity.ClientVendor;
+import com.cydeo.entity.Company;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ClientVendorService {
 
@@ -26,5 +28,9 @@ public interface ClientVendorService {
     public List<ClientVendorDTO> findAllClients();
 
     public List<ClientVendorDTO> findAllVendors();
+
+    boolean findIfCompanyHasOpenInvoices(Long id);
+
+    Optional<ClientVendor> findClientVendorById(Long id);
 
 }
