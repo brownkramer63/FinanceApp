@@ -10,6 +10,7 @@ import com.cydeo.repository.RoleRepository;
 import com.cydeo.repository.UserRepository;
 import com.cydeo.security.SecurityService;
 import com.cydeo.service.RoleService;
+import com.cydeo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -20,22 +21,24 @@ import java.util.stream.Collectors;
 @Service
 public class RoleServiceImpl implements RoleService {
     private final UserRepository userRepository;
+    private final UserService userService;
     private final RoleRepository roleRepository;
     private final MapperUtil mapperUtil;
     private final SecurityService securityService;
 
-    public RoleServiceImpl(RoleRepository roleRepository, MapperUtil mapperUtil,  SecurityService securityService,
-                           UserRepository userRepository) {
+    public RoleServiceImpl(RoleRepository roleRepository, MapperUtil mapperUtil, SecurityService securityService,
+                           UserRepository userRepository, UserService userService) {
         this.roleRepository = roleRepository;
         this.mapperUtil = mapperUtil;
         this.securityService = securityService;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Override
     public RoleDTO findById(Long id) {
         return mapperUtil.convert(roleRepository.findById(id)
-                .orElseThrow(()->new RoleNotFoundException("Role does not exist")), new RoleDTO());
+                .orElseThrow(() -> new RoleNotFoundException("Role does not exist")), new RoleDTO());
     }
 
     @Override
@@ -43,7 +46,7 @@ public class RoleServiceImpl implements RoleService {
 
         UserDTO loggedInUser = securityService.getLoggedInUser();
 
-        List<Role> roleList = roleRepository.findAll();                     //findRolesBy(loggedInUser.getRole().getId());  //find roles by logged in user
+        List<Role> roleList = roleRepository.findAll();
         if (loggedInUser.getRole().getDescription().equals("Root User")) {
             log.info("List of users: " + roleList.size());
             return roleList.stream()
@@ -51,17 +54,22 @@ public class RoleServiceImpl implements RoleService {
                     .map(role -> mapperUtil.convert(role, new RoleDTO()))
                     .collect(Collectors.toList());
 
-        } else if (loggedInUser.getRole().getDescription().equals("Admin")) {                   //if admin loggedIn
+        } else if (loggedInUser.getRole().getDescription().equals("Admin")) {
             List<User> userList = userRepository.findAllByCompanyId(loggedInUser.getCompany().getId());
-            log.info("Users size: " + userList.size() + loggedInUser.getCompany().getTitle());
+            long admin = userList.stream()
+                    .filter(user -> user.getRole().getDescription().equals("Admin"))
+                    .count();
+//            if (admin==1){
+//                RoleDTO convert = mapperUtil.convert(roleRepository.findById(2L), new RoleDTO());
+//                return List.of(convert);
+//            }
+            log.info("Users size: " + userList.size() + " - " +loggedInUser.getCompany().getTitle());
             return roleList.stream()
-                    .filter(user -> !user.getDescription().equals("Root User"))
+                    .filter(role -> !role.getDescription().equals("Root User"))
                     .map(role -> mapperUtil.convert(role, new RoleDTO()))
                     .collect(Collectors.toList());
-
         }
         return Collections.emptyList();
 
     }
-
 }
