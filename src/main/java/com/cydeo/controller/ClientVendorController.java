@@ -2,6 +2,7 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.ClientVendorDTO;
 import com.cydeo.enums.ClientVendorType;
+import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.ClientVendorService;
@@ -96,7 +97,8 @@ public class ClientVendorController {
     }
     @GetMapping("/delete/{id}") //replaced clientVendorId with id
     public String deleteClientVendorById(@PathVariable("id") Long clientVendorId, RedirectAttributes redirectAttributes, Model model) throws IllegalAccessException {
-        if (invoiceService.existsById(clientVendorId)){
+    //    if (clientVendorService.findIfCompanyHasOpenInvoices(clientVendorService.findClientVendorById(clientVendorId).get().getCompany())){
+        if (clientVendorService.findIfCompanyHasOpenInvoices(clientVendorId)){
             String error="cannot delete client/vendor linked to open invoice";
             redirectAttributes.addFlashAttribute("error", error);
 
