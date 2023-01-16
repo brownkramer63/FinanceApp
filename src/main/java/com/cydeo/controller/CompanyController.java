@@ -2,7 +2,7 @@ package com.cydeo.controller;
 
 
 import com.cydeo.dto.CompanyDTO;
-import com.cydeo.enums.CompanyStatus;
+import com.cydeo.service.AddressService;
 import com.cydeo.service.CompanyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -18,9 +18,11 @@ import javax.validation.Valid;
 public class CompanyController {
 
     private final CompanyService companyService;
+    private final AddressService addressService;
 
-    public CompanyController(CompanyService companyService) {
+    public CompanyController(CompanyService companyService, AddressService addressService) {
         this.companyService = companyService;
+        this.addressService = addressService;
     }
 
 
@@ -77,6 +79,7 @@ public class CompanyController {
 
 
         model.addAttribute("newCompany", new CompanyDTO());
+        model.addAttribute("countries", addressService.getListOfCountries() );
 
         return "company/company-create";
     }
