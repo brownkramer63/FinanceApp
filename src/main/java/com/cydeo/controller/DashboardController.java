@@ -32,7 +32,7 @@ public class DashboardController {
         Map<String, BigDecimal> map = new TreeMap<>();
         map.put("totalCost",invoiceService.totalCostOfApprovedInvoices());
         map.put("totalSales", invoiceService.totalSalesOfApprovedInvoices());
-        map.put("profitLoss", invoiceService.totalCostOfApprovedInvoices());
+        map.put("profitLoss", dashboardService.totalProfitLoss());
         List<InvoiceDTO> collect = invoiceService.listAllApprovedInvoices()
 
                 .stream().limit(3).collect(Collectors.toList());
