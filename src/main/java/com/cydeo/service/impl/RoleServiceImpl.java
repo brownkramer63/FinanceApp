@@ -59,10 +59,10 @@ public class RoleServiceImpl implements RoleService {
             long admin = userList.stream()
                     .filter(user -> user.getRole().getDescription().equals("Admin"))
                     .count();
-            if (admin==1){
-                RoleDTO convert = mapperUtil.convert(roleRepository.findById(2L), new RoleDTO());
-                return List.of(convert);
-            }
+//            if (admin==1){
+//                RoleDTO convert = mapperUtil.convert(roleRepository.findById(2L), new RoleDTO());
+//                return List.of(convert);
+//            }
             log.info("Users size: " + userList.size() + " - " +loggedInUser.getCompany().getTitle());
             return roleList.stream()
                     .filter(role -> !role.getDescription().equals("Root User"))

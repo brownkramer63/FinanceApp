@@ -1,5 +1,6 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.RoleDTO;
 import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.*;
 import com.cydeo.exception.UserNotFoundException;
@@ -110,7 +111,10 @@ public class UserServiceImpl implements UserService {
         User convertedUser = mapperUtil.convert(userDTO, new User());    // we have entity now
         convertedUser.setId(user.get().getId());                         //
         convertedUser.setPassword(user.get().getPassword());
-        convertedUser.setEnabled(true);                                   //jan11 added bug fix
+        convertedUser.setEnabled(true); //jan11 added bug fix
+        if (isOnlyAdmin(userDTO)) {                                      // when updating admin, saves as admin
+            convertedUser.setRole(user.get().getRole());
+        }
         userRepository.save(convertedUser);
         return mapperUtil.convert(convertedUser, new UserDTO());
     }
