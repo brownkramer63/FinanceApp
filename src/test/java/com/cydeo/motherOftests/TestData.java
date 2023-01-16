@@ -28,6 +28,8 @@ public class TestData {
     public static InvoiceProductDTO invoiceProductDTO;
     public static InvoiceDTO invoiceDTO;
 
+    public static AddressDTO addressDTO;
+
 
     static {
         //todo add other roles if need
@@ -49,11 +51,22 @@ public class TestData {
         companyDTO = CompanyDTO.builder()
                 .title("Test_Company")
                 .website("www.test.com")
-                .id(1L)
+                .id(5L)
                 .phone("+1 (111) 111-1111")
-                .companyStatus(CompanyStatus.ACTIVE)
-                .address(new AddressDTO())
+                .companyStatus(CompanyStatus.PASSIVE)
+                .address(addressDTO)
                 .build();
+
+        addressDTO = AddressDTO.builder()
+                .id(9L)
+                .addressLine1("Some address")
+                .addressLine2("Abc")
+                .city("Some city")
+                .state("Some state")
+                .country("France")
+                .zipCode("44455-33")
+                .build();
+
 
         categoryDTO = CategoryDTO.builder()
                 .company(companyDTO)
