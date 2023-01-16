@@ -2,14 +2,20 @@ package com.cydeo.motherOftests;
 
 import com.cydeo.dto.*;
 import com.cydeo.enums.*;
-import org.springframework.security.core.parameters.P;
-import org.thymeleaf.model.IStandaloneElementTag;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.List;
 
+@AutoConfigureTestDatabase
+@SqlGroup({
+        @Sql(value = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class TestData {
 
 
@@ -18,16 +24,13 @@ public class TestData {
     public static RoleDTO roleDTO;
     public static CategoryDTO categoryDTO;
     public static ClientVendorDTO clientVendorDTO;
-
     public static ProductDTO productDTO;
-
     public static InvoiceProductDTO invoiceProductDTO;
-
     public static InvoiceDTO invoiceDTO;
 
 
     static {
-        //todo add other roles
+        //todo add other roles if need
         roleDTO = RoleDTO.builder()
                 .description("Manager").build();
 
