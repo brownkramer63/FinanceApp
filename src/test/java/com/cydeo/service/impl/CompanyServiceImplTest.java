@@ -87,7 +87,7 @@ class CompanyServiceImplTest {
     @Test
     @Transactional
 //    @ValueSource(longs = {1L, 2L, 3L, 4L})
-    void activateDeactivateCompanyStatus(Long id) {
+    void activateDeactivateCompanyStatus() {
 
 //        CompanyDTO companyDTO = TestData.companyDTO;
 //        Mockito.when(companyService.findById(1L)).thenReturn(companyDTO);
@@ -117,9 +117,7 @@ class CompanyServiceImplTest {
 //        log.info("Updated object: " + companyRepository.findById(id).get().getAddress().getAddressLine1());
     }
 
-    @ParameterizedTest
-    @Transactional
-    @ValueSource(strings = {"root@cydeo.com", "admin@greentech.com", "manager@greentech.com", "employee@greentech.com"})
+    @Test
     void getCompaniesByLoggedInUserForRoot() {
 
     }
