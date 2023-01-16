@@ -61,11 +61,25 @@ class ClientVendorServiceImplIntegrationTest{
     }
 
     @Test
+    @Transactional
+    @WithMockUser(username = "manager@greentech.com", password = "Abc1", roles = "Manager")
     void delete() {
-    }
+    ClientVendorDTO testdto=TestData.clientVendorDTO;
+    testdto.setId(1L);
+    clientVendorService.delete(testdto.getId());
+    assertThat(testdto).isNotNull();
 
+
+    }
     @Test
+    @WithMockUser(username = "manager@greentech.com", password = "Abc1", roles = "Manager")
+    @Transactional
     void update() {
+       ClientVendorDTO clientVendorDTO= TestData.clientVendorDTO;
+       clientVendorDTO.setId(1L);
+       ClientVendorDTO updatedclientVendor= clientVendorService.update(clientVendorDTO);
+       assertThat(updatedclientVendor.getId()).isEqualTo(1L);
+        assertThat(updatedclientVendor.getClientVendorType()).isEqualTo(ClientVendorType.CLIENT);
     }
 
     @Test
@@ -79,14 +93,29 @@ class ClientVendorServiceImplIntegrationTest{
     }
 
     @Test
+    @WithMockUser(username = "manager@greentech.com", password = "Abc1", roles = "Manager")
+    @Transactional
     void findAllByClientVendorName() {
+       List<ClientVendor> clientVendor= clientVendorService.findAllByClientVendorName("Photobug Tech");
+       assertThat(clientVendor).hasSize(1);
+       assertThat(clientVendor.get(0).getClientVendorType()).isEqualTo(ClientVendorType.VENDOR);
     }
 
     @Test
+    @WithMockUser(username = "manager@greentech.com", password = "Abc1", roles = "Manager")
+    @Transactional
     void findAllClients() {
+        List<ClientVendorDTO> list=clientVendorService.findAllClients();
+        assertThat(list).hasSize(2);
+        assertThat(list.get(0).getClientVendorName()).isEqualTo("Orange Tech");
     }
 
     @Test
+    @WithMockUser(username = "manager@greentech.com", password = "Abc1", roles = "Manager")
+    @Transactional
     void findAllVendors() {
+        List<ClientVendorDTO> list=clientVendorService.findAllVendors();
+        assertThat(list).hasSize(2);
+        assertThat(list.get(0).getClientVendorName()).isEqualTo("Photobug Tech");
     }
 }
