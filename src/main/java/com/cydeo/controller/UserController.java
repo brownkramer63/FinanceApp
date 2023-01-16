@@ -1,6 +1,8 @@
 package com.cydeo.controller;
 
+import com.cydeo.dto.RoleDTO;
 import com.cydeo.dto.UserDTO;
+import com.cydeo.security.SecurityService;
 import com.cydeo.service.CompanyService;
 import com.cydeo.service.RoleService;
 import com.cydeo.service.UserService;
@@ -21,11 +23,13 @@ public class UserController {
     private final CompanyService companyService;
     private final RoleService roleService;
     private final UserService userService;
+    private final SecurityService securityService;
 
-    public UserController(CompanyService companyService, RoleService roleService, UserService userService) {
+    public UserController(CompanyService companyService, RoleService roleService, UserService userService, SecurityService securityService) {
         this.companyService = companyService;
         this.roleService = roleService;
         this.userService = userService;
+        this.securityService = securityService;
     }
 
     @GetMapping("/list")
@@ -65,18 +69,26 @@ public class UserController {
 
     @GetMapping("/update/{id}")
     public String updateUser(@PathVariable("id") Long id, RedirectAttributes redirectAttributes, Model model) {
+        UserDTO loggedInUser = securityService.getLoggedInUser();
         UserDTO userDTO = userService.findById(id);
+
         if (userDTO.isOnlyAdmin()) {
             String text = "This user is the only admin of" + userDTO.getCompany().getTitle() +
-                    "company. You cant change his/her company";
+                    "company. You can't change his/her company";
             redirectAttributes.addFlashAttribute("text", text);
             model.addAttribute("user", text);
-
         }
         model.addAttribute("user", userDTO);
-        model.addAttribute("userRoles", roleService.listRoles());
         model.addAttribute("companies", companyService.getCompaniesByLoggedInUserForRoot());
-        log.info("User with id:" + userDTO.getId()+ " and username: " + userDTO.getUsername()+ " is ready to be updated");
+
+        if (userDTO.getUsername().equals(loggedInUser.getUsername())) {
+
+            model.addAttribute("userRoles", new RoleDTO(2L, "Admin"));
+        }else{
+
+            model.addAttribute("userRoles", roleService.listRoles());
+        }
+        log.info("User with id:" + userDTO.getId() + " and username: " + userDTO.getUsername() + " is ready to be updated");
         return "user/user-update";
     }
 
@@ -90,7 +102,7 @@ public class UserController {
         }
         userDTO.setId(id);
         userService.update(userDTO);
-        log.info("User updated: "+ userDTO.getUsername());
+        log.info("User updated: " + userDTO.getUsername());
         return "redirect:/users/list";
     }
 
