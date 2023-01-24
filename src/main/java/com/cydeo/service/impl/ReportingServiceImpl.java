@@ -16,6 +16,7 @@ import com.cydeo.service.ReportingService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -133,7 +134,7 @@ public class ReportingServiceImpl implements ReportingService {
             totalQuantityOfProduct = totalQuantityOfProduct + each.getQuantity();
             totalPriceOfProduct = totalPriceOfProduct.add(each.getPrice());
         }
-        BigDecimal medianProductCost = totalPriceOfProduct.divide(BigDecimal.valueOf(totalQuantityOfProduct));
+        BigDecimal medianProductCost = totalPriceOfProduct.divide(BigDecimal.valueOf(totalQuantityOfProduct),2, RoundingMode.HALF_UP);
 //median cost found above
         BigDecimal profitOrLossPerInvoice = totalPriceWithTax.subtract(medianProductCost.multiply(BigDecimal.valueOf(quantityOfInvoiceProduct)));
 
