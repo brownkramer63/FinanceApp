@@ -22,18 +22,18 @@ services:                             # Which cantainers I need...
       - db
 
   db:                             # Second container...
-    image: postgres               # Use official postgres image to run my container
+    image: postgres:15.1              # Use official postgres image to run my container
     container_name: db
     networks:
       - sparkle-network        # Which network this container will use...
     ports:
-      - "5435:5432"                 # Container will expose 5433 outside, POSTGRES will connect with container on 5432
+      - "5435:5432"                 # Container will expose 5435 outside, POSTGRES will connect with container on 5432
     volumes:
       - .m2:/root/.m2             # Save my data inside hosting OS ".m2:/root/.m2 folder"
     environment:
       POSTGRES_USER: postgres     # Postgres inside this container has this credentials...
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: sparkle-db
+      POSTGRES_DB: sparkle-database
 
 networks:                         # Create this network so as our containers can communicate each other..
   sparkle-network:

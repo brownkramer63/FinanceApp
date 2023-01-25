@@ -15,6 +15,6 @@ RUN mvn package -Dmaven.test.skip
 #  Get openjdk image which is one of many choices for Java Applications..
 FROM adoptopenjdk/openjdk11
 #  Copy .jar file from builder and paste inside Container root folder -> /root/accounting.jar
-COPY --from=builder /app/target/accounting.jar /accounting.jar
-#  Inside Container, open a TERMINAL and run "java -jar accounting.jar" command -> This will run jar file
-ENTRYPOINT ["java","-jar","accounting.jar"]
+COPY --from=builder /app/target/sparkle-accounting.*jar /sparkle-accounting.jar
+#  Inside Container, open a TERMINAL and run "java -jar sparkle-accounting.jar" command -> This will run jar file
+ENTRYPOINT ["java","-jar","sparkle-accounting.jar"]
