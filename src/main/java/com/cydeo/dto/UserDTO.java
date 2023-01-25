@@ -21,6 +21,7 @@ public class UserDTO {
     "should be at least be 4 characters long and needs to contain 1 capital letter, 1 small letter and 1 special character or number.")
     private String password;
     @NotNull(message = "Password should match)")
+    @Pattern(regexp = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,}", message = "Passwords don't match")
     private String confirmPassword;
     @NotBlank(message = "First name is required field" )
     @Size(max = 50, min = 2, message ="must be between 2-50 characters long")
@@ -73,7 +74,7 @@ public class UserDTO {
     public void checkConfirmPassword() {
         if (this.password == null || this.confirmPassword == null) {
             return;
-        } else if (!this.password.equals(this.confirmPassword)) {
+        } else if (!this.confirmPassword.equals(this.password)) {
             this.confirmPassword = null;
         }
     }
