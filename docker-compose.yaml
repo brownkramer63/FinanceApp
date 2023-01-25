@@ -1,17 +1,60 @@
-
-#This docker compose aims to provide runnig postgresql for sparkle app without PGADMIN
-
-# Use credentials comes from application.properties
 version: '3.1'
-services:
-  db:
-    image: postgres
-    container_name: sparkle_database
+services:                             # Which cantainers I need...
+  app:                                # First container...
+    networks:                         # Which network this container will use...
+      - sparkle-network
+    container_name: sparkle-container
+    build:                            # This container does not have an image yet, create image from below
+      context: .                      # You can find Dockerfile in the same folder you are in...
+      dockerfile: Dockerfile          # Name of the dockerfile...
+    environment:                      # Attach this environment variables to my container
+      SPRING_PROFILES_ACTIVE: default # Which profile you want to use dev / test etc.
+      DATABASE_HOST: db               # Who is the host for database, localhost or do you have other container
+      DATABASE_PORT: 5432             # Database provider will be waiting us at 5433 - Other container's port
+      DATABASE_NAME: sparkle-database           # Database name
+      DATABASE_USERNAME: postgres     # Database username
+      DATABASE_PASSWORD: admin        # Database password
+      DATABASE_SSL: 'false'
+      SLEEP_LENGTH: 5
     ports:
-      - 5433:5432
+      - "8085:8085"                     # This container will connect with my application on 8080
+    depends_on:                       # Before running this container I need 'db' container ready..
+      - db
+
+  db:                             # Second container...
+    image: postgres               # Use official postgres image to run my container
+    container_name: db
+    networks:
+      - sparkle-network        # Which network this container will use...
+    ports:
+      - "5435:5432"                 # Container will expose 5433 outside, POSTGRES will connect with container on 5432
     volumes:
-      - .m2:/root/.m2
+      - .m2:/root/.m2             # Save my data inside hosting OS ".m2:/root/.m2 folder"
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: postgres     # Postgres inside this container has this credentials...
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: sparkle
+      POSTGRES_DB: sparkle-db
+
+networks:                         # Create this network so as our containers can communicate each other..
+  sparkle-network:
+
+volumes:                          # Create this volume so that containers can save persisting data in it..
+  db:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
