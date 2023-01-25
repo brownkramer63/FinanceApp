@@ -46,38 +46,25 @@ public class CategoryServiceImpl implements CategoryService {
         return mapperUtil.convert(category, new CategoryDTO());
     }
 
-    @Override
-    public CategoryDTO save(CategoryDTO categoryDTO) {
-
-
-        //company of logged in user
+     @Override
+   public CategoryDTO save(CategoryDTO categoryDTO) {
         CompanyDTO companyDTO = companyService.getCompanyByLoggedInUser();
-        log.info("category belongs to company : " + companyDTO.getTitle());
         categoryDTO.setCompany(companyDTO);
-        log.info("category updated for company : " + categoryDTO.getCompany().getTitle());
         Category category = mapperUtil.convert(categoryDTO, new Category());
-
-
         List<Category> list = categoryRepository.findAllByIsDeletedAndCompanyId(false, companyDTO.getId());
-
-        // list of categories : computer and Phone
-
-
-        //find all description of categories of the company
-        List<String> descList = list.stream().map(Category::getDescription).collect(Collectors.toList());
-        //  list of categories : computer and Phone
-
+        List<String> descList1 = list.stream().map(Category::getDescription).collect(Collectors.toList());
+        List<String> descList=descList1.stream().map(String::toLowerCase).collect(Collectors.toList());
         Category savedCategory;
-
-        if (descList.contains(category.getDescription().toLowerCase())) { // category is exist
-            return categoryDTO;
-        } else {
+        if (!(descList.contains(category.getDescription().toLowerCase()))) {
             savedCategory = categoryRepository.save(category);
-
-
+            return mapperUtil.convert(savedCategory, new CategoryDTO());
+        } else{
+            return categoryDTO;
         }
-        return mapperUtil.convert(savedCategory, new CategoryDTO());
+
     }
+
+
 
 
     @Override
