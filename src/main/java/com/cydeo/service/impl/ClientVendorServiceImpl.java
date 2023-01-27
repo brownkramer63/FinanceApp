@@ -146,15 +146,6 @@ public class ClientVendorServiceImpl implements ClientVendorService {
         return false;
     }
 
-    @Override
-    public boolean findIfCompanyNameExists(ClientVendorDTO clientVendorDTO) {
-        String name= clientVendorDTO.getClientVendorName();
-   List<ClientVendor> list = clientVendorRepository.findAll().stream().filter(clientVendor -> clientVendor.getClientVendorName().equals(name)).collect(Collectors.toList());
-   if (list.size()>0){
-       return true;
-   }
-        return false;
-    }
 
     @Override
     public Optional<ClientVendor> findClientVendorById(Long id) {

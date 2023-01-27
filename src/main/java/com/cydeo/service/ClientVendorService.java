@@ -31,7 +31,6 @@ public interface ClientVendorService {
 
     boolean findIfCompanyHasOpenInvoices(Long id);
 
-    boolean findIfCompanyNameExists(ClientVendorDTO clientVendorDTO);
 
     Optional<ClientVendor> findClientVendorById(Long id);
 
