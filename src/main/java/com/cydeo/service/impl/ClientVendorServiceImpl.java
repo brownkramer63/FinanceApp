@@ -146,6 +146,7 @@ public class ClientVendorServiceImpl implements ClientVendorService {
         return false;
     }
 
+
     @Override
     public Optional<ClientVendor> findClientVendorById(Long id) {
         return clientVendorRepository.findById(id);

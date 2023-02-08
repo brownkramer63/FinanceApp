@@ -97,7 +97,6 @@ public class ClientVendorController {
     }
     @GetMapping("/delete/{id}") //replaced clientVendorId with id
     public String deleteClientVendorById(@PathVariable("id") Long clientVendorId, RedirectAttributes redirectAttributes, Model model) throws IllegalAccessException {
-    //    if (clientVendorService.findIfCompanyHasOpenInvoices(clientVendorService.findClientVendorById(clientVendorId).get().getCompany())){
         if (clientVendorService.findIfCompanyHasOpenInvoices(clientVendorId)){
             String error="cannot delete client/vendor linked to open invoice";
             redirectAttributes.addFlashAttribute("error", error);
