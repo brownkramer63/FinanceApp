@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO findById(Long id) {
 
-        Product  product = productRepository.findById(id).get();
+        Product product = productRepository.findById(id).get();
         return mapperUtil.convert(product, new ProductDTO());
 
 
@@ -39,16 +39,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDTO> listAllProducts() {
-        CompanyDTO companyDTO=companyService.getCompanyByLoggedInUser();
-        List<Product>  productList = productRepository.findAllByIsDeletedOrderByCategoryAsc(false);
-        List<Product> filteredList=productList.stream()
+        CompanyDTO companyDTO = companyService.getCompanyByLoggedInUser();
+        List<Product> productList = productRepository.findAllByIsDeletedOrderByCategoryAsc(false);
+        List<Product> filteredList = productList.stream()
                 .filter(product -> product
                         .getCategory()
-                        .getCompany().getId()==(companyDTO.getId()))
+                        .getCompany().getId() == (companyDTO.getId()))
                 .collect(Collectors.toList());
 
         //log.info(filteredList(1));
-        return filteredList.stream().map(product-> mapperUtil.convert(product, new ProductDTO()))
+        return filteredList.stream().map(product -> mapperUtil.convert(product, new ProductDTO()))
                 .collect(Collectors.toList());
     }
 
@@ -81,13 +81,13 @@ public class ProductServiceImpl implements ProductService {
 
 
     }
+
     @Override
-    public List<ProductUnit> listAllEnums(){
-       // List<ProductUnit> productUnits= Arrays.asList(ProductUnit.class.getEnumConstants());
-        List<ProductUnit> productUnits= Arrays.asList(ProductUnit.values());
+    public List<ProductUnit> listAllEnums() {
+        // List<ProductUnit> productUnits= Arrays.asList(ProductUnit.class.getEnumConstants());
+        List<ProductUnit> productUnits = Arrays.asList(ProductUnit.values());
         return productUnits;
     }
-
 
 
 }

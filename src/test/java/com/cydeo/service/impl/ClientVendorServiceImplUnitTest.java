@@ -43,13 +43,13 @@ class ClientVendorServiceImplUnitTest {
     @Mock
     MapperUtil mapperUtil;
 
-     @Mock
-     SecurityService securityService;
+    @Mock
+    SecurityService securityService;
 
-     @Mock
+    @Mock
     InvoiceRepository invoiceRepository;
 
-     @Mock
+    @Mock
     CompanyService companyService;
 
 
@@ -57,18 +57,18 @@ class ClientVendorServiceImplUnitTest {
     @DisplayName("find clientVendor by id test")
     void findClientVendorByIdTest() {
         //stubbing
-     //Given both parts of method in serviceimpl we are trying to test
+        //Given both parts of method in serviceimpl we are trying to test
         when(clientVendorRepository.findById(anyLong())).thenReturn(Optional.of(new ClientVendor()));
-       when(mapperUtil.convert(any(ClientVendor.class),any(ClientVendorDTO.class))).thenReturn(new ClientVendorDTO());
+        when(mapperUtil.convert(any(ClientVendor.class), any(ClientVendorDTO.class))).thenReturn(new ClientVendorDTO());
 
-     //when   we are running the method we want to test with the parameters it takes
-        ClientVendorDTO clientVendorDTO= clientVendorService.findById(anyLong());
+        //when   we are running the method we want to test with the parameters it takes
+        ClientVendorDTO clientVendorDTO = clientVendorService.findById(anyLong());
 
         //then
         //since we have two parts to this method make sure we run them in order
         InOrder inOrder = inOrder(clientVendorRepository, mapperUtil);
         inOrder.verify(clientVendorRepository).findById(anyLong());
-        inOrder.verify(mapperUtil).convert(any(ClientVendor.class),any(ClientVendorDTO.class));
+        inOrder.verify(mapperUtil).convert(any(ClientVendor.class), any(ClientVendorDTO.class));
 
         //then we have our assertions
         assertNotNull(clientVendorDTO);
