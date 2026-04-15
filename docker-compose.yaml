@@ -1,45 +1,61 @@
-version: '3.1'
-services:                             # Which cantainers I need...
-  app:                                # First container...
-    networks:                         # Which network this container will use...
-      - sparkle-network
-    container_name: sparkle-container
-    build:                            # This container does not have an image yet, create image from below
-      context: .                      # You can find Dockerfile in the same folder you are in...
-      dockerfile: Dockerfile          # Name of the dockerfile...
-    environment:                      # Attach this environment variables to my container
-      SPRING_PROFILES_ACTIVE: default # Which profile you want to use dev / test etc.
-      DATABASE_HOST: db               # Who is the host for database, localhost or do you have other container
-      DATABASE_PORT: 5432             # Database provider will be waiting us at 5433 - Other container's port
-      DATABASE_NAME: sparkle-database           # Database name
-      DATABASE_USERNAME: postgres     # Database username
-      DATABASE_PASSWORD: admin        # Database password
-      DATABASE_SSL: 'false'
-      SLEEP_LENGTH: 5
-    ports:
-      - "8085:8085"                     # This container will connect with my application on 8080
-    depends_on:                       # Before running this container I need 'db' container ready..
-      - db
+version: "3.9"
 
-  db:                             # Second container...
-    image: postgres:15.1              # Use official postgres image to run my container
-    container_name: db
-    networks:
-      - sparkle-network        # Which network this container will use...
+services:
+  app:
+    container_name: sparkle-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
-      - "5435:5432"                 # Container will expose 5435 outside, POSTGRES will connect with container on 5432
-    volumes:
-      - .m2:/root/.m2             # Save my data inside hosting OS ".m2:/root/.m2 folder"
+      - "${SERVER_PORT:-8085}:8085"
     environment:
-      POSTGRES_USER: postgres     # Postgres inside this container has this credentials...
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: sparkle-database
+      SERVER_PORT: 8085
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-sparkle_accounting}
+      DB_USERNAME: ${DB_USERNAME:-sparkle}
+      DB_PASSWORD: ${DB_PASSWORD:-sparkle123}
+      DB_SSL: "false"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: never
+      ADDRESS_API_TOKEN: ${ADDRESS_API_TOKEN:-change-me}
+      ADDRESS_API_EMAIL: ${ADDRESS_API_EMAIL:-change-me@example.com}
+      ADDRESS_API_URL: ${ADDRESS_API_URL:-https://www.universal-tutorial.com/api}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - sparkle-network
 
-networks:                         # Create this network so as our containers can communicate each other..
+  mysql:
+    image: mysql:8.4
+    container_name: sparkle-mysql
+    restart: unless-stopped
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-sparkle_accounting}
+      MYSQL_USER: ${DB_USERNAME:-sparkle}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-sparkle123}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
+    command: --default-authentication-plugin=caching_sha2_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD:-root123}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - sparkle-network
+
+networks:
   sparkle-network:
 
-volumes:                          # Create this volume so that containers can save persisting data in it..
-  db:
+volumes:
+  mysql-data:
 
 
 

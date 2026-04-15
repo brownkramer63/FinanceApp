@@ -1,0 +1,5 @@
+target/
+.idea/
+.codex_tmp/
+app-transfer.tar.gz
+*.log
